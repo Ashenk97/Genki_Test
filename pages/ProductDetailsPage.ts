@@ -1,4 +1,5 @@
 import { Locator, Page, expect } from '@playwright/test';
+import { AUTH_MESSAGES } from '../fixtures/test-data';
 import { BasePage } from './BasePage';
 
 /**
@@ -113,5 +114,10 @@ export class ProductDetailsPage extends BasePage {
   async expectAddToCartVisible(): Promise<void> {
     await expect(this.addToCartButton).toBeVisible();
     await expect(this.addToCartButton).toBeEnabled();
+  }
+
+  /** Assert the success toast after adding an item to the cart. */
+  async expectAddedToCart(): Promise<void> {
+    await this.expectToast(AUTH_MESSAGES.addedToCartToast, 'success');
   }
 }
