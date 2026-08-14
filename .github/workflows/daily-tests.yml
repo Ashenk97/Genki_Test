@@ -1,0 +1,58 @@
+name: Daily Playwright Tests with Allure
+
+on:
+  schedule:
+    - cron: '0 2 * * *' # Runs daily at 2:00 AM UTC
+  workflow_dispatch: # Allows you to trigger it manually anytime!
+
+jobs:
+  test-and-report:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps
+
+      - name: Run Playwright tests
+        run: npx playwright test
+        continue-on-error: true # Crucial: Keeps running so the report generates
+        env:
+          GENKI_TEST_EMAIL: ${{ secrets.GENKI_TEST_EMAIL }}
+          GENKI_TEST_PASSWORD: ${{ secrets.GENKI_TEST_PASSWORD }}
+          GENKI_TEST_DISPLAY_NAME: ${{ secrets.GENKI_TEST_DISPLAY_NAME }}
+
+      - name: Get Allure history
+        uses: actions/checkout@v4
+        if: always()
+        continue-on-error: true
+        with:
+          ref: gh-pages
+          path: gh-pages
+
+      - name: Generate Allure Report
+        uses: simple-elf/allure-report-action@master
+        if: always()
+        with:
+          allure_results: allure-results
+          gh_pages: gh-pages
+          allure_report: allure-report
+          allure_history: allure-history
+
+      - name: Deploy report to Github Pages
+        uses: peaceiris/actions-gh-pages@v3
+        if: always()
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_branch: gh-pages
+          publish_dir: allure-history
