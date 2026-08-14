@@ -1,0 +1,22 @@
+{
+  "name": "genki-wardrobe-e2e",
+  "version": "1.0.0",
+  "description": "End-to-end UI test automation for Genki Wardrobe (Playwright + TypeScript + POM)",
+  "private": true,
+  "scripts": {
+    "test": "playwright test",
+    "test:headed": "playwright test --headed",
+    "test:ui": "playwright test --ui",
+    "test:debug": "playwright test --debug",
+    "test:chromium": "playwright test --project=chromium",
+    "test:firefox": "playwright test --project=firefox",
+    "test:webkit": "playwright test --project=webkit",
+    "report": "playwright show-report",
+    "codegen": "playwright codegen https://staging.genkiwardrobe.com/"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.62.1",
+    "@types/node": "^22.15.29",
+    "typescript": "^7.0.2"
+  }
+}

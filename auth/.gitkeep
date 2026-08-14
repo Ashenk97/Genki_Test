@@ -1,0 +1,5 @@
+# Playwright authentication state files are stored here.
+# Example: storageState.json generated via globalSetup or auth setup projects.
+#
+# This directory is intentionally empty at bootstrap time.
+# Add .gitkeep so the folder is tracked by version control.
