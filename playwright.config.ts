@@ -15,7 +15,11 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
   workers: process.env.CI ? 2 : undefined,
-  reporter: [['html', { open: 'never' }], ['list']],
+  reporter: [
+    ['html', { open: 'never' }],
+    ['list'],
+    ['allure-playwright'],
+  ],
   use: {
     baseURL: 'https://staging.genkiwardrobe.com/',
     trace: 'retain-on-failure',
