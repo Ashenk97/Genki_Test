@@ -1,4 +1,9 @@
+import path from 'path';
+import { config as loadEnv } from 'dotenv';
 import { defineConfig, devices } from '@playwright/test';
+
+// Load local secrets (GENKI_TEST_EMAIL / GENKI_TEST_PASSWORD) before tests import fixtures.
+loadEnv({ path: path.resolve(__dirname, '.env') });
 
 /**
  * Playwright configuration for Genki Wardrobe E2E tests.
@@ -20,6 +25,13 @@ export default defineConfig({
     navigationTimeout: 30_000,
   },
   projects: [
+    {
+      name: 'chrome',
+      use: {
+        ...devices['Desktop Chrome'],
+        channel: 'chrome',
+      },
+    },
     {
       name: 'chromium',
       use: { ...devices['Desktop Chrome'] },

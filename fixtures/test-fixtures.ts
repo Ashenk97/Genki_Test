@@ -1,6 +1,12 @@
 import { test as base } from '@playwright/test';
+import { AccountDashboardPage } from '../pages/AccountDashboardPage';
+import { CollectionPage } from '../pages/CollectionPage';
+import { ForgotPasswordPage } from '../pages/ForgotPasswordPage';
+import { Header } from '../pages/Header';
 import { HomePage } from '../pages/HomePage';
+import { LoginPage } from '../pages/LoginPage';
 import { ProductDetailsPage } from '../pages/ProductDetailsPage';
+import { RegisterPage } from '../pages/RegisterPage';
 
 /**
  * Extended test fixture that injects pre-instantiated page objects.
@@ -10,6 +16,12 @@ import { ProductDetailsPage } from '../pages/ProductDetailsPage';
 type GenkiFixtures = {
   homePage: HomePage;
   productDetailsPage: ProductDetailsPage;
+  header: Header;
+  collectionPage: CollectionPage;
+  loginPage: LoginPage;
+  registerPage: RegisterPage;
+  forgotPasswordPage: ForgotPasswordPage;
+  accountDashboardPage: AccountDashboardPage;
 };
 
 export const test = base.extend<GenkiFixtures>({
@@ -19,6 +31,30 @@ export const test = base.extend<GenkiFixtures>({
 
   productDetailsPage: async ({ page }, use) => {
     await use(new ProductDetailsPage(page));
+  },
+
+  header: async ({ page }, use) => {
+    await use(new Header(page));
+  },
+
+  collectionPage: async ({ page }, use) => {
+    await use(new CollectionPage(page));
+  },
+
+  loginPage: async ({ page }, use) => {
+    await use(new LoginPage(page));
+  },
+
+  registerPage: async ({ page }, use) => {
+    await use(new RegisterPage(page));
+  },
+
+  forgotPasswordPage: async ({ page }, use) => {
+    await use(new ForgotPasswordPage(page));
+  },
+
+  accountDashboardPage: async ({ page }, use) => {
+    await use(new AccountDashboardPage(page));
   },
 });
 

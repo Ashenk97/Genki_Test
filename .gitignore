@@ -6,4 +6,6 @@ blob-report/
 .auth/
 *.log
 .env
-.env.*
+.env.local
+.env.*.local
+!.env.example

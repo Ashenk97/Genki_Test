@@ -5,16 +5,28 @@ test.describe('Homepage navigation', () => {
     homePage,
   }) => {
     await homePage.open();
-
-    await expect(homePage.page).toHaveTitle(/genki/i);
-
-    const prominentHeading = homePage.featuredSectionHeading.or(homePage.heroHeading);
-    await expect(prominentHeading.first()).toBeVisible();
+    await homePage.expectLoaded();
 
     const productPage = await homePage.openFirstProduct();
 
     await expect(productPage.productTitle).toBeVisible();
+    await expect(productPage.page).toHaveURL(/\/products\//);
     await productPage.selectFirstAvailableSize();
     await productPage.expectAddToCartVisible();
+  });
+
+  test('should add a product to the cart and show a success toast', async ({
+    homePage,
+    header,
+  }) => {
+    await homePage.open();
+    await homePage.expectLoaded();
+
+    const productPage = await homePage.openFirstProduct();
+    await productPage.selectFirstAvailableSize();
+    await productPage.expectAddToCartVisible();
+    await productPage.addToCart();
+    await productPage.expectAddedToCart();
+    await expect(header.cartButton).toHaveAttribute('aria-label', /open cart,\s*\d+\s*item/i);
   });
 });

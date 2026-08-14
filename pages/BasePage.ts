@@ -44,6 +44,22 @@ export class BasePage {
     await expect(this.page).toHaveTitle(title);
   }
 
+  /**
+   * Assert a Sonner toast popup is visible with the expected copy.
+   * Optional `type` narrows to `.toast-success` or `.toast-error`.
+   */
+  async expectToast(
+    message: string | RegExp,
+    type?: 'success' | 'error',
+  ): Promise<void> {
+    const toastRoot = type
+      ? this.page.locator(`[data-sonner-toast].toast-${type}`)
+      : this.page.locator('[data-sonner-toast]');
+    await expect(toastRoot.filter({ hasText: message }).first()).toBeVisible({
+      timeout: 15_000,
+    });
+  }
+
   /** Return a locator scoped to the main landmark region. */
   protected get mainContent(): Locator {
     return this.page.getByRole('main');
