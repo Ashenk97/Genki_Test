@@ -19,6 +19,7 @@ export interface WaitForMessageOptions {
   readonly timeoutMs?: number;
   readonly pollMs?: number;
   readonly subjectIncludes?: string;
+  readonly bodyIncludes?: string;
 }
 
 export interface MailTmDomain {

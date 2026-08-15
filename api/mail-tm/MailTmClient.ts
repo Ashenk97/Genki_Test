@@ -80,15 +80,38 @@ export async function waitForMessage(
     ).json()) as MailTmHydraCollection<MailMessageSummary>;
 
     const messages = list['hydra:member'] ?? [];
-    const match = options.subjectIncludes
-      ? messages.find((m) =>
-          (m.subject ?? '').toLowerCase().includes(options.subjectIncludes!.toLowerCase()),
-        )
-      : messages[0];
+    let candidates = messages;
+    if (options.subjectIncludes) {
+      const needle = options.subjectIncludes.toLowerCase();
+      candidates = messages.filter((m) =>
+        (m.subject ?? '').toLowerCase().includes(needle),
+      );
+    }
 
-    if (match?.id) {
+    for (const summary of candidates) {
+      if (!summary?.id) {
+        continue;
+      }
+      const full = (await (
+        await mailFetch(`/messages/${summary.id}`, {
+          headers: { Authorization: `Bearer ${mailbox.token}` },
+        })
+      ).json()) as MailMessage;
+
+      if (options.bodyIncludes) {
+        const body = getMessageBody(full).toLowerCase();
+        if (!body.includes(options.bodyIncludes.toLowerCase())) {
+          continue;
+        }
+      }
+
+      return full;
+    }
+
+    // Fallback: if no subject filter, return first message once available.
+    if (!options.subjectIncludes && !options.bodyIncludes && messages[0]?.id) {
       return (await (
-        await mailFetch(`/messages/${match.id}`, {
+        await mailFetch(`/messages/${messages[0].id}`, {
           headers: { Authorization: `Bearer ${mailbox.token}` },
         })
       ).json()) as MailMessage;
@@ -99,8 +122,35 @@ export async function waitForMessage(
 
   throw new Error(
     `No email received at ${mailbox.address} within ${timeoutMs}ms` +
-      (options.subjectIncludes ? ` (subject includes "${options.subjectIncludes}")` : ''),
+      (options.subjectIncludes ? ` (subject includes "${options.subjectIncludes}")` : '') +
+      (options.bodyIncludes ? ` (body includes "${options.bodyIncludes}")` : ''),
   );
+}
+
+export function getMessageBody(message: MailMessage): string {
+  const html = Array.isArray(message.html) ? message.html.join('\n') : (message.html ?? '');
+  return `${message.subject ?? ''}\n${message.intro ?? ''}\n${message.text ?? ''}\n${html}`;
+}
+
+export function expectOrderConfirmationEmail(
+  message: MailMessage,
+  orderId: string,
+): void {
+  const subject = message.subject ?? '';
+  if (!/order confirmation/i.test(subject)) {
+    throw new Error(`Expected order confirmation subject, got: "${subject}"`);
+  }
+  if (!subject.includes(orderId)) {
+    throw new Error(`Expected subject to include ${orderId}, got: "${subject}"`);
+  }
+
+  const body = getMessageBody(message);
+  if (!body.includes(orderId)) {
+    throw new Error(`Order confirmation email body missing order id ${orderId}`);
+  }
+  if (!/order confirmation|thank you|order/i.test(body)) {
+    throw new Error('Order confirmation email body missing expected confirmation copy');
+  }
 }
 
 export function extractConfirmLink(message: MailMessage): string {
