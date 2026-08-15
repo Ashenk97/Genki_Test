@@ -1,12 +1,19 @@
 import { test as base } from '@playwright/test';
 import { AccountDashboardPage } from '../pages/AccountDashboardPage';
+import { CartPage } from '../pages/CartPage';
+import { CheckoutPage } from '../pages/CheckoutPage';
 import { CollectionPage } from '../pages/CollectionPage';
+import { Footer } from '../pages/Footer';
 import { ForgotPasswordPage } from '../pages/ForgotPasswordPage';
 import { Header } from '../pages/Header';
 import { HomePage } from '../pages/HomePage';
 import { LoginPage } from '../pages/LoginPage';
+import { PayHereCheckout } from '../pages/PayHereCheckout';
 import { ProductDetailsPage } from '../pages/ProductDetailsPage';
 import { RegisterPage } from '../pages/RegisterPage';
+import { ResetPasswordPage } from '../pages/ResetPasswordPage';
+import { RewardsPage } from '../pages/RewardsPage';
+import { WishlistPage } from '../pages/WishlistPage';
 
 type GenkiFixtures = {
   homePage: HomePage;
@@ -16,7 +23,14 @@ type GenkiFixtures = {
   loginPage: LoginPage;
   registerPage: RegisterPage;
   forgotPasswordPage: ForgotPasswordPage;
+  resetPasswordPage: ResetPasswordPage;
   accountDashboardPage: AccountDashboardPage;
+  footer: Footer;
+  cartPage: CartPage;
+  wishlistPage: WishlistPage;
+  checkoutPage: CheckoutPage;
+  rewardsPage: RewardsPage;
+  payHereCheckout: PayHereCheckout;
 };
 
 export const test = base.extend<GenkiFixtures>({
@@ -48,8 +62,36 @@ export const test = base.extend<GenkiFixtures>({
     await use(new ForgotPasswordPage(page));
   },
 
+  resetPasswordPage: async ({ page }, use) => {
+    await use(new ResetPasswordPage(page));
+  },
+
   accountDashboardPage: async ({ page }, use) => {
     await use(new AccountDashboardPage(page));
+  },
+
+  footer: async ({ page }, use) => {
+    await use(new Footer(page));
+  },
+
+  cartPage: async ({ page }, use) => {
+    await use(new CartPage(page));
+  },
+
+  wishlistPage: async ({ page }, use) => {
+    await use(new WishlistPage(page));
+  },
+
+  checkoutPage: async ({ page }, use) => {
+    await use(new CheckoutPage(page));
+  },
+
+  rewardsPage: async ({ page }, use) => {
+    await use(new RewardsPage(page));
+  },
+
+  payHereCheckout: async ({ page }, use) => {
+    await use(new PayHereCheckout(page));
   },
 });
 

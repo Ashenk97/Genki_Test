@@ -1,12 +1,26 @@
 import { Locator, Page, expect } from '@playwright/test';
 import { BasePage } from './BasePage';
+import { ProductDetailsPage } from './ProductDetailsPage';
 
 export class CollectionPage extends BasePage {
   readonly heading: Locator;
+  readonly productLinks: Locator;
+  readonly filterControls: Locator;
+  readonly sortControls: Locator;
 
   constructor(page: Page) {
     super(page);
     this.heading = page.getByRole('heading', { level: 1 }).first();
+    this.productLinks = page.locator('a[href^="/products/"]:not([href*="undefined"])');
+    this.filterControls = page.getByRole('button', { name: /filter|sort/i })
+      .or(page.getByLabel(/filter|sort/i))
+      .or(page.locator('select').filter({ hasText: /sort|filter/i }));
+    this.sortControls = page.getByRole('combobox', { name: /sort/i });
+  }
+
+  async open(path: string): Promise<void> {
+    await this.goto(path);
+    await this.waitForNetworkIdle();
   }
 
   async expectLoaded(path: string, heading: string | RegExp): Promise<void> {
@@ -17,8 +31,14 @@ export class CollectionPage extends BasePage {
   }
 
   async expectHasProducts(): Promise<void> {
-    const products = this.page.locator('a[href^="/products/"]:not([href*="undefined"])');
-    await expect(products.first()).toBeVisible();
-    await expect(products).not.toHaveCount(0);
+    await expect(this.productLinks.first()).toBeVisible();
+    await expect(this.productLinks).not.toHaveCount(0);
+  }
+
+  async openFirstProduct(): Promise<ProductDetailsPage> {
+    await this.productLinks.first().click();
+    await this.waitForPageLoad();
+    await this.acceptCookiesIfVisible();
+    return new ProductDetailsPage(this.page);
   }
 }

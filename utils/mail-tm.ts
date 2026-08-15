@@ -99,6 +99,18 @@ export async function waitForMessage(
 }
 
 export function extractConfirmLink(message: MailMessage): string {
+  return extractGenkiLink(message, /(confirm|verify|token|activat|email)/i, 'confirmation');
+}
+
+export function extractResetLink(message: MailMessage): string {
+  return extractGenkiLink(message, /(reset-password|reset|password|token)/i, 'password reset');
+}
+
+function extractGenkiLink(
+  message: MailMessage,
+  preferredPattern: RegExp,
+  purpose: string,
+): string {
   const html = Array.isArray(message.html) ? message.html.join('\n') : (message.html ?? '');
   const blob = `${html}\n${message.text ?? ''}\n${message.intro ?? ''}`;
   const urls = [...blob.matchAll(/https?:\/\/[^\s"'<>\\]+/gi)].map((m) =>
@@ -106,15 +118,12 @@ export function extractConfirmLink(message: MailMessage): string {
   );
 
   const preferred =
-    urls.find(
-      (url) =>
-        /genkiwardrobe\.com/i.test(url) &&
-        /(confirm|verify|token|activat|email)/i.test(url),
-    ) ?? urls.find((url) => /genkiwardrobe\.com/i.test(url));
+    urls.find((url) => /genkiwardrobe\.com/i.test(url) && preferredPattern.test(url)) ??
+    urls.find((url) => /genkiwardrobe\.com/i.test(url));
 
   if (!preferred) {
     throw new Error(
-      `No Genki confirmation link found in email "${message.subject ?? ''}". URLs: ${urls.join(', ') || '(none)'}`,
+      `No Genki ${purpose} link found in email "${message.subject ?? ''}". URLs: ${urls.join(', ') || '(none)'}`,
     );
   }
   return preferred;

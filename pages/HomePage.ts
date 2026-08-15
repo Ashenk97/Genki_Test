@@ -17,12 +17,17 @@ export class HomePage extends BasePage {
   readonly searchInput: Locator;
 
   readonly firstProductLink: Locator;
+  readonly heroSlider: Locator;
+  readonly heroSlides: Locator;
+  readonly heroNextButton: Locator;
+  readonly heroPrevButton: Locator;
+  readonly moodCategoryLinks: Locator;
 
   constructor(page: Page) {
     super(page);
     this.header = new Header(page);
 
-    this.heroBanner = page.locator('[class*="hero"], [class*="banner"], .swiper, .slider').first();
+    this.heroBanner = page.locator('.hero-slider-two, [class*="hero"], [class*="banner"], .swiper, .slider').first();
     this.heroHeading = page.getByRole('heading', { level: 1 }).first();
     this.featuredSectionHeading = page.getByRole('heading', {
       name: /cultural threads for every mood/i,
@@ -35,6 +40,15 @@ export class HomePage extends BasePage {
     this.searchInput = page.getByRole('searchbox', { name: /search products/i });
 
     this.firstProductLink = page.locator('a[href^="/products/"]:not([href*="undefined"])').first();
+    this.heroSlider = page.locator('.hero-slider-two .swiper').first();
+    this.heroSlides = page.locator(
+      '.hero-slider-two .swiper-slide:not(.swiper-slide-duplicate)',
+    );
+    this.heroNextButton = page.locator('.swiper-button-next.next-hero-swiper-two');
+    this.heroPrevButton = page.locator('.swiper-button-prev.prev-hero-swiper-two');
+    this.moodCategoryLinks = page.getByRole('link', {
+      name: /^(anime|culture|originals|jdm|kawaii)$/i,
+    });
   }
 
   async open(): Promise<void> {
@@ -75,5 +89,23 @@ export class HomePage extends BasePage {
     await this.waitForPageLoad();
     await this.acceptCookiesIfVisible();
     return new ProductDetailsPage(this.page);
+  }
+
+  async expectCarouselVisible(): Promise<void> {
+    await expect(this.heroSlider).toBeVisible();
+    await expect(this.heroSlides.first()).toBeVisible();
+    expect(await this.heroSlides.count()).toBeGreaterThan(1);
+  }
+
+  async clickCarouselNext(): Promise<void> {
+    await this.heroSlider.hover();
+    await this.heroNextButton.click({ force: true });
+  }
+
+  async activeSlideIndex(): Promise<string | null> {
+    return this.page
+      .locator('.hero-slider-two .swiper-slide-active')
+      .first()
+      .getAttribute('data-swiper-slide-index');
   }
 }

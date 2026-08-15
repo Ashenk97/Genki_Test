@@ -4,15 +4,21 @@ import { BasePage } from './BasePage';
 
 export class ProductDetailsPage extends BasePage {
   readonly productTitle: Locator;
+  readonly price: Locator;
   readonly sizeSelector: Locator;
   readonly colorSelector: Locator;
   readonly addToCartButton: Locator;
   readonly selectSizePrompt: Locator;
+  readonly addToWishlistButton: Locator;
+  readonly increaseQtyButton: Locator;
+  readonly decreaseQtyButton: Locator;
+  readonly qtyInput: Locator;
 
   constructor(page: Page) {
     super(page);
 
     this.productTitle = page.getByRole('heading', { level: 1 }).first();
+    this.price = page.getByText(/LKR\s*[\d,.]+/).first();
 
     this.sizeSelector = page.getByRole('radio', { name: /^(XS|S|M|L|XL|XXL|2XL|3XL)$/i }).first();
 
@@ -23,6 +29,12 @@ export class ProductDetailsPage extends BasePage {
 
     this.addToCartButton = page.getByRole('button', { name: /add to cart/i });
     this.selectSizePrompt = page.getByRole('button', { name: /select a size/i });
+    this.addToWishlistButton = page.getByRole('button', { name: /add to wishlist/i });
+    this.increaseQtyButton = page.locator('button.inc.qtybutton, button').filter({ hasText: /^\+$/ }).first();
+    this.decreaseQtyButton = page.locator('button.dec.qtybutton, button').filter({ hasText: /^-$/ }).first();
+    this.qtyInput = page.locator('input[type="text"][value], input[type="number"]').filter({
+      hasNot: page.locator('#mc-form-email'),
+    }).first();
   }
 
   async selectFirstAvailableSize(): Promise<void> {
@@ -109,5 +121,24 @@ export class ProductDetailsPage extends BasePage {
 
   async expectAddedToCart(): Promise<void> {
     await this.expectToast(AUTH_MESSAGES.addedToCartToast, 'success');
+  }
+
+  async expectProductDetailsVisible(): Promise<void> {
+    await expect(this.productTitle).toBeVisible();
+    await expect(this.price).toBeVisible();
+    await expect(this.addToCartButton.or(this.selectSizePrompt)).toBeVisible();
+  }
+
+  async addToWishlist(): Promise<void> {
+    await this.addToWishlistButton.click();
+  }
+
+  async increaseQuantity(): Promise<void> {
+    await this.increaseQtyButton.click();
+  }
+
+  async open(path: string): Promise<void> {
+    await this.goto(path);
+    await this.waitForNetworkIdle();
   }
 }
