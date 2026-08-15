@@ -8,6 +8,8 @@ blob-report/
 .auth/
 *.log
 .env
+.env.staging
+.env.production
 .env.local
 .env.*.local
 !.env.example

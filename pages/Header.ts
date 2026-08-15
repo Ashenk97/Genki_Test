@@ -2,10 +2,6 @@ import { Locator, Page, expect } from '@playwright/test';
 import { AUTH_MESSAGES } from '../fixtures/test-data';
 import { BasePage } from './BasePage';
 
-/**
- * Site-wide header: logo, desktop primary nav, and utility icons.
- * Dropdowns are CSS hover menus (`.sub-menu`) inside `nav.header-content__navigation`.
- */
 export class Header extends BasePage {
   readonly root: Locator;
   readonly desktopNav: Locator;
@@ -14,7 +10,6 @@ export class Header extends BasePage {
   readonly navWomen: Locator;
   readonly navCollections: Locator;
 
-  // ── Top bar (phone, WhatsApp, login, socials) ─────────────────────────────
   readonly phoneLink: Locator;
   readonly whatsappLink: Locator;
   readonly loginLink: Locator;
@@ -23,7 +18,6 @@ export class Header extends BasePage {
   readonly facebookLink: Locator;
   readonly instagramLink: Locator;
 
-  // ── Header icons ──────────────────────────────────────────────────────────
   readonly cartButton: Locator;
   readonly wishlistButton: Locator;
 
@@ -50,13 +44,11 @@ export class Header extends BasePage {
     this.wishlistButton = this.root.getByRole('button', { name: /open wishlist/i });
   }
 
-  /** Open the homepage so the header is in its default desktop state. */
   async openHome(): Promise<void> {
     await this.goto('/');
     await this.waitForNetworkIdle();
   }
 
-  /** Assert the top-bar utility links are present (phone, WhatsApp, socials). */
   async expectTopBarVisible(): Promise<void> {
     await expect(this.phoneLink).toBeVisible();
     await expect(this.whatsappLink).toBeVisible();
@@ -64,7 +56,6 @@ export class Header extends BasePage {
     await expect(this.instagramLink).toBeVisible();
   }
 
-  /** Assert the logo, primary nav items, and header icons are present. */
   async expectPrimaryNavVisible(): Promise<void> {
     await expect(this.logoLink).toBeVisible();
     await expect(this.navMen).toBeVisible();
@@ -74,10 +65,6 @@ export class Header extends BasePage {
     await expect(this.wishlistButton).toBeVisible();
   }
 
-  /**
-   * Assert an external / protocol header link without navigating away.
-   * WhatsApp and socials open in a new tab (`target=_blank`); the phone uses `tel:`.
-   */
   async expectUtilityHref(link: Locator, href: string, target?: string): Promise<void> {
     await expect(link).toBeVisible();
     await expect(link).toHaveAttribute('href', href);
@@ -86,20 +73,17 @@ export class Header extends BasePage {
     }
   }
 
-  /** Open the login page from the top-bar Login link. */
   async clickLogin(): Promise<void> {
     await this.loginLink.click();
     await this.waitForPageLoad();
     await this.acceptCookiesIfVisible();
   }
 
-  /** Scroll the header back into view so top-bar links are in the viewport. */
   async revealHeader(): Promise<void> {
     await this.page.evaluate(() => window.scrollTo(0, 0));
     await this.root.scrollIntoViewIfNeeded();
   }
 
-  /** Assert the guest header shows Login and hides account controls. */
   async expectLoggedOut(): Promise<void> {
     await this.revealHeader();
     await expect(this.loginLink).toBeVisible();
@@ -107,7 +91,6 @@ export class Header extends BasePage {
     await expect(this.accountLink).toHaveCount(0);
   }
 
-  /** Assert the signed-in header replaced Login with Logout and the account greeting. */
   async expectLoggedIn(displayName?: string): Promise<void> {
     await this.revealHeader();
     await expect(this.logoutLink).toBeVisible();
@@ -118,7 +101,6 @@ export class Header extends BasePage {
     }
   }
 
-  /** Open the signed-in account dashboard from the header greeting. */
   async openAccountDashboard(): Promise<void> {
     await this.revealHeader();
     await this.accountLink.click();
@@ -126,7 +108,6 @@ export class Header extends BasePage {
     await this.acceptCookiesIfVisible();
   }
 
-  /** Sign out from the header, assert the logout toast, then wait for Login. */
   async clickLogout(): Promise<void> {
     await this.logoutLink.click();
     await this.expectToast(AUTH_MESSAGES.logoutToast, 'success');
@@ -134,7 +115,6 @@ export class Header extends BasePage {
     await this.acceptCookiesIfVisible();
   }
 
-  /** Map a utility-link key from test data to its header locator. */
   utilityLink(name: string): Locator {
     const links: Record<string, Locator> = {
       phone: this.phoneLink,
@@ -151,30 +131,22 @@ export class Header extends BasePage {
     return link;
   }
 
-  /** Click the brand logo and wait for navigation. */
   async clickLogo(): Promise<void> {
     await this.logoLink.click();
     await this.waitForPageLoad();
     await this.acceptCookiesIfVisible();
   }
 
-  /** Click a top-level desktop nav item (Men, Women, or Collections). */
   async clickTopLevel(name: string): Promise<void> {
     await this.topLevelLink(name).click();
     await this.waitForPageLoad();
     await this.acceptCookiesIfVisible();
   }
 
-  /**
-   * Hover a top-level item to reveal its dropdown, then click a child link.
-   * Child names like "Hoodies" exist under both Men and Women, so the click
-   * is scoped to that category's submenu.
-   */
   async clickDropdownItem(category: string, itemName: string): Promise<void> {
     const menuItem = this.categoryItem(category);
     await this.topLevelLink(category).hover();
 
-    // Dropdown labels include a trailing arrow (e.g. "View All Women's →").
     const dropdownLink = menuItem.getByRole('link', { name: itemName });
 
     await expect(dropdownLink).toBeVisible();
@@ -183,12 +155,10 @@ export class Header extends BasePage {
     await this.acceptCookiesIfVisible();
   }
 
-  /** Open the cart drawer from the header icon. */
   async openCart(): Promise<void> {
     await this.cartButton.click();
   }
 
-  /** Open the wishlist drawer from the header icon. */
   async openWishlist(): Promise<void> {
     await this.wishlistButton.click();
   }
@@ -197,7 +167,6 @@ export class Header extends BasePage {
     return this.desktopNav.getByRole('link', { name: new RegExp(`^${escapeRegExp(name)}$`, 'i') });
   }
 
-  /** The listitem that wraps a top-level link and its submenu. */
   private categoryItem(name: string): Locator {
     return this.desktopNav.getByRole('listitem').filter({
       has: this.page.getByRole('link', { name: new RegExp(`^${escapeRegExp(name)}$`, 'i') }),

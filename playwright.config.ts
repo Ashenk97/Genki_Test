@@ -1,14 +1,11 @@
-import path from 'path';
-import { config as loadEnv } from 'dotenv';
 import { defineConfig, devices } from '@playwright/test';
+import { loadProjectEnv } from './fixtures/env';
+import { getEnvConfig } from './fixtures/environments';
 
-// Load local secrets (GENKI_TEST_EMAIL / GENKI_TEST_PASSWORD) before tests import fixtures.
-loadEnv({ path: path.resolve(__dirname, '.env') });
+loadProjectEnv();
 
-/**
- * Playwright configuration for Genki Wardrobe E2E tests.
- * @see https://playwright.dev/docs/test-configuration
- */
+const { baseURL } = getEnvConfig();
+
 export default defineConfig({
   testDir: './tests',
   fullyParallel: true,
@@ -20,7 +17,7 @@ export default defineConfig({
     ['allure-playwright'],
   ],
   use: {
-    baseURL: 'https://staging.genkiwardrobe.com/',
+    baseURL,
     trace: 'retain-on-failure',
     video: 'retain-on-failure',
     screenshot: 'only-on-failure',

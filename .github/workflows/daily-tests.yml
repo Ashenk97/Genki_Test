@@ -2,19 +2,31 @@ name: Daily Playwright Tests with Allure
 
 on:
   schedule:
-    - cron: '0 2 * * *' # Runs daily at 2:00 AM UTC
-  workflow_dispatch: # Allows you to trigger it manually anytime!
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+    inputs:
+      test_env:
+        description: Target site environment
+        required: true
+        default: staging
+        type: choice
+        options:
+          - staging
+          - production
 
 permissions:
   contents: write
 
 concurrency:
-  group: pages-deploy
+  group: pages-deploy-${{ github.event.inputs.test_env || 'staging' }}
   cancel-in-progress: false
 
 jobs:
   test-and-report:
     runs-on: ubuntu-latest
+    environment: ${{ github.event.inputs.test_env || 'staging' }}
+    env:
+      TEST_ENV: ${{ github.event.inputs.test_env || 'staging' }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -31,27 +43,27 @@ jobs:
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps
 
-      # Empty ${{ secrets.* }} means the secret is not configured in the repo.
-      - name: Verify staging credentials secrets
+      - name: Verify credentials secrets
         env:
           GENKI_TEST_EMAIL: ${{ secrets.GENKI_TEST_EMAIL }}
           GENKI_TEST_PASSWORD: ${{ secrets.GENKI_TEST_PASSWORD }}
         run: |
+          echo "TEST_ENV=${TEST_ENV}"
           missing=0
           for name in GENKI_TEST_EMAIL GENKI_TEST_PASSWORD; do
             if [ -z "${!name}" ]; then
-              echo "::error title=Missing Actions secret::$name is empty. Add it under Settings → Secrets and variables → Actions."
+              echo "::error title=Missing Actions secret::$name is empty for environment '${TEST_ENV}'. Add it under Settings → Environments → ${TEST_ENV} (or repo Actions secrets)."
               missing=1
             fi
           done
           if [ "$missing" -ne 0 ]; then
             exit 1
           fi
-          echo "Staging credential secrets are present."
+          echo "Credential secrets are present for ${TEST_ENV}."
 
       - name: Run Playwright tests
         run: npx playwright test
-        continue-on-error: true # Crucial: Keeps running so the report generates
+        continue-on-error: true
         env:
           GENKI_TEST_EMAIL: ${{ secrets.GENKI_TEST_EMAIL }}
           GENKI_TEST_PASSWORD: ${{ secrets.GENKI_TEST_PASSWORD }}
@@ -65,8 +77,6 @@ jobs:
           ref: gh-pages
           path: gh-pages
 
-      # simple-elf copies gh-pages/* (including .git) into allure-history from Docker
-      # as root. Strip git metadata first so the publish dir is not a nested repo.
       - name: Strip git metadata from history checkout
         if: always()
         run: rm -rf gh-pages/.git

@@ -2,9 +2,6 @@ import { Locator, Page, expect } from '@playwright/test';
 import { REGISTER_PAGE } from '../fixtures/test-data';
 import { BasePage } from './BasePage';
 
-/**
- * Customer registration page (`/register`) and the email-confirmation landing.
- */
 export class RegisterPage extends BasePage {
   readonly heading: Locator;
   readonly form: Locator;
@@ -58,7 +55,6 @@ export class RegisterPage extends BasePage {
     await expect(this.page.getByText(/we have sent an email/i)).toBeVisible();
   }
 
-  /** Assert the browser blocks submit when email is empty (HTML5 required). */
   async expectEmailRequired(): Promise<void> {
     await this.submitButton.click();
     await expect

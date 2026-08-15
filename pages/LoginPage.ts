@@ -2,9 +2,6 @@ import { Locator, Page, expect } from '@playwright/test';
 import { AUTH_MESSAGES, LOGIN_PAGE } from '../fixtures/test-data';
 import { BasePage } from './BasePage';
 
-/**
- * Customer login page (`/login`).
- */
 export class LoginPage extends BasePage {
   readonly heading: Locator;
   readonly form: Locator;
@@ -66,24 +63,16 @@ export class LoginPage extends BasePage {
     await this.submitButton.click();
   }
 
-  /**
-   * Fill credentials and submit. When `rememberMe` is true, checks the box first.
-   * Does not wait for navigation — specs assert success or error themselves.
-   */
   async login(email: string, password: string, rememberMe = false): Promise<void> {
     await this.fillCredentials(email, password);
     await this.setRememberMe(rememberMe);
     await this.submit();
   }
 
-  /** Assert an inline field validation message under the login form. */
   async expectValidationMessage(message: string | RegExp): Promise<void> {
     await expect(this.form.getByText(message)).toBeVisible();
   }
 
-  /**
-   * Assert auth failure: error toast popup + inline form message, still on /login.
-   */
   async expectInvalidCredentials(): Promise<void> {
     await this.expectToast(AUTH_MESSAGES.invalidCredentials, 'error');
     await expect(this.formErrorMessage).toBeVisible({ timeout: 15_000 });
@@ -92,10 +81,6 @@ export class LoginPage extends BasePage {
     await expect(this.submitButton).toBeVisible();
   }
 
-  /**
-   * Assert successful sign-in: success toast, homepage URL, and Genki title.
-   * Toast is checked first because Sonner notifications auto-dismiss.
-   */
   async expectLoginSuccess(): Promise<void> {
     await this.expectToast(AUTH_MESSAGES.loginSuccessToast, 'success');
     await expect(this.page).toHaveURL((url) => {
@@ -106,7 +91,6 @@ export class LoginPage extends BasePage {
     await this.acceptCookiesIfVisible();
   }
 
-  /** Toggle password visibility and assert the input type flips between password/text. */
   async toggleShowPassword(): Promise<void> {
     await expect(this.passwordInput).toHaveAttribute('type', 'password');
     await this.showPasswordButton.click();

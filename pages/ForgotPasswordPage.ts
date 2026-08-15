@@ -2,9 +2,6 @@ import { Locator, Page, expect } from '@playwright/test';
 import { FORGOT_PASSWORD_PAGE, AUTH_MESSAGES } from '../fixtures/test-data';
 import { BasePage } from './BasePage';
 
-/**
- * Forgot-password page opened from "Lost your password?" on login.
- */
 export class ForgotPasswordPage extends BasePage {
   readonly heading: Locator;
   readonly form: Locator;

@@ -2,7 +2,7 @@ import { AUTH_MESSAGES, TEST_DATA } from '../fixtures/test-data';
 import { test, expect } from '../fixtures/test-fixtures';
 import { randomEmail } from '../utils/random';
 
-// Staging rate-limits this account if invalid logins overlap a valid sign-in.
+// Avoid overlapping invalid + valid logins (rate limit).
 test.describe.configure({ mode: 'serial' });
 
 test.describe('Remember me', () => {
@@ -138,7 +138,6 @@ test.describe('Customer login', () => {
     await loginPage.open();
     await loginPage.expectLoaded();
     await loginPage.submit();
-    // Empty fields use inline validation under the inputs (no toast popup).
     await loginPage.expectValidationMessage(AUTH_MESSAGES.emailRequired);
     await loginPage.expectValidationMessage(AUTH_MESSAGES.passwordRequired);
     await loginPage.expectLoaded();

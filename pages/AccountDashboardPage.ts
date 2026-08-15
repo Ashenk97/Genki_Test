@@ -2,9 +2,6 @@ import { Locator, Page, expect } from '@playwright/test';
 import { ACCOUNT_DASHBOARD_PAGE } from '../fixtures/test-data';
 import { BasePage } from './BasePage';
 
-/**
- * Signed-in account dashboard (`/my-account/dashboard`).
- */
 export class AccountDashboardPage extends BasePage {
   readonly heading: Locator;
 

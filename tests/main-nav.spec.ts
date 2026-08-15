@@ -23,7 +23,6 @@ test.describe('Desktop main navigation', () => {
     }) => {
       await header.clickTopLevel(item.name);
       await collectionPage.expectLoaded(item.path, item.heading);
-      // Product grids live on category pages; the Collections hub lists collection tiles.
       if (item.path !== '/collection') {
         await collectionPage.expectHasProducts();
       }

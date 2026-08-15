@@ -2,9 +2,6 @@ import { Locator, Page, expect } from '@playwright/test';
 import { AUTH_MESSAGES } from '../fixtures/test-data';
 import { BasePage } from './BasePage';
 
-/**
- * Page object for an individual product detail page (PDP).
- */
 export class ProductDetailsPage extends BasePage {
   readonly productTitle: Locator;
   readonly sizeSelector: Locator;
@@ -28,7 +25,6 @@ export class ProductDetailsPage extends BasePage {
     this.selectSizePrompt = page.getByRole('button', { name: /select a size/i });
   }
 
-  /** Select the first available size option on the PDP. */
   async selectFirstAvailableSize(): Promise<void> {
     const sizeInput = this.page.locator('input[type="radio"]:not([name="product-color"])').first();
     const sizeId = await sizeInput.getAttribute('id');
@@ -43,13 +39,12 @@ export class ProductDetailsPage extends BasePage {
     await sizeInput.click({ force: true });
   }
 
-  /** Select a size by visible label (e.g. "M", "L", "XL"). */
   async selectSize(size: string): Promise<void> {
     const sizeInput = this.page
       .locator(`input[type="radio"][value="${size}" i], input[type="radio"]#${size}`)
       .first();
 
-    // label[for] must match the input's id, not its value attribute.
+    // Use input id for label[for], not value.
     const sizeId = await sizeInput.getAttribute('id');
     if (sizeId) {
       const label = this.page.locator(`label[for="${sizeId}"]`);
@@ -62,7 +57,6 @@ export class ProductDetailsPage extends BasePage {
     await sizeInput.click({ force: true });
   }
 
-  /** Select a color swatch or dropdown option by name. */
   async selectColor(color: string): Promise<void> {
     const colorOption = this.page.getByRole('button', { name: new RegExp(color, 'i') })
       .or(this.page.getByRole('radio', { name: new RegExp(color, 'i') }));
@@ -79,7 +73,6 @@ export class ProductDetailsPage extends BasePage {
       .first();
 
     if (await input.count()) {
-      // label[for] must match the input's id, not its value attribute.
       const inputId = await input.getAttribute('id');
       if (inputId) {
         const idLabel = this.page.locator(`label[for="${inputId}"]`);
@@ -105,18 +98,15 @@ export class ProductDetailsPage extends BasePage {
     }
   }
 
-  /** Click the primary "Add to Cart" CTA. */
   async addToCart(): Promise<void> {
     await this.addToCartButton.click();
   }
 
-  /** Assert the Add to Cart button is present and actionable. */
   async expectAddToCartVisible(): Promise<void> {
     await expect(this.addToCartButton).toBeVisible();
     await expect(this.addToCartButton).toBeEnabled();
   }
 
-  /** Assert the success toast after adding an item to the cart. */
   async expectAddedToCart(): Promise<void> {
     await this.expectToast(AUTH_MESSAGES.addedToCartToast, 'success');
   }

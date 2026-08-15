@@ -1,12 +1,5 @@
-/**
- * Shared test data constants.
- * Extend this file as new scenarios require structured input.
- *
- * Staging login credentials come from environment variables — never commit secrets.
- * Locally: copy `.env.example` to `.env`.
- * CI: set Actions secrets GENKI_TEST_EMAIL / GENKI_TEST_PASSWORD.
- */
 import { requiredEnv } from './env';
+import { getEnvConfig } from './environments';
 
 export type NavDestination = {
   name: string;
@@ -26,7 +19,9 @@ export type HeaderUtilityLink = {
 };
 
 export const TEST_DATA = {
-  baseUrl: 'https://staging.genkiwardrobe.com/',
+  get baseUrl() {
+    return getEnvConfig().baseURL;
+  },
   searchQueries: {
     valid: 'Berserk',
     invalid: 'xyznonexistentproduct123',
@@ -34,8 +29,6 @@ export const TEST_DATA = {
   product: {
     defaultSize: 'M',
   },
-  // Credentials resolve on access so non-auth specs can import this module
-  // without requiring GENKI_TEST_* to be set.
   auth: {
     get email() {
       return requiredEnv('GENKI_TEST_EMAIL');
@@ -53,14 +46,12 @@ export const TEST_DATA = {
   },
 } as const;
 
-/** Top-level desktop nav items and the collection page they open. */
 export const MAIN_NAV_TOP_LEVEL: readonly NavDestination[] = [
   { name: 'Men', path: '/collection/men', heading: /^Men's Wear$/i },
   { name: 'Women', path: '/collection/women', heading: /^Women's Wear$/i },
   { name: 'Collections', path: '/collection', heading: /^Collections$/i },
 ];
 
-/** Hover-dropdown children grouped by parent category. */
 export const MAIN_NAV_DROPDOWNS: readonly NavCategory[] = [
   {
     category: 'Men',
@@ -108,10 +99,6 @@ export const MAIN_NAV_DROPDOWNS: readonly NavCategory[] = [
   },
 ];
 
-/**
- * Top-bar links that must not be followed in-browser (tel / new-tab socials).
- * Specs assert href (and target) instead of clicking through.
- */
 export const HEADER_UTILITY_LINKS: readonly HeaderUtilityLink[] = [
   { name: 'phone', href: 'tel:0701002922' },
   { name: 'whatsapp', href: 'https://wa.me/94701002922', target: '_blank' },

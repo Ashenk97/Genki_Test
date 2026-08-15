@@ -8,11 +8,6 @@ import { LoginPage } from '../pages/LoginPage';
 import { ProductDetailsPage } from '../pages/ProductDetailsPage';
 import { RegisterPage } from '../pages/RegisterPage';
 
-/**
- * Extended test fixture that injects pre-instantiated page objects.
- * Import `test` and `expect` from this module instead of `@playwright/test`
- * to access POM instances directly in specs.
- */
 type GenkiFixtures = {
   homePage: HomePage;
   productDetailsPage: ProductDetailsPage;
