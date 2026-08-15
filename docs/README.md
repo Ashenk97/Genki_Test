@@ -2,6 +2,14 @@
 
 Open [`test-cases.csv`](./test-cases.csv) in Excel or Google Sheets for the living inventory of automated and planned Genki Wardrobe E2E cases.
 
+Regenerate from the source script:
+
+```bash
+npm run docs:cases
+```
+
+Related docs: [`BUG_REPORT.md`](./BUG_REPORT.md) (staging defects) · [`TODO.md`](./TODO.md) (follow-ups) · [root README](../README.md) (setup & scripts).
+
 ## Columns
 
 | Column | Description |
@@ -10,7 +18,7 @@ Open [`test-cases.csv`](./test-cases.csv) in Excel or Google Sheets for the livi
 | Name | Short unique case title |
 | Objective | Risk / behavior under test |
 | Priority | `P0` / `P1` / `P2` |
-| Labels | Tags such as `smoke`, `regression`, `auth`, `@email`, `checkout` |
+| Labels | Tags such as `smoke`, `regression`, `auth`, `@email`, `checkout`, `gift` |
 | Owner | Default `QA` |
 | Preconditions | Account, cart, or env setup |
 | Test Steps | Numbered steps |
@@ -26,4 +34,4 @@ Open [`test-cases.csv`](./test-cases.csv) in Excel or Google Sheets for the livi
 | `Partial` | Spec exists but does not fully meet the objective |
 | `Blocked` | Cannot automate yet (site bug, missing sandbox creds, etc.) |
 
-Update `Automation status` whenever a matching spec is added, changed, or blocked.
+Update `Automation status` whenever a matching spec is added, changed, or blocked. Gift / payment edge cases live under the Checkout area (labels include `gift`).

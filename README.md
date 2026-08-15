@@ -2,13 +2,9 @@
 
 <img src="https://readme-typing-svg.demolab.com?font=Fira+Code&weight=700&size=32&duration=2800&pause=1200&color=E11D48&center=true&vCenter=true&multiline=true&width=780&height=100&lines=GENKI+WARDROBE;%F0%9F%9A%80+E2E+Test+Automation" alt="Typing SVG" />
 
-<br/>
-
-<img src="https://media.giphy.com/media/26tn33aiTi1jkl6H6/giphy.gif" width="140" alt="rocket launch" />
-
 ### Production-ready UI tests for [Genki Wardrobe Staging](https://staging.genkiwardrobe.com/)
 
-**Playwright** · **TypeScript** · **Page Object Model** · **Cross-Browser**
+**Playwright** · **TypeScript** · **Page Object Model** · **Chrome + mobile + cross-browser**
 
 <br/>
 
@@ -16,11 +12,11 @@
 ![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white)
 ![Node.js](https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)
 ![POM](https://img.shields.io/badge/Pattern-Page%20Object%20Model-E11D48?style=for-the-badge)
-![Browsers](https://img.shields.io/badge/Browsers-Chromium%20%7C%20Firefox%20%7C%20WebKit-0EA5E9?style=for-the-badge)
+![Allure](https://img.shields.io/badge/Reporting-Allure-FF6A00?style=for-the-badge)
 
 <br/>
 
-[![Staging](https://img.shields.io/badge/🎯_Target-staging.genkiwardrobe.com-black?style=flat-square)](https://staging.genkiwardrobe.com/)
+[![Staging](https://img.shields.io/badge/Target-staging.genkiwardrobe.com-black?style=flat-square)](https://staging.genkiwardrobe.com/)
 [![Status](https://img.shields.io/badge/Status-Active_Development-brightgreen?style=flat-square&logo=github)](https://github.com)
 [![License](https://img.shields.io/badge/License-Private-red?style=flat-square)](#license)
 
@@ -28,266 +24,223 @@
 
 ---
 
-<p align="center">
-  <img src="https://capsule-render.vercel.app/api?type=waving&color=gradient&customColorList=12,14,6&height=120&section=header&text=&fontSize=40&animation=fadeIn&fontAlignY=35" width="100%" alt="wave header"/>
-</p>
+## Why this suite
 
-## ✨ Why This Suite Hits Different
+| Feature | What you get |
+|:--------|:-------------|
+| **POM + fixtures** | Locators/actions in `/pages`; specs stay thin via injected fixtures |
+| **Layered helpers** | Cart/checkout setup in `/helpers`; domain data in `/data` |
+| **Email flows** | mail.tm client for register confirm, password reset, order confirmation (`@email`) |
+| **Payments** | COD, bank transfer, PayHere sandbox card success/decline paths |
+| **Failure forensics** | Trace · video · screenshot retained on fail |
+| **CI** | Daily GitHub Actions run with Allure report publish |
 
-> Ship confidence with every click. This framework doesn't just click buttons — it **owns the UI** with clean POM architecture, typed fixtures, and failure artifacts that tell the full story.
-
-| 🔥 Feature | 💥 What You Get |
-|:-----------|:----------------|
-| **Cross-browser power** | Chromium · Firefox · WebKit — all in parallel |
-| **POM architecture** | Locators live in pages, specs stay razor-thin |
-| **Smart fixtures** | Page objects injected automatically into every test |
-| **Failure forensics** | Trace · Video · Screenshot retained on fail |
-| **CI-ready** | Retries, `forbidOnly`, capped workers when `CI=1` |
-
-<p align="center">
-  <img src="https://media.giphy.com/media/qgQUggACQPF6vfYTmJ/giphy.gif" width="220" alt="test automation energy"/>
-</p>
+**Default target:** [https://staging.genkiwardrobe.com/](https://staging.genkiwardrobe.com/) (`TEST_ENV=staging`)
 
 ---
 
-## 🧰 Tech Stack
-
-<div align="center">
+## Tech stack
 
 | Tool | Version | Purpose |
-|:----:|:-------:|:--------|
+|:-----|:-------:|:--------|
 | [@playwright/test](https://playwright.dev/) | `^1.62.1` | Browser automation, assertions, reporting |
 | [TypeScript](https://www.typescriptlang.org/) | `^7.0.2` | Type-safe tests & page objects |
-| [@types/node](https://www.npmjs.com/package/@types/node) | `^22.15.29` | Node.js type definitions |
+| [allure-playwright](https://www.npmjs.com/package/allure-playwright) | `^3.10.2` | Allure results for CI reporting |
+| [dotenv](https://www.npmjs.com/package/dotenv) | `^17.4.2` | Env loading for credentials / billing |
 
-</div>
-
-**Design pattern:** Page Object Model (POM) — UI locators and actions live in `/pages`; specs in `/tests` stay thin and readable.
-
-**Target environment:** [https://staging.genkiwardrobe.com/](https://staging.genkiwardrobe.com/)
+Path aliases (see `tsconfig.json`): `@pages/*`, `@fixtures/*`, `@helpers/*`, `@constants/*`, `@data/*`, `@api/*`, `@models/*`.
 
 ---
 
-## 🗂️ Project Structure
+## Project structure
 
 ```text
 Genki_Test/
-├── 🔐 auth/                      # Authentication state storage (future use)
-│   └── .gitkeep
-├── 📦 fixtures/
-│   ├── test-data.ts              # Shared constants and test input
-│   └── test-fixtures.ts          # Custom fixtures injecting POM instances
-├── 🧩 pages/
-│   ├── BasePage.ts               # Shared navigation & cookie handling
-│   ├── HomePage.ts               # Landing page POM
-│   └── ProductDetailsPage.ts     # Product detail page (PDP) POM
-├── 🧪 tests/
-│   └── navigation.spec.ts        # First E2E test
-├── 🛠️ utils/
-│   └── random.ts                 # Random string / email helpers
-├── ⚙️ playwright.config.ts        # Playwright runner configuration
-├── 📝 tsconfig.json               # TypeScript compiler options
-└── 📄 package.json
+├── api/mail-tm/              # Disposable inbox client (email specs)
+├── auth/                     # Reserved for Playwright storageState
+├── constants/                # Routes, timeouts, payment enums, env config
+├── data/                     # Auth, checkout, products, PayHere cards, nav copy
+├── docs/                     # Test-case CSV, bug report, TODOs
+├── fixtures/                 # Custom test fixtures + env loader
+├── helpers/                  # Cart / checkout / random helpers
+├── pages/                    # Page Object Model classes
+├── scripts/                  # generate-test-cases.mjs
+├── tests/                    # Playwright specs
+├── types/                    # Shared TypeScript models
+├── playwright.config.ts
+├── package.json
+└── .env.example
 ```
-
-### 📁 Folder Purposes
 
 | Folder | Purpose |
 |:-------|:--------|
-| **`/tests`** | Executable `.spec.ts` files. Each file groups related scenarios (e.g. navigation, checkout). Specs stay thin — delegate all UI interaction to page objects. |
-| **`/pages`** | Page Object Model classes. Each class encapsulates locators and actions for a single page or component. All pages inherit from `BasePage`. |
-| **`/fixtures`** | Custom Playwright fixtures that inject page objects into tests, plus structured test data and future state helpers. |
-| **`/utils`** | Framework-agnostic helpers (random emails/strings) not tied to a specific page. |
-| **`/auth`** | Reserved for Playwright `storageState` JSON when login flows land. |
+| **`/tests`** | `.spec.ts` scenarios by area (auth, cart, checkout, gift, nav, …) |
+| **`/pages`** | POM classes (inherit `BasePage`) |
+| **`/fixtures`** | Inject page objects; load `.env` / `.env.{TEST_ENV}` |
+| **`/helpers`** | Reusable flows (add sample product, start guest card checkout) |
+| **`/data`** | Test inputs and product paths |
+| **`/api`** | External APIs used by tests (mail.tm) |
+| **`/docs`** | Living test inventory, staging bug report, follow-ups |
+| **`/constants`** | Routes, messages, timeouts, payment methods |
 
 ---
 
-## ✅ Prerequisites
+## Prerequisites
 
-- **Node.js** ≥ 18
+- **Node.js** ≥ 18 (CI uses 20)
 - **npm** ≥ 9
+- Staging account credentials for logged-in flows (see `.env.example`)
 
 ---
 
-## 🚀 Getting Started — Launch Sequence
+## Getting started
 
 ```bash
-# 1️⃣  Install dependencies
+# 1. Install dependencies
 npm install
 
-# 2️⃣  Install Playwright browsers (first time only)
+# 2. Install Playwright browsers (first time only)
 npx playwright install
 
-# 3️⃣  Run the full suite (Chromium, Firefox, WebKit in parallel)
+# 3. Configure env (staging credentials + optional checkout overrides)
+cp .env.example .env.staging
+# Edit GENKI_TEST_EMAIL / GENKI_TEST_PASSWORD / GENKI_TEST_DISPLAY_NAME
+
+# 4. Default suite — Chrome desktop + mobile-chrome, excludes @email
 npm test
 
-# 🎯 Run a single browser
-npm run test:chromium
-
-# 🎮 Open the interactive UI mode
+# Interactive / debug
 npm run test:ui
+npm run test:debug
 
-# 📊 View the HTML report after a run
+# HTML report from last run
 npm run report
 ```
 
-<p align="center">
-  <img src="https://media.giphy.com/media/l0MYC0LajbaPoEADu/giphy.gif" width="260" alt="systems go"/>
-</p>
+---
+
+## NPM scripts
+
+| Command | Description |
+|:--------|:------------|
+| `npm test` | Chrome + mobile-chrome, headless, **excludes** `@email` |
+| `npm run test:headed` | Same as `test`, headed |
+| `npm run test:chrome` | Desktop Chrome only (no `@email`) |
+| `npm run test:mobile` | `mobile-chrome` project (mobile nav specs) |
+| `npm run test:chromium` / `test:firefox` / `test:webkit` | Single engine, no `@email` |
+| `npm run test:all` | All configured projects, no `@email` |
+| `npm run test:staging` | Force `TEST_ENV=staging` |
+| `npm run test:production` | Force `TEST_ENV=production` |
+| `npm run test:email` | Staging only — specs tagged `@email` |
+| `npm run typecheck` | `tsc --noEmit` |
+| `npm run report` | Open Playwright HTML report |
+| `npm run allure:generate` / `allure:open` / `allure:serve` | Allure report helpers |
+| `npm run codegen` | Record against staging |
+| `npm run docs:cases` | Regenerate `docs/test-cases.csv` |
+
+Email specs (`@email`) are **opt-in** via `npm run test:email` so disposable-inbox runs stay separate from the daily UI suite.
 
 ---
 
-## ⚙️ Configuration
+## Configuration
 
-Defined in `playwright.config.ts`:
+From `playwright.config.ts`:
 
 | Setting | Value |
 |:--------|:------|
-| 🌐 Base URL | `https://staging.genkiwardrobe.com/` |
-| 🌍 Browsers | Chromium, Firefox, WebKit |
-| ⚡ Parallelism | Enabled (`fullyParallel: true`) |
-| 🔍 Trace | `retain-on-failure` |
-| 🎥 Video | `retain-on-failure` |
-| 📸 Screenshot | `only-on-failure` |
-| 📋 Reporter | HTML + list |
+| Base URL | From `TEST_ENV` → staging or production (`constants/environments.ts`) |
+| Default projects | `chrome` (Desktop Chrome channel) + `mobile-chrome` (Pixel 7) |
+| Also available | `chromium`, `firefox`, `webkit` |
+| Parallelism | `fullyParallel: true` |
+| Trace / video / screenshot | Retain / only on failure |
+| Reporters | HTML + Allure |
 
-### 🤖 CI Behaviour
-
-When the `CI` environment variable is set, the config automatically:
-
-- Sets `retries: 2`
-- Enables `forbidOnly: true` to block accidental `test.only` commits
-- Limits `workers: 2` to balance speed and resource usage
+**CI (`CI=1`):** `retries: 2`, `forbidOnly: true`, `workers: 2`. Daily workflow: `.github/workflows/daily-tests.yml`.
 
 ---
 
-## 🧩 Page Object Model
+## Page objects & fixtures
 
-```text
-BasePage
-  ├── HomePage             — landing page (hero, nav, search, product grid)
-  └── ProductDetailsPage   — PDP (size, color, add to cart)
-```
+Fixtures inject POMs into specs (see `fixtures/test-fixtures.ts`):
 
-### Class Responsibilities
-
-| Class | Responsibility |
-|:------|:---------------|
-| `BasePage` | `goto()`, cookie consent dismissal, network/page load waits, title assertions |
-| `HomePage` | Hero banner, primary navigation (Home / Shop / Collections), search bar, product grid navigation |
-| `ProductDetailsPage` | Product title, size and color selectors, Add to Cart actions and assertions |
-
-### 🎯 Staging Site Locator Notes
-
-Locators are mapped to the **actual staging DOM**, not generic placeholders:
-
-| Element | Locator strategy |
-|:--------|:-----------------|
-| Product cards | `a[href^="/products/"]` — staging uses direct product links, not a "View Product" CTA |
-| Home nav | Logo link filtered by `getByAltText('Genki Wardrobe')` |
-| Shop nav | `Men` link in the primary navigation (shop equivalent on staging) |
-| Collections nav | `Collections` link in the primary navigation |
-| Search bar | `getByRole('searchbox', { name: /search products/i })` |
-| Size selection | Hidden radio inputs (`input[type="radio"]:not([name="product-color"])`) — label click or force-click |
-| Add to Cart | `getByRole('button', { name: /add to cart/i })` — appears only **after** a size is selected |
-
-### ✍️ Writing a New Test
-
-1. Add or extend a page object in `/pages`.
-2. Register it in `/fixtures/test-fixtures.ts` if it should be injected as a fixture.
-3. Create a spec in `/tests` using the custom `test` fixture:
+`homePage`, `header`, `footer`, `productDetailsPage`, `collectionPage`, `loginPage`, `registerPage`, `forgotPasswordPage`, `resetPasswordPage`, `accountDashboardPage`, `cartPage`, `wishlistPage`, `checkoutPage`, `rewardsPage`, `payHereCheckout`
 
 ```typescript
-import { test, expect } from '../fixtures/test-fixtures';
+import { test } from '@fixtures/test-fixtures';
+import { PaymentMethod } from '@constants/payment';
+import { guestCheckoutEmail } from '@data/checkout.data';
+import { addSampleProductToCart } from '@helpers/cart.helper';
 
-test('my scenario', async ({ homePage }) => {
-  await homePage.open();
-  // ...
+test('guest COD checkout', async ({ productDetailsPage, checkoutPage }) => {
+  await addSampleProductToCart(productDetailsPage);
+  await checkoutPage.open();
+  await checkoutPage.fillGuestBilling(guestCheckoutEmail('guest-cod'));
+  await checkoutPage.selectPayment(PaymentMethod.COD);
+  await checkoutPage.acceptTerms();
+  await checkoutPage.placeOrder();
+  await checkoutPage.expectOrderSuccess(PaymentMethod.COD);
 });
 ```
 
 ---
 
-## 🧪 Test Coverage
+## Test coverage
 
-### `tests/navigation.spec.ts` — Homepage Navigation
+Inventory: [`docs/test-cases.csv`](./docs/test-cases.csv) (~95 cases; regenerate with `npm run docs:cases`). Details: [`docs/README.md`](./docs/README.md).
 
-Validates the core browse flow from landing page to product detail:
+| Area | Specs (examples) |
+|:-----|:-----------------|
+| **Nav / chrome** | `home`, `main-nav`, `navigation`, `mobile-nav`, `top-bar`, `footer` |
+| **Auth** | `auth`, `register-email`, `forgot-password-email` |
+| **Catalog / PDP** | `collections`, `pdp`, `catalog-edges`, `search` |
+| **Cart / wishlist** | `cart`, `wishlist` |
+| **Checkout** | `checkout` (COD, bank, PayHere), `checkout-advanced` (shipping, gift, create-account bug guard) |
+| **Account / loyalty** | `profile`, `rewards` |
+| **Email** | `order-confirmation-email`, register / reset (`@email`) |
 
-1. Opens the homepage
-2. Asserts the page title contains `"Genki"`
-3. Asserts the heading **"Cultural Threads for Every Mood"** is visible
-4. Clicks the first product card via `HomePage.openFirstProduct()`
-5. Selects an available size via `ProductDetailsPage.selectFirstAvailableSize()`
-6. Verifies the **Add to Cart** button is visible and enabled
+### Gift checkout (intentional product rule)
 
----
-
-## 📜 NPM Scripts
-
-| Command | Description |
-|:--------|:------------|
-| `npm test` | 🏁 Run all tests headlessly across all browsers |
-| `npm run test:headed` | 👀 Run with a visible browser window |
-| `npm run test:ui` | 🎮 Playwright interactive UI mode |
-| `npm run test:debug` | 🐛 Debug mode with Playwright Inspector |
-| `npm run test:chromium` | 🟦 Chromium only |
-| `npm run test:firefox` | 🟧 Firefox only |
-| `npm run test:webkit` | 🟪 WebKit only |
-| `npm run report` | 📊 Open the HTML report from the last run |
-| `npm run codegen` | 🎥 Record actions against the staging site |
+Marking **This order is a gift** disables **Cash on Delivery**; card and bank transfer stay available. Covered under `Gift checkout` in `tests/checkout-advanced.spec.ts`.
 
 ---
 
-## 🔎 Debugging Failed Tests
+## Docs
 
-Playwright captures artifacts automatically on failure:
+| Doc | Purpose |
+|:----|:--------|
+| [`docs/TODO.md`](./docs/TODO.md) | Follow-ups (PDP variants and process) |
+| [`docs/PDP_VARIANT_TODO.md`](./docs/PDP_VARIANT_TODO.md) | Color/size matrix automation backlog |
+| [`docs/test-cases.csv`](./docs/test-cases.csv) | Living case inventory |
+| [`docs/README.md`](./docs/README.md) | How to read / regenerate the CSV |
+
+---
+
+## Debugging failures
 
 ```bash
-# Open the HTML report (traces, screenshots, videos linked per test)
 npm run report
-
-# Open a specific trace file directly
 npx playwright show-trace test-results/<test-folder>/trace.zip
 ```
 
-<p align="center">
-  <img src="https://media.giphy.com/media/xT9IgzoKnwFNmISR8I/giphy.gif" width="240" alt="debug mode"/>
-</p>
-
 ---
 
-## 🗺️ Roadmap Vibes
-
-```text
-  NOW ✅                    NEXT 🔜                   LATER 🚀
- ┌─────────────────┐      ┌─────────────────┐      ┌─────────────────┐
- │ Navigation flow │ ───► │ Auth & sessions │ ───► │ CI pipeline     │
- │ Home → PDP →    │      │ storageState    │      │ GitHub Actions  │
- │ Add to Cart     │      │ Cart & Checkout │      │ Visual regress. │
- └─────────────────┘      └─────────────────┘      └─────────────────┘
-```
+## Roadmap
 
 | Phase | Status | Focus |
 |:------|:------:|:------|
-| **Now** | ✅ | Homepage → PDP → Add to Cart |
-| **Next** | 🔜 | Auth / `storageState` · Cart & Checkout |
-| **Later** | 🚀 | GitHub Actions CI · Visual regression |
+| **Core browse + PDP** | Done | Home, nav, collections, PDP, cart/wishlist |
+| **Auth + checkout + payments** | Done | Login/register/reset, COD/bank/PayHere, gift rules, email confirms |
+| **Hardening** | In progress | Search coverage once fixed, fuller PDP variant matrix |
+| **Later** | Planned | `storageState` reuse, broader visual checks |
 
 ---
 
-## 📄 License
+## License
 
 **Private** — Genki Wardrobe QA Automation Project.
 
-<p align="center">
-  <img src="https://capsule-render.vercel.app/api?type=waving&color=gradient&customColorList=12,14,6&height=100&section=footer" width="100%" alt="wave footer"/>
-</p>
-
 <div align="center">
 
-### Built with ❤️ · Powered by Playwright · Styled with Genki energy
-
-<img src="https://readme-typing-svg.demolab.com?font=Fira+Code&size=18&duration=3000&pause=1000&color=94A3B8&center=true&vCenter=true&width=500&lines=Automate+boldly.+Assert+loudly.+Ship+confidently." alt="footer typing" />
+### Built with Playwright · Styled with Genki energy
 
 </div>

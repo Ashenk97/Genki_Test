@@ -21,6 +21,9 @@ export class CheckoutPage extends BasePage {
   private readonly accountPassword: Locator;
   private readonly termsLabel: Locator;
   private readonly placeOrderButton: Locator;
+  private readonly cardPaymentInput: Locator;
+  private readonly bankPaymentInput: Locator;
+  private readonly codPaymentInput: Locator;
   private readonly cardPaymentLabel: Locator;
   private readonly bankPaymentLabel: Locator;
   private readonly codPaymentLabel: Locator;
@@ -29,6 +32,7 @@ export class CheckoutPage extends BasePage {
   private readonly shopNowLink: Locator;
   private readonly selectedRewards: Locator;
   private readonly sameAddressLabel: Locator;
+  private readonly giftCheckbox: Locator;
   private readonly giftLabel: Locator;
   private readonly orderNotes: Locator;
   private readonly giftMessage: Locator;
@@ -48,9 +52,12 @@ export class CheckoutPage extends BasePage {
     this.accountPassword = page.locator('input[name="password"]');
     this.termsLabel = page.locator('label').filter({ hasText: /terms & conditions/i });
     this.placeOrderButton = page.getByRole('button', { name: /place order/i });
-    this.cardPaymentLabel = page.getByText(/card payments/i);
-    this.bankPaymentLabel = page.getByText(/direct bank transfer/i);
-    this.codPaymentLabel = page.getByText(/cash on delivery/i);
+    this.cardPaymentInput = page.locator('#payment_check');
+    this.bankPaymentInput = page.locator('#payment_bank');
+    this.codPaymentInput = page.locator('#payment_cash');
+    this.cardPaymentLabel = page.locator('label[for="payment_check"]');
+    this.bankPaymentLabel = page.locator('label[for="payment_bank"]');
+    this.codPaymentLabel = page.locator('label[for="payment_cash"]');
     this.orderSuccessHeading = page.getByRole('heading', {
       name: /your order has been placed/i,
     });
@@ -60,6 +67,7 @@ export class CheckoutPage extends BasePage {
     this.sameAddressLabel = page.locator('label[for="sameAddress"]').or(
       page.locator('label').filter({ hasText: /shipping address is the same/i }),
     );
+    this.giftCheckbox = page.locator('#isGift');
     this.giftLabel = page.locator('label[for="isGift"]').or(
       page.locator('label').filter({ hasText: /this order is a gift/i }),
     );
@@ -151,15 +159,58 @@ export class CheckoutPage extends BasePage {
 
   async selectPayment(method: PaymentMethod): Promise<this> {
     if (method === PaymentMethod.Card) {
+      await expect(this.cardPaymentInput).toBeEnabled();
       await this.cardPaymentLabel.click();
+      await expect(this.cardPaymentInput).toBeChecked();
       return this;
     }
     if (method === PaymentMethod.BankTransfer) {
+      await expect(this.bankPaymentInput).toBeEnabled();
       await this.bankPaymentLabel.click();
+      await expect(this.bankPaymentInput).toBeChecked();
       return this;
     }
+    await expect(this.codPaymentInput).toBeEnabled();
     await this.codPaymentLabel.click();
+    await expect(this.codPaymentInput).toBeChecked();
     return this;
+  }
+
+  async expectPaymentSelected(method: PaymentMethod): Promise<void> {
+    if (method === PaymentMethod.Card) {
+      await expect(this.cardPaymentInput).toBeChecked();
+      return;
+    }
+    if (method === PaymentMethod.BankTransfer) {
+      await expect(this.bankPaymentInput).toBeChecked();
+      return;
+    }
+    await expect(this.codPaymentInput).toBeChecked();
+  }
+
+  async expectNoPaymentSelected(): Promise<void> {
+    await expect(this.cardPaymentInput).not.toBeChecked();
+    await expect(this.bankPaymentInput).not.toBeChecked();
+    await expect(this.codPaymentInput).not.toBeChecked();
+  }
+
+  async expectCodPaymentDisabledForGift(): Promise<void> {
+    await expect(this.codPaymentInput).toBeDisabled();
+    await expect(this.codPaymentLabel).toHaveClass(/disabled/);
+    await expect(this.codPaymentLabel).toContainText(/not available for gift orders/i);
+  }
+
+  async expectCodPaymentEnabled(): Promise<void> {
+    await expect(this.codPaymentInput).toBeEnabled();
+    await expect(this.codPaymentLabel).not.toHaveClass(/disabled/);
+    await expect(this.codPaymentLabel).toHaveText(/^cash on delivery$/i);
+  }
+
+  async expectCardAndBankPaymentsAvailable(): Promise<void> {
+    await expect(this.cardPaymentInput).toBeEnabled();
+    await expect(this.bankPaymentInput).toBeEnabled();
+    await expect(this.cardPaymentLabel).toBeVisible();
+    await expect(this.bankPaymentLabel).toBeVisible();
   }
 
   async acceptTerms(): Promise<this> {
@@ -267,14 +318,44 @@ export class CheckoutPage extends BasePage {
     return this;
   }
 
-  async enableGift(message: string): Promise<this> {
-    const checkbox = this.page.locator('#isGift');
-    if (!(await checkbox.isChecked())) {
+  async enableGift(message?: string): Promise<this> {
+    if (!(await this.giftCheckbox.isChecked())) {
       await this.giftLabel.click();
     }
+    await expect(this.giftCheckbox).toBeChecked();
+    await expect(this.giftMessage).toBeVisible();
+    if (message !== undefined) {
+      await this.giftMessage.fill(message);
+    }
+    return this;
+  }
+
+  async disableGift(): Promise<this> {
+    if (await this.giftCheckbox.isChecked()) {
+      await this.giftLabel.click();
+    }
+    await expect(this.giftCheckbox).not.toBeChecked();
+    await expect(this.giftMessage).toBeHidden();
+    return this;
+  }
+
+  async expectGiftMessageVisible(): Promise<void> {
+    await expect(this.giftMessage).toBeVisible();
+    await expect(this.page.getByText(/gift message \(optional\)/i)).toBeVisible();
+  }
+
+  async expectGiftMessageMaxLength(maxLength = 300): Promise<void> {
+    await expect(this.giftMessage).toHaveAttribute('maxlength', String(maxLength));
+  }
+
+  async fillGiftMessage(message: string): Promise<this> {
     await expect(this.giftMessage).toBeVisible();
     await this.giftMessage.fill(message);
     return this;
+  }
+
+  async expectGiftMessageValue(expected: string): Promise<void> {
+    await expect(this.giftMessage).toHaveValue(expected);
   }
 
   async expectCreateAccountSchemaError(): Promise<void> {

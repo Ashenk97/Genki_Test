@@ -1,10 +1,10 @@
 import { PaymentMethod } from '@constants/payment';
-import { PRODUCT_DATA } from '@data/products.data';
+import { Timeouts } from '@constants/timeouts';
 import { guestCheckoutEmail } from '@data/checkout.data';
 import { TEST_DATA } from '@data/index';
 import { strongPassword } from '@helpers/random';
 import { test } from '@fixtures/test-fixtures';
-import { addSampleProductToCart } from '@helpers/cart.helper';
+import { addSampleProductToCart, addSecondaryProductToCart } from '@helpers/cart.helper';
 
 test.describe('Checkout advanced flows', () => {
   test.describe.configure({ mode: 'parallel' });
@@ -25,26 +25,6 @@ test.describe('Checkout advanced flows', () => {
     });
     await test.step('Verify COD success', async () => {
       await checkoutPage.expectOrderSuccess(PaymentMethod.COD);
-    });
-  });
-
-  test('should place a bank transfer order with gift message and order notes', { tag: '@checkout' }, async ({
-    productDetailsPage,
-    checkoutPage,
-  }) => {
-    await test.step('Checkout with gift + notes (COD disabled for gifts)', async () => {
-      await addSampleProductToCart(productDetailsPage);
-      await checkoutPage.open();
-      await checkoutPage.fillGuestBilling(guestCheckoutEmail('guest-gift'));
-      await checkoutPage.fillOrderNotes('Please call before delivery — QA automation');
-      await checkoutPage.enableGift('Happy birthday from Genki QA!');
-      await checkoutPage.selectPayment(PaymentMethod.BankTransfer);
-      await checkoutPage.acceptTerms();
-      await checkoutPage.placeOrder();
-    });
-    await test.step('Verify bank transfer success', async () => {
-      await checkoutPage.expectOrderSuccess(PaymentMethod.BankTransfer);
-      await checkoutPage.expectBankTransferInstructions();
     });
   });
 
@@ -80,6 +60,163 @@ test.describe('Checkout advanced flows', () => {
       });
     },
   );
+});
+
+test.describe('Gift checkout', () => {
+  test.describe.configure({ mode: 'parallel' });
+
+  test(
+    'should disable COD for gift orders while keeping card and bank available',
+    { tag: '@checkout' },
+    async ({ productDetailsPage, checkoutPage }) => {
+      await test.step('Open checkout and enable gift', async () => {
+        await addSampleProductToCart(productDetailsPage);
+        await checkoutPage.open();
+        await checkoutPage.fillGuestBilling(guestCheckoutEmail('guest-gift-cod'));
+        await checkoutPage.expectCodPaymentEnabled();
+        await checkoutPage.enableGift('Happy birthday from Genki QA!');
+      });
+      await test.step('COD disabled; card and bank still available', async () => {
+        await checkoutPage.expectGiftMessageVisible();
+        await checkoutPage.expectCodPaymentDisabledForGift();
+        await checkoutPage.expectCardAndBankPaymentsAvailable();
+      });
+    },
+  );
+
+  test(
+    'should clear a selected COD payment when the order is marked as a gift',
+    { tag: '@checkout' },
+    async ({ productDetailsPage, checkoutPage }) => {
+      await test.step('Select COD then mark as gift', async () => {
+        await addSampleProductToCart(productDetailsPage);
+        await checkoutPage.open();
+        await checkoutPage.fillGuestBilling(guestCheckoutEmail('guest-gift-clear-cod'));
+        await checkoutPage.selectPayment(PaymentMethod.COD);
+        await checkoutPage.expectPaymentSelected(PaymentMethod.COD);
+        await checkoutPage.enableGift();
+      });
+      await test.step('COD is deselected and disabled', async () => {
+        await checkoutPage.expectCodPaymentDisabledForGift();
+        await checkoutPage.expectNoPaymentSelected();
+        await checkoutPage.expectCardAndBankPaymentsAvailable();
+      });
+    },
+  );
+
+  test(
+    'should restore COD after unchecking the gift option',
+    { tag: '@checkout' },
+    async ({ productDetailsPage, checkoutPage }) => {
+      await test.step('Toggle gift on then off', async () => {
+        await addSampleProductToCart(productDetailsPage);
+        await checkoutPage.open();
+        await checkoutPage.fillGuestBilling(guestCheckoutEmail('guest-gift-toggle'));
+        await checkoutPage.enableGift('Temporary gift note');
+        await checkoutPage.expectCodPaymentDisabledForGift();
+        await checkoutPage.disableGift();
+      });
+      await test.step('COD available again and gift message hidden', async () => {
+        await checkoutPage.expectCodPaymentEnabled();
+        await checkoutPage.selectPayment(PaymentMethod.COD);
+        await checkoutPage.expectPaymentSelected(PaymentMethod.COD);
+      });
+    },
+  );
+
+  test(
+    'should treat gift message as optional and cap length at 300 characters',
+    { tag: '@checkout' },
+    async ({ productDetailsPage, checkoutPage }) => {
+      await test.step('Enable gift and assert message rules', async () => {
+        await addSampleProductToCart(productDetailsPage);
+        await checkoutPage.open();
+        await checkoutPage.fillGuestBilling(guestCheckoutEmail('guest-gift-message'));
+        await checkoutPage.enableGift();
+        await checkoutPage.expectGiftMessageVisible();
+        await checkoutPage.expectGiftMessageMaxLength(300);
+        await checkoutPage.fillGiftMessage('A'.repeat(350));
+        await checkoutPage.expectGiftMessageValue('A'.repeat(300));
+        await checkoutPage.fillGiftMessage('');
+        await checkoutPage.expectGiftMessageValue('');
+        await checkoutPage.selectPayment(PaymentMethod.BankTransfer);
+        await checkoutPage.expectPaymentSelected(PaymentMethod.BankTransfer);
+      });
+    },
+  );
+
+  test.describe('Gift order placement', () => {
+    test.describe.configure({ mode: 'serial', timeout: Timeouts.PayHereCheckout });
+
+    test(
+      'should place a bank transfer gift order with an empty gift message',
+      { tag: '@checkout' },
+      async ({ productDetailsPage, checkoutPage }) => {
+        await test.step('Place gift bank transfer with empty message', async () => {
+          await addSecondaryProductToCart(productDetailsPage);
+          await checkoutPage.open();
+          await checkoutPage.fillGuestBilling(guestCheckoutEmail('guest-gift-empty-msg'));
+          await checkoutPage.enableGift();
+          await checkoutPage.expectGiftMessageValue('');
+          await checkoutPage.expectCodPaymentDisabledForGift();
+          await checkoutPage.selectPayment(PaymentMethod.BankTransfer);
+          await checkoutPage.acceptTerms();
+          await checkoutPage.placeOrder();
+        });
+        await test.step('Verify bank transfer success', async () => {
+          await checkoutPage.expectOrderSuccess(PaymentMethod.BankTransfer);
+          await checkoutPage.expectBankTransferInstructions();
+        });
+      },
+    );
+
+    test(
+      'should place a bank transfer gift order with message, notes, and separate shipping',
+      { tag: '@checkout' },
+      async ({ productDetailsPage, checkoutPage }) => {
+        await test.step('Checkout gift order with bank transfer', async () => {
+          await addSecondaryProductToCart(productDetailsPage);
+          await checkoutPage.open();
+          await checkoutPage.fillGuestBilling(guestCheckoutEmail('guest-gift'));
+          await checkoutPage.useSeparateShippingAddress();
+          await checkoutPage.fillShippingAddress({
+            firstName: 'Gift',
+            lastName: 'Recipient',
+          });
+          await checkoutPage.fillOrderNotes('Please call before delivery — QA automation');
+          await checkoutPage.enableGift('Happy birthday from Genki QA!');
+          await checkoutPage.expectCodPaymentDisabledForGift();
+          await checkoutPage.selectPayment(PaymentMethod.BankTransfer);
+          await checkoutPage.acceptTerms();
+          await checkoutPage.placeOrder();
+        });
+        await test.step('Verify bank transfer success', async () => {
+          await checkoutPage.expectOrderSuccess(PaymentMethod.BankTransfer);
+          await checkoutPage.expectBankTransferInstructions();
+        });
+      },
+    );
+
+    test(
+      'should start PayHere for a gift order paid by card',
+      { tag: ['@checkout', '@payment'] },
+      async ({ productDetailsPage, checkoutPage, payHereCheckout }) => {
+        await test.step('Place gift order with card payment', async () => {
+          await addSecondaryProductToCart(productDetailsPage);
+          await checkoutPage.open();
+          await checkoutPage.fillGuestBilling(guestCheckoutEmail('guest-gift-card'));
+          await checkoutPage.enableGift('Congrats — enjoy your Genki drop!');
+          await checkoutPage.expectCodPaymentDisabledForGift();
+          await checkoutPage.selectPayment(PaymentMethod.Card);
+          await checkoutPage.acceptTerms();
+          await checkoutPage.placeOrder();
+        });
+        await test.step('PayHere checkout frame opens', async () => {
+          await payHereCheckout.expectCheckoutFrameVisible();
+        });
+      },
+    );
+  });
 });
 
 test.describe('Guest cart session', () => {
