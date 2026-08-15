@@ -1,31 +1,28 @@
 import { Locator, Page, expect } from '@playwright/test';
-import { BasePage } from './BasePage';
-import { ProductDetailsPage } from './ProductDetailsPage';
+import { BasePage } from '@pages/BasePage';
+import { ProductDetailsPage } from '@pages/ProductDetailsPage';
+import { normalizePathname } from '@helpers/string';
 
 export class CollectionPage extends BasePage {
-  readonly heading: Locator;
-  readonly productLinks: Locator;
-  readonly filterControls: Locator;
-  readonly sortControls: Locator;
+  private readonly heading: Locator;
+  private readonly productLinks: Locator;
 
   constructor(page: Page) {
     super(page);
     this.heading = page.getByRole('heading', { level: 1 }).first();
     this.productLinks = page.locator('a[href^="/products/"]:not([href*="undefined"])');
-    this.filterControls = page.getByRole('button', { name: /filter|sort/i })
-      .or(page.getByLabel(/filter|sort/i))
-      .or(page.locator('select').filter({ hasText: /sort|filter/i }));
-    this.sortControls = page.getByRole('combobox', { name: /sort/i });
   }
 
-  async open(path: string): Promise<void> {
+  async open(path: string): Promise<this> {
     await this.goto(path);
-    await this.waitForNetworkIdle();
+    return this;
   }
 
   async expectLoaded(path: string, heading: string | RegExp): Promise<void> {
-    const normalized = path.replace(/\/$/, '');
-    await expect(this.page).toHaveURL((url) => url.pathname.replace(/\/$/, '') === normalized);
+    const normalized = normalizePathname(path);
+    await expect(this.page).toHaveURL(
+      (url) => normalizePathname(url.pathname) === normalized,
+    );
     await expect(this.heading).toBeVisible();
     await expect(this.heading).toHaveText(heading);
   }

@@ -1,25 +1,26 @@
 import { Locator, Page, expect } from '@playwright/test';
-import { AUTH_MESSAGES } from '../fixtures/test-data';
-import { BasePage } from './BasePage';
+import { AUTH_MESSAGES } from '@constants/messages';
+import { ToastType } from '@constants/payment';
+import { escapeRegExp } from '@helpers/string';
+import { AppRoutes } from '@constants/routes';
+import { BasePage } from '@pages/BasePage';
 
 export class Header extends BasePage {
-  readonly root: Locator;
-  readonly desktopNav: Locator;
-  readonly logoLink: Locator;
-  readonly navMen: Locator;
-  readonly navWomen: Locator;
-  readonly navCollections: Locator;
-
-  readonly phoneLink: Locator;
-  readonly whatsappLink: Locator;
-  readonly loginLink: Locator;
-  readonly accountLink: Locator;
-  readonly logoutLink: Locator;
-  readonly facebookLink: Locator;
-  readonly instagramLink: Locator;
-
-  readonly cartButton: Locator;
-  readonly wishlistButton: Locator;
+  private readonly root: Locator;
+  private readonly desktopNav: Locator;
+  private readonly logoLink: Locator;
+  private readonly navMen: Locator;
+  private readonly navWomen: Locator;
+  private readonly navCollections: Locator;
+  private readonly phoneLink: Locator;
+  private readonly whatsappLink: Locator;
+  private readonly loginLink: Locator;
+  private readonly accountLink: Locator;
+  private readonly logoutLink: Locator;
+  private readonly facebookLink: Locator;
+  private readonly instagramLink: Locator;
+  private readonly cartButton: Locator;
+  private readonly wishlistButton: Locator;
 
   constructor(page: Page) {
     super(page);
@@ -44,9 +45,21 @@ export class Header extends BasePage {
     this.wishlistButton = this.root.getByRole('button', { name: /open wishlist/i });
   }
 
-  async openHome(): Promise<void> {
-    await this.goto('/');
-    await this.waitForNetworkIdle();
+  get navMenLink(): Locator {
+    return this.navMen;
+  }
+
+  get navCollectionsLink(): Locator {
+    return this.navCollections;
+  }
+
+  get logo(): Locator {
+    return this.logoLink;
+  }
+
+  async openHome(): Promise<this> {
+    await this.goto(AppRoutes.Home);
+    return this;
   }
 
   async expectTopBarVisible(): Promise<void> {
@@ -65,7 +78,8 @@ export class Header extends BasePage {
     await expect(this.wishlistButton).toBeVisible();
   }
 
-  async expectUtilityHref(link: Locator, href: string, target?: string): Promise<void> {
+  async expectUtilityHref(name: string, href: string, target?: string): Promise<void> {
+    const link = this.utilityLink(name);
     await expect(link).toBeVisible();
     await expect(link).toHaveAttribute('href', href);
     if (target) {
@@ -110,9 +124,14 @@ export class Header extends BasePage {
 
   async clickLogout(): Promise<void> {
     await this.logoutLink.click();
-    await this.expectToast(AUTH_MESSAGES.logoutToast, 'success');
+    await this.expectToast(AUTH_MESSAGES.logoutToast, ToastType.Success);
     await expect(this.loginLink).toBeVisible({ timeout: 15_000 });
     await this.acceptCookiesIfVisible();
+  }
+
+  async reloadPage(): Promise<void> {
+    await this.page.reload();
+    await this.waitForPageLoad();
   }
 
   utilityLink(name: string): Locator {
@@ -163,17 +182,31 @@ export class Header extends BasePage {
     await this.wishlistButton.click();
   }
 
+  async expectEmptyCartDrawer(): Promise<void> {
+    await expect(this.page.getByRole('heading', { name: /^cart$/i })).toBeVisible();
+    await expect(this.page.getByText(AUTH_MESSAGES.drawerCartEmpty)).toBeVisible();
+  }
+
+  async expectEmptyWishlistDrawer(): Promise<void> {
+    await expect(this.page.getByRole('heading', { name: /^wishlist$/i })).toBeVisible();
+    await expect(this.page.getByText(AUTH_MESSAGES.wishlistEmpty)).toBeVisible();
+  }
+
+  async expectCartBadgeHasItems(): Promise<void> {
+    await expect(this.cartButton).toHaveAttribute('aria-label', /open cart,\s*\d+\s*item/i);
+  }
+
   private topLevelLink(name: string): Locator {
-    return this.desktopNav.getByRole('link', { name: new RegExp(`^${escapeRegExp(name)}$`, 'i') });
+    return this.desktopNav.getByRole('link', {
+      name: new RegExp(`^${escapeRegExp(name)}$`, 'i'),
+    });
   }
 
   private categoryItem(name: string): Locator {
     return this.desktopNav.getByRole('listitem').filter({
-      has: this.page.getByRole('link', { name: new RegExp(`^${escapeRegExp(name)}$`, 'i') }),
+      has: this.page.getByRole('link', {
+        name: new RegExp(`^${escapeRegExp(name)}$`, 'i'),
+      }),
     });
   }
-}
-
-function escapeRegExp(value: string): string {
-  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }

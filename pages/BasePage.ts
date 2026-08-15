@@ -1,14 +1,14 @@
 import { Locator, Page, expect } from '@playwright/test';
+import { AppRoutes } from '@constants/routes';
+import { Timeouts } from '@constants/timeouts';
+import { ToastType } from '@constants/payment';
+import { normalizePathname } from '@helpers/string';
 
-export class BasePage {
+export abstract class BasePage {
   readonly page: Page;
 
   constructor(page: Page) {
     this.page = page;
-  }
-
-  async waitForNetworkIdle(): Promise<void> {
-    await this.page.waitForLoadState('networkidle');
   }
 
   async waitForPageLoad(): Promise<void> {
@@ -22,10 +22,11 @@ export class BasePage {
     }
   }
 
-  async goto(path = '/'): Promise<void> {
+  async goto(path: string = AppRoutes.Home): Promise<this> {
     await this.page.goto(path);
     await this.waitForPageLoad();
     await this.acceptCookiesIfVisible();
+    return this;
   }
 
   async expectTitle(title: string | RegExp): Promise<void> {
@@ -34,14 +35,26 @@ export class BasePage {
 
   async expectToast(
     message: string | RegExp,
-    type?: 'success' | 'error',
+    type?: ToastType,
   ): Promise<void> {
     const toastRoot = type
       ? this.page.locator(`[data-sonner-toast].toast-${type}`)
       : this.page.locator('[data-sonner-toast]');
     await expect(toastRoot.filter({ hasText: message }).first()).toBeVisible({
-      timeout: 15_000,
+      timeout: Timeouts.Toast,
     });
+  }
+
+  async expectPathname(path: string): Promise<void> {
+    const normalized = normalizePathname(path);
+    await expect(this.page).toHaveURL((url) => normalizePathname(url.pathname) === normalized);
+  }
+
+  async openExternalUrl(url: string): Promise<this> {
+    await this.page.goto(url);
+    await this.waitForPageLoad();
+    await this.acceptCookiesIfVisible();
+    return this;
   }
 
   protected get mainContent(): Locator {

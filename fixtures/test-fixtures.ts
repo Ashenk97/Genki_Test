@@ -1,21 +1,21 @@
 import { test as base } from '@playwright/test';
-import { AccountDashboardPage } from '../pages/AccountDashboardPage';
-import { CartPage } from '../pages/CartPage';
-import { CheckoutPage } from '../pages/CheckoutPage';
-import { CollectionPage } from '../pages/CollectionPage';
-import { Footer } from '../pages/Footer';
-import { ForgotPasswordPage } from '../pages/ForgotPasswordPage';
-import { Header } from '../pages/Header';
-import { HomePage } from '../pages/HomePage';
-import { LoginPage } from '../pages/LoginPage';
-import { PayHereCheckout } from '../pages/PayHereCheckout';
-import { ProductDetailsPage } from '../pages/ProductDetailsPage';
-import { RegisterPage } from '../pages/RegisterPage';
-import { ResetPasswordPage } from '../pages/ResetPasswordPage';
-import { RewardsPage } from '../pages/RewardsPage';
-import { WishlistPage } from '../pages/WishlistPage';
+import { AccountDashboardPage } from '@pages/AccountDashboardPage';
+import { CartPage } from '@pages/CartPage';
+import { CheckoutPage } from '@pages/CheckoutPage';
+import { CollectionPage } from '@pages/CollectionPage';
+import { Footer } from '@pages/Footer';
+import { ForgotPasswordPage } from '@pages/ForgotPasswordPage';
+import { Header } from '@pages/Header';
+import { HomePage } from '@pages/HomePage';
+import { LoginPage } from '@pages/LoginPage';
+import { PayHereCheckout } from '@pages/PayHereCheckout';
+import { ProductDetailsPage } from '@pages/ProductDetailsPage';
+import { RegisterPage } from '@pages/RegisterPage';
+import { ResetPasswordPage } from '@pages/ResetPasswordPage';
+import { RewardsPage } from '@pages/RewardsPage';
+import { WishlistPage } from '@pages/WishlistPage';
 
-type GenkiFixtures = {
+export type GenkiFixtures = {
   homePage: HomePage;
   productDetailsPage: ProductDetailsPage;
   header: Header;
@@ -34,63 +34,63 @@ type GenkiFixtures = {
 };
 
 export const test = base.extend<GenkiFixtures>({
-  homePage: async ({ page }, use) => {
+  homePage: async ({ page }, use): Promise<void> => {
     await use(new HomePage(page));
   },
 
-  productDetailsPage: async ({ page }, use) => {
+  productDetailsPage: async ({ page }, use): Promise<void> => {
     await use(new ProductDetailsPage(page));
   },
 
-  header: async ({ page }, use) => {
+  header: async ({ page }, use): Promise<void> => {
     await use(new Header(page));
   },
 
-  collectionPage: async ({ page }, use) => {
+  collectionPage: async ({ page }, use): Promise<void> => {
     await use(new CollectionPage(page));
   },
 
-  loginPage: async ({ page }, use) => {
+  loginPage: async ({ page }, use): Promise<void> => {
     await use(new LoginPage(page));
   },
 
-  registerPage: async ({ page }, use) => {
+  registerPage: async ({ page }, use): Promise<void> => {
     await use(new RegisterPage(page));
   },
 
-  forgotPasswordPage: async ({ page }, use) => {
+  forgotPasswordPage: async ({ page }, use): Promise<void> => {
     await use(new ForgotPasswordPage(page));
   },
 
-  resetPasswordPage: async ({ page }, use) => {
+  resetPasswordPage: async ({ page }, use): Promise<void> => {
     await use(new ResetPasswordPage(page));
   },
 
-  accountDashboardPage: async ({ page }, use) => {
+  accountDashboardPage: async ({ page }, use): Promise<void> => {
     await use(new AccountDashboardPage(page));
   },
 
-  footer: async ({ page }, use) => {
+  footer: async ({ page }, use): Promise<void> => {
     await use(new Footer(page));
   },
 
-  cartPage: async ({ page }, use) => {
+  cartPage: async ({ page }, use): Promise<void> => {
     await use(new CartPage(page));
   },
 
-  wishlistPage: async ({ page }, use) => {
+  wishlistPage: async ({ page }, use): Promise<void> => {
     await use(new WishlistPage(page));
   },
 
-  checkoutPage: async ({ page }, use) => {
+  checkoutPage: async ({ page }, use): Promise<void> => {
     await use(new CheckoutPage(page));
   },
 
-  rewardsPage: async ({ page }, use) => {
+  rewardsPage: async ({ page }, use): Promise<void> => {
     await use(new RewardsPage(page));
   },
 
-  payHereCheckout: async ({ page }, use) => {
+  payHereCheckout: async ({ page }, use): Promise<void> => {
     await use(new PayHereCheckout(page));
   },
 });

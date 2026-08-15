@@ -4,6 +4,8 @@
     "module": "commonjs",
     "moduleResolution": "bundler",
     "strict": true,
+    "noImplicitAny": true,
+    "noImplicitReturns": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
@@ -14,7 +16,11 @@
     "paths": {
       "@pages/*": ["./pages/*"],
       "@fixtures/*": ["./fixtures/*"],
-      "@utils/*": ["./utils/*"]
+      "@helpers/*": ["./helpers/*"],
+      "@constants/*": ["./constants/*"],
+      "@data/*": ["./data/*"],
+      "@api/*": ["./api/*"],
+      "@models/*": ["./types/*"]
     }
   },
   "include": ["**/*.ts"],

@@ -1,19 +1,22 @@
 import { Locator, Page, expect } from '@playwright/test';
-import { AUTH_MESSAGES, LOGIN_PAGE } from '../fixtures/test-data';
-import { BasePage } from './BasePage';
+import { AUTH_MESSAGES, PAGE_HEADINGS } from '@constants/messages';
+import { ToastType } from '@constants/payment';
+import { Timeouts } from '@constants/timeouts';
+import { LOGIN_PAGE } from '@data/navigation.data';
+import { BasePage } from '@pages/BasePage';
 
 export class LoginPage extends BasePage {
-  readonly heading: Locator;
-  readonly form: Locator;
-  readonly emailInput: Locator;
-  readonly passwordInput: Locator;
-  readonly submitButton: Locator;
-  readonly rememberMeCheckbox: Locator;
-  readonly rememberMeLabel: Locator;
-  readonly forgotPasswordLink: Locator;
-  readonly registerLink: Locator;
-  readonly formErrorMessage: Locator;
-  readonly showPasswordButton: Locator;
+  private readonly heading: Locator;
+  private readonly form: Locator;
+  private readonly emailInput: Locator;
+  private readonly passwordInput: Locator;
+  private readonly submitButton: Locator;
+  private readonly rememberMeCheckbox: Locator;
+  private readonly rememberMeLabel: Locator;
+  private readonly forgotPasswordLink: Locator;
+  private readonly registerLink: Locator;
+  private readonly formErrorMessage: Locator;
+  private readonly showPasswordButton: Locator;
 
   constructor(page: Page) {
     super(page);
@@ -28,45 +31,80 @@ export class LoginPage extends BasePage {
     this.forgotPasswordLink = this.form.getByRole('link', { name: /lost your password/i });
     this.registerLink = this.form.getByRole('link', { name: /register here/i });
     this.formErrorMessage = this.form.getByText(AUTH_MESSAGES.invalidCredentials);
-    this.showPasswordButton = this.form.getByRole('button', { name: /show password|hide password/i });
+    this.showPasswordButton = this.form.getByRole('button', {
+      name: /show password|hide password/i,
+    });
   }
 
-  async open(): Promise<void> {
+  async open(): Promise<this> {
     await this.goto(LOGIN_PAGE.path);
-    await this.waitForNetworkIdle();
+    return this;
   }
 
   async expectLoaded(): Promise<void> {
-    await expect(this.page).toHaveURL(
-      (url) => url.pathname.replace(/\/$/, '') === LOGIN_PAGE.path,
-    );
+    await this.expectPathname(LOGIN_PAGE.path);
     await expect(this.heading).toBeVisible();
     await expect(this.emailInput).toBeVisible();
     await expect(this.passwordInput).toBeVisible();
     await expect(this.submitButton).toBeVisible();
   }
 
-  async fillCredentials(email: string, password: string): Promise<void> {
+  async fillCredentials(email: string, password: string): Promise<this> {
     await this.emailInput.fill(email);
     await this.passwordInput.fill(password);
+    return this;
   }
 
-  async setRememberMe(checked: boolean): Promise<void> {
+  async fillEmailOnly(email: string): Promise<this> {
+    await this.emailInput.fill(email);
+    return this;
+  }
+
+  async fillPasswordOnly(password: string): Promise<this> {
+    await this.passwordInput.fill(password);
+    return this;
+  }
+
+  async setRememberMe(checked: boolean): Promise<this> {
     if (checked) {
       await this.rememberMeCheckbox.check();
-      return;
+    } else {
+      await this.rememberMeCheckbox.uncheck();
     }
-    await this.rememberMeCheckbox.uncheck();
+    return this;
   }
 
-  async submit(): Promise<void> {
+  async expectRememberMeVisibleAndUnchecked(): Promise<void> {
+    await expect(this.rememberMeLabel).toBeVisible();
+    await expect(this.rememberMeCheckbox).not.toBeChecked();
+  }
+
+  async expectRememberMeChecked(): Promise<void> {
+    await expect(this.rememberMeCheckbox).toBeChecked();
+  }
+
+  async expectRememberMeUnchecked(): Promise<void> {
+    await expect(this.rememberMeCheckbox).not.toBeChecked();
+  }
+
+  async submit(): Promise<this> {
     await this.submitButton.click();
+    return this;
   }
 
-  async login(email: string, password: string, rememberMe = false): Promise<void> {
+  async login(email: string, password: string, rememberMe = false): Promise<this> {
     await this.fillCredentials(email, password);
     await this.setRememberMe(rememberMe);
     await this.submit();
+    return this;
+  }
+
+  async openForgotPassword(): Promise<void> {
+    await this.forgotPasswordLink.click();
+  }
+
+  async openRegister(): Promise<void> {
+    await this.registerLink.click();
   }
 
   async expectValidationMessage(message: string | RegExp): Promise<void> {
@@ -74,20 +112,20 @@ export class LoginPage extends BasePage {
   }
 
   async expectInvalidCredentials(): Promise<void> {
-    await this.expectToast(AUTH_MESSAGES.invalidCredentials, 'error');
-    await expect(this.formErrorMessage).toBeVisible({ timeout: 15_000 });
-    await expect(this.page).toHaveURL((url) => url.pathname.replace(/\/$/, '') === LOGIN_PAGE.path);
+    await this.expectToast(AUTH_MESSAGES.invalidCredentials, ToastType.Error);
+    await expect(this.formErrorMessage).toBeVisible({ timeout: Timeouts.Assertion });
+    await this.expectPathname(LOGIN_PAGE.path);
     await expect(this.emailInput).toBeVisible();
     await expect(this.submitButton).toBeVisible();
   }
 
   async expectLoginSuccess(): Promise<void> {
-    await this.expectToast(AUTH_MESSAGES.loginSuccessToast, 'success');
+    await this.expectToast(AUTH_MESSAGES.loginSuccessToast, ToastType.Success);
     await expect(this.page).toHaveURL((url) => {
       const path = url.pathname.replace(/\/$/, '');
       return path === '' || path === '/';
-    }, { timeout: 15_000 });
-    await expect(this.page).toHaveTitle(/genki/i);
+    }, { timeout: Timeouts.Assertion });
+    await expect(this.page).toHaveTitle(PAGE_HEADINGS.siteTitle);
     await this.acceptCookiesIfVisible();
   }
 

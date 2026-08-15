@@ -1,19 +1,17 @@
 import { Locator, Page, expect } from '@playwright/test';
-import { CART_PAGE } from '../fixtures/test-data';
-import { BasePage } from './BasePage';
+import { CART_PAGE } from '@data/navigation.data';
+import { BasePage } from '@pages/BasePage';
 
 export class CartPage extends BasePage {
-  readonly heading: Locator;
-  readonly emptyMessage: Locator;
-  readonly shopNowLink: Locator;
-  readonly proceedToCheckout: Locator;
-  readonly productRows: Locator;
-  readonly increaseQtyButton: Locator;
-  readonly decreaseQtyButton: Locator;
-  readonly removeButtons: Locator;
-  readonly drawer: Locator;
-  readonly drawerCheckout: Locator;
-  readonly drawerViewCart: Locator;
+  private readonly heading: Locator;
+  private readonly emptyMessage: Locator;
+  private readonly shopNowLink: Locator;
+  private readonly proceedToCheckout: Locator;
+  private readonly productRows: Locator;
+  private readonly increaseQtyButton: Locator;
+  private readonly removeButtons: Locator;
+  private readonly drawer: Locator;
+  private readonly drawerCheckout: Locator;
 
   constructor(page: Page) {
     super(page);
@@ -24,23 +22,20 @@ export class CartPage extends BasePage {
     this.productRows = page.locator('table tbody tr').filter({
       has: page.locator('a[href^="/products/"]:not([href*="undefined"])'),
     });
-    this.increaseQtyButton = this.productRows.first().locator('button.inc.qtybutton');
-    this.decreaseQtyButton = this.productRows.first().locator('button.dec.qtybutton');
+    this.increaseQtyButton = this.productRows.first().getByRole('button', { name: /^\+$/ })
+      .or(this.productRows.first().locator('button.inc.qtybutton'));
     this.removeButtons = page.locator('table tbody tr td:last-child button');
     this.drawer = page.locator('.cart-overlay');
     this.drawerCheckout = this.drawer.getByRole('link', { name: /^checkout$/i });
-    this.drawerViewCart = this.drawer.getByRole('link', { name: /view cart/i });
   }
 
-  async open(): Promise<void> {
+  async open(): Promise<this> {
     await this.goto(CART_PAGE.path);
-    await this.waitForNetworkIdle();
+    return this;
   }
 
   async expectLoaded(): Promise<void> {
-    await expect(this.page).toHaveURL(
-      (url) => url.pathname.replace(/\/$/, '') === CART_PAGE.path,
-    );
+    await this.expectPathname(CART_PAGE.path);
     await expect(this.heading).toBeVisible();
   }
 
@@ -53,18 +48,27 @@ export class CartPage extends BasePage {
     await expect(this.shopNowLink).toBeVisible();
   }
 
-  async increaseQuantity(): Promise<void> {
+  async increaseQuantity(): Promise<this> {
     await this.increaseQtyButton.click();
-    await this.waitForNetworkIdle();
+    return this;
+  }
+
+  async expectQuantity(quantity: number): Promise<void> {
+    await expect(
+      this.productRows.first().locator(`input[value="${quantity}"]`),
+    ).toBeVisible();
   }
 
   async clearCart(): Promise<void> {
     for (let i = 0; i < 10; i += 1) {
-      if ((await this.removeButtons.count()) === 0) {
+      const count = await this.removeButtons.count();
+      if (count === 0) {
         break;
       }
       await this.removeButtons.first().click();
-      await this.page.waitForTimeout(500);
+      await expect
+        .poll(async () => this.removeButtons.count(), { timeout: 5_000 })
+        .toBeLessThan(count);
     }
   }
 
