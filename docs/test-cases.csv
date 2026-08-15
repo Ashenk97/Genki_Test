@@ -1,0 +1,88 @@
+Area,Name,Objective,Priority,Labels,Owner,Preconditions,Test Steps,Expected Result,Automation status
+Navigation,Display logo primary nav cart wishlist,Verify desktop header chrome,P0,"smoke,nav",QA,Desktop viewport,1. Open home 2. Inspect header,Logo Men Women Collections cart and wishlist visible,Covered
+Navigation,Logo returns to homepage,Logo click navigates home,P0,"smoke,nav",QA,On a collection page,1. Open Men 2. Click logo,Homepage loads,Covered
+Navigation,Top-level Men Women Collections,Top-level nav routes,P0,"smoke,nav",QA,Desktop,1. Click each top-level link,Correct URL and H1; products on Men/Women,Covered
+Navigation,Dropdown Men Women Collections,Dropdown destinations,P0,"regression,nav",QA,Desktop,1. Hover category 2. Click each item,Correct collection URL and H1,Covered
+Navigation,Open empty cart drawer,Empty cart drawer copy,P1,"smoke,cart,nav",QA,Empty cart,1. Click cart icon,Drawer shows cart is empty,Covered
+Navigation,Open empty wishlist drawer,Empty wishlist drawer copy,P1,"smoke,wishlist,nav",QA,Empty wishlist,1. Click wishlist icon,Drawer shows wishlist is empty,Covered
+Follow Us,Top bar phone WhatsApp Facebook Instagram,Header utility links,P0,"smoke,social",QA,Desktop,1. Open home 2. Assert each utility link,Visible with correct href and target,Covered
+Login,Open login from header,Header Login link,P0,"smoke,auth",QA,Logged out,1. Click Login,/login Customer login,Covered
+Login,Successful login,Valid credentials,P0,"smoke,auth",QA,Valid test account,1. Submit email/password,Success toast; homepage; Logout visible,Covered
+Login,Logout restores Login link,Logout,P0,"smoke,auth",QA,Logged in,1. Logout,Login link restored; logout toast,Covered
+Login,Open account dashboard from greeting,Account entry,P0,"smoke,auth,profile",QA,Logged in,1. Click Signed in as,/my-account/dashboard,Covered
+Login,Toggle show hide password,Password visibility,P2,"regression,auth",QA,On login,1. Toggle show/hide,Input type password/text,Covered
+Login,Open forgot password from login,Lost password link,P0,"smoke,auth",QA,On login,1. Click lost password,/forgot-password,Covered
+Login,Empty submit validation,Required fields,P1,"regression,auth",QA,On login,1. Submit empty,Email/password required messages,Covered
+Login,Email only validation,Password required,P1,"regression,auth",QA,On login,1. Email only submit,Password required,Covered
+Login,Password only validation,Email required,P1,"regression,auth",QA,On login,1. Password only submit,Email required,Covered
+Login,Invalid email format,Format validation,P1,"regression,auth",QA,On login,1. Enter invalid email,Valid email toast/error,Covered
+Login,Unknown email,Unknown account,P1,"regression,auth",QA,On login,1. Unknown email,Invalid credentials,Covered
+Login,Wrong password,Wrong password,P1,"regression,auth",QA,On login,1. Wrong password,Invalid credentials,Covered
+Login,Remember me default unchecked,Default remember me,P2,"regression,auth",QA,On login,1. Open login,Remember me unchecked,Covered
+Login,Remember me toggle,Toggle remember me,P2,"regression,auth",QA,On login,1. Check/uncheck,Checkbox state updates,Covered
+Login,Remember me persists after reload,Session persistence,P1,"regression,auth",QA,Valid account,1. Login with remember me 2. Reload,Still logged in,Covered
+Lost Password,Email required on forgot password,Required email,P1,"regression,auth",QA,On forgot password,1. Submit empty,Email required,Covered
+Lost Password,Send password reset email message,Reset request success copy,P0,"smoke,auth",QA,On forgot password,1. Submit known email,Password reset email sent message,Covered
+Lost Password,Back to login from forgot password,Return link,P2,"regression,auth",QA,On forgot password,1. Click back to login,Login page,Covered
+Lost Password,Complete reset via email link,End-to-end reset with temp mailbox,P0,"smoke,auth,@email",QA,Staging; mail.tm disposable inbox,1. Register+confirm temp user 2. Request reset 3. Open email link 4. Set new password 5. Login with new password; old password fails,Password updated; login succeeds with new password only,Covered
+Register,Open register from login,Register link,P0,"smoke,auth",QA,On login,1. Click register here,/register,Covered
+Register,Link back to login,Login link on register,P2,"regression,auth",QA,On register,1. Click login link,/login,Covered
+Register,Reject invalid email,Email format,P1,"regression,auth",QA,On register,1. Invalid email,Validation error,Covered
+Register,Require email on empty submit,Required email,P1,"regression,auth",QA,On register,1. Empty submit,Email required,Covered
+Register,Password rules when missing,Password rules,P1,"regression,auth",QA,On register,1. Email only,Password rule messages,Covered
+Register,Weak password rules,Weak password,P1,"regression,auth",QA,On register,1. Weak password,Rule messages,Covered
+Register,Already registered email,Duplicate email,P1,"regression,auth",QA,Existing account email,1. Register existing,Already taken,Covered
+Register,New register shows email confirmation,Confirmation page,P0,"smoke,auth",QA,Fresh email,1. Register valid user,Email confirmation page,Covered
+Register,Confirm email and login,Full email confirm,P0,"smoke,auth,@email",QA,mail.tm on staging,1. Register 2. Confirm link 3. Login,Account active,Covered
+Home,Homepage loads with title and featured heading,Home smoke,P0,"smoke,home",QA,None,1. Open /,Title Genki; featured heading visible,Covered
+Carousel,Hero carousel is visible with slides,Carousel presence,P0,"smoke,home,carousel",QA,Home,1. Open home,Hero slider with multiple slides,Covered
+Carousel,Carousel next navigation changes slide,Carousel control,P1,"regression,home,carousel",QA,Home,1. Click next,Active slide changes,Covered
+Newsletter,Subscribe button disabled when empty,Empty newsletter,P2,"regression,newsletter",QA,Home footer,1. Leave email empty,Subscribe disabled or validation,Covered
+Newsletter,Subscribe with valid email,Newsletter happy path,P1,"smoke,newsletter",QA,Home footer,1. Enter valid email 2. Submit,Success feedback or accepted submit,Covered
+Newsletter,Reject invalid newsletter email,Newsletter validation,P2,"regression,newsletter",QA,Home footer,1. Enter invalid email,Validation prevents submit or shows error,Covered
+Categories,Open Men collection PLP,Men PLP,P0,"smoke,plp",QA,Desktop,1. Navigate Men,Men H1 and products,Covered
+Categories,Open Women collection PLP,Women PLP,P0,"smoke,plp",QA,Desktop,1. Navigate Women,Women H1 and products,Covered
+Categories,Open theme collections,Anime Originals Culture JDM Kawaii,P0,"smoke,plp",QA,Desktop,1. Open each theme collection,Correct H1,Covered
+Products,PLP shows product grid and opens PDP,Grid to PDP,P0,"smoke,plp",QA,On Men collection,1. Assert products 2. Open first valid product,PDP URL /products/,Covered
+Products,PLP filters or sort if present,Optional filters,P2,"regression,plp",QA,Collection with filters,1. Apply filter/sort if UI exists,Results update or control visible,Planned
+Individual product,PDP shows title price and ATC,PDP smoke,P0,"smoke,pdp",QA,Product URL,1. Open PDP,Title price ATC visible,Covered
+Individual product,Select size enables ATC,Size selection,P0,"smoke,pdp",QA,PDP with sizes,1. Select size,ATC enabled,Covered
+Individual product,Add to cart success toast and badge,ATC happy path,P0,"smoke,pdp,cart",QA,PDP,1. Select size 2. ATC,Toast; cart badge count,Covered
+Individual product,Add to wishlist from PDP,Wishlist from PDP,P0,"smoke,pdp,wishlist",QA,PDP,1. Click add to wishlist,Item in wishlist drawer or toast,Covered
+Individual product,Quantity stepper on PDP,Qty controls,P2,"regression,pdp",QA,PDP,1. Increase qty,Qty value updates,Covered
+Wishlist,Add product to wishlist and open drawer,Wishlist add,P0,"smoke,wishlist",QA,Empty wishlist,1. Add from PDP 2. Open wishlist,Item listed,Covered
+Wishlist,Remove item from wishlist,Wishlist remove,P1,"regression,wishlist",QA,Item in wishlist,1. Remove item,Empty or item gone,Covered
+Wishlist,Wishlist page view,/wishlist page,P1,"regression,wishlist",QA,Item in wishlist,1. Open /wishlist,Item visible,Covered
+Cart,View cart page after ATC,Cart view,P0,"smoke,cart",QA,Item added,1. ATC 2. Open /cart,Line item with price qty,Covered
+Cart,Increase quantity on cart page,Qty increase,P1,"regression,cart",QA,Item in cart,1. Click +,Qty and totals update,Covered
+Cart,Remove item empties cart,Remove line,P1,"regression,cart",QA,Item in cart,1. Remove,No items found; shop now,Covered
+Cart,Proceed to checkout from cart,Checkout entry,P0,"smoke,cart,checkout",QA,Item in cart,1. Click proceed to checkout,/checkout loads,Covered
+Info,About us page,About CMS,P1,"regression,footer",QA,Home,1. Footer About us,/about-us content loads,Covered
+Info,Contact section,Contact anchor,P1,"regression,footer",QA,Home,1. Footer Contact,/about-us#contact,Covered
+Info,Privacy Policy page,Privacy CMS,P1,"regression,footer",QA,Home,1. Footer Privacy,/privacy-policy loads,Covered
+Info,Terms and Conditions page,Terms CMS,P1,"regression,footer",QA,Home,1. Footer Terms,/terms-and-conditions loads,Covered
+Info,Exchange via return policy promo,Exchange link,P2,"regression,footer",QA,Home promo,1. Click Exchange,/return-policy loads,Covered
+Useful Links,Returns page,Returns CMS,P1,"regression,footer",QA,Home,1. Footer Returns,/return-policy loads,Covered
+Useful Links,Shipping and Delivery page,Shipping CMS,P1,"regression,footer",QA,Home,1. Footer Shipping,/shipping-policy loads,Covered
+Useful Links,Size guide page,Size guide CMS,P1,"regression,footer",QA,Home,1. Footer Size guide,/size-guide loads,Covered
+Useful Links,FAQs page,FAQ CMS,P1,"regression,footer",QA,Home,1. Footer FAQs,/faq loads,Covered
+Follow Us,Footer Facebook Instagram TikTok WhatsApp,Footer social hrefs,P1,"regression,social,footer",QA,Home,1. Assert footer social links,Correct hrefs open external,Covered
+Profile,Dashboard greeting and email,Dashboard,P0,"smoke,profile",QA,Logged in,1. Open dashboard,Hello name and email,Covered
+Profile,Orders page lists or empty state,Orders,P0,"smoke,profile",QA,Logged in,1. Open Orders,Orders table or empty,Covered
+Profile,Loyalty page shows points,Loyalty,P0,"smoke,profile,rewards",QA,Logged in,1. Open Loyalty,Points visible,Covered
+Profile,Address page loads editable fields,Address,P1,"regression,profile",QA,Logged in,1. Open Address,Address fields visible,Covered
+Profile,Account details page loads,Account details,P1,"regression,profile",QA,Logged in,1. Open Account Details,Personal info fields,Covered
+Profile,Logout from account sidebar,Sidebar logout,P0,"smoke,profile,auth",QA,Logged in on dashboard,1. Click Logout in sidebar,Logged out,Covered
+Profile,Redeem points link to rewards,Redeem entry,P1,"smoke,profile,rewards",QA,Logged in dashboard,1. Click Redeem Points,/rewards,Covered
+Rewards,Rewards page shows usable points and catalog,Rewards load,P0,"smoke,rewards",QA,Logged in with points,1. Open /rewards,Points and catalog visible,Covered
+Rewards,Add reward to next order,Redeem add,P1,"regression,rewards",QA,Usable points >= reward cost,1. Click ADD on a reward,Reward queued for next order,Covered
+Checkout,Checkout loads with billing and payment methods,Checkout smoke,P0,"smoke,checkout",QA,Guest cart with item,1. Open /checkout,Billing fields; Card Bank COD,Covered
+Checkout,Place order disabled when billing incomplete,Billing required,P1,"regression,checkout",QA,Guest cart,1. Open checkout without billing 2. Select COD,Place Order stays disabled,Covered
+Checkout,Place order COD guest,Full COD order,P0,"smoke,checkout,payment",QA,Guest cart,1. Fill billing 2. COD 3. Accept terms 4. Place order,order-success COD,Covered
+Checkout,Place order bank transfer guest,Full bank order,P0,"smoke,checkout,payment",QA,Guest cart,1. Fill billing 2. Bank 3. Place order,order-success BankTransfer with bank details,Covered
+Checkout,Place order Visa success via PayHere,Sandbox Visa success,P0,"smoke,checkout,payment",QA,Guest cart; PayHere sandbox iframe,1. Card payment 2. Select Visa 3. Enter 4916217501611292 4. Submit,Payment Approved then order-success Card,Covered
+Checkout,Place order MasterCard success via PayHere,Sandbox Master success,P1,"regression,checkout,payment",QA,Guest cart; PayHere sandbox,1. Card payment 2. Select Master 3. Enter 5307732125531191 4. Submit,Payment Approved then order-success Card,Covered
+Checkout,Decline Visa insufficient funds,Sandbox decline insufficient funds,P1,"regression,checkout,payment",QA,Guest cart; PayHere sandbox,1. Card payment 2. Enter 4024007194349121 3. Submit,Payment Declined; stay off order-success,Covered
+Checkout,Decline MasterCard limit exceeded,Sandbox decline limit exceeded,P1,"regression,checkout,payment",QA,Guest cart; PayHere sandbox,1. Card payment 2. Enter 5491182243178283 3. Submit,Payment Declined; stay off order-success,Covered
+Checkout,Decline Visa do not honor,Sandbox decline do not honor,P1,"regression,checkout,payment",QA,Guest cart; PayHere sandbox,1. Card payment 2. Enter 4929768900837248 3. Submit,Payment Declined; stay off order-success,Covered
+Checkout,Decline Visa network error,Sandbox decline network error,P1,"regression,checkout,payment",QA,Guest cart; PayHere sandbox,1. Card payment 2. Enter 4024007120869333 3. Submit,Payment Declined; stay off order-success,Covered
