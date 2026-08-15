@@ -121,4 +121,5 @@ jobs:
           publish_branch: gh-pages
           publish_dir: ./allure-history
           allow_empty_commit: true
-          exclude_assets: '.github,.git'
+          # Never exclude .git — peaceiris would delete the publish worktree repo.
+          exclude_assets: '.github'
