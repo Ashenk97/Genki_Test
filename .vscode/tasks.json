@@ -1,0 +1,47 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "test",
+      "type": "shell",
+      "command": "npm test",
+      "group": {
+        "kind": "test",
+        "isDefault": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "test:headed",
+      "type": "shell",
+      "command": "npm run test:headed",
+      "group": "test",
+      "problemMatcher": []
+    },
+    {
+      "label": "test:all",
+      "type": "shell",
+      "command": "npm run test:all",
+      "group": "test",
+      "problemMatcher": []
+    },
+    {
+      "label": "report",
+      "type": "shell",
+      "command": "npm run report",
+      "problemMatcher": []
+    },
+    {
+      "label": "allure:serve",
+      "type": "shell",
+      "command": "npm run allure:serve",
+      "problemMatcher": []
+    },
+    {
+      "label": "allure:generate",
+      "type": "shell",
+      "command": "npm run allure:generate",
+      "problemMatcher": []
+    }
+  ]
+}
