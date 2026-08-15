@@ -41,4 +41,25 @@ export class RewardsPage extends BasePage {
     await expect(this.includedSection).toBeVisible();
     await expect(this.page.getByText(/sticker|keytag|reward/i).first()).toBeVisible();
   }
+
+  async getUsablePoints(): Promise<number> {
+    const body = await this.page.locator('body').innerText();
+    const normalized = body.replace(/,/g, '');
+    const match =
+      normalized.match(/usable points[^\d]*(\d+)/i) ||
+      normalized.match(/(\d+)\s*points available/i);
+    return match ? Number(match[1]) : 0;
+  }
+
+  async expectUsablePointsAtMost(maxPoints: number): Promise<void> {
+    await expect
+      .poll(async () => this.getUsablePoints(), { timeout: 15_000 })
+      .toBeLessThanOrEqual(maxPoints);
+  }
+
+  async proceedToCheckoutFromQueue(): Promise<void> {
+    await this.page.getByRole('link', { name: /proceed to checkout/i }).click();
+    await this.waitForPageLoad();
+    await this.acceptCookiesIfVisible();
+  }
 }

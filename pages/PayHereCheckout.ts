@@ -83,11 +83,13 @@ export class PayHereCheckout extends BasePage {
     await this.selectCardBrand(card.brand);
     const ipg = await this.waitForIpgFrame();
     const defaults = getPayHereCardDefaults();
+    const cvv =
+      card.cvv ?? (card.brand === PayHereCardBrand.Amex ? '1234' : defaults.cardCvv);
     await ipg.locator('#cardHolderName').fill(card.holder ?? defaults.cardHolder);
     await ipg.locator('#cardNo').click();
     await ipg.locator('#cardNo').fill('');
     await ipg.locator('#cardNo').pressSequentially(card.number, { delay: 15 });
-    await ipg.locator('#cardSecureId').fill(card.cvv ?? defaults.cardCvv);
+    await ipg.locator('#cardSecureId').fill(cvv);
     await ipg.locator('#cardExpiry').fill('');
     await ipg.locator('#cardExpiry').pressSequentially(card.expiry ?? defaults.cardExpiry, {
       delay: 15,
@@ -126,5 +128,23 @@ export class PayHereCheckout extends BasePage {
     await expect(outer.getByText(/payment declined/i)).toBeVisible({
       timeout: Timeouts.PayHereResult,
     });
+  }
+
+  async cancelCheckout(): Promise<this> {
+    const outer = this.page.frameLocator('#ph-iframe');
+    const cancel = outer.getByRole('button', { name: /cancel|close|back/i }).first();
+    if (await cancel.isVisible({ timeout: Timeouts.ShortUi }).catch(() => false)) {
+      await cancel.click();
+      return this;
+    }
+    // Fallback: leave checkout without completing payment.
+    await this.page.goto('/cart');
+    await this.waitForPageLoad();
+    await this.acceptCookiesIfVisible();
+    return this;
+  }
+
+  async expectCheckoutFrameVisible(): Promise<void> {
+    await expect(this.page.locator('#ph-iframe')).toBeVisible({ timeout: Timeouts.PayHereFrame });
   }
 }

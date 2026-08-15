@@ -53,6 +53,29 @@ test.describe('Remember me', () => {
       await header.expectLoggedOut();
     });
   });
+
+  test('should keep a session cookie after reload when Remember me is unchecked', async ({
+    loginPage,
+    header,
+    homePage,
+  }) => {
+    await test.step('Sign in without Remember me', async () => {
+      await loginPage.open();
+      await loginPage.expectLoaded();
+      await loginPage.login(TEST_DATA.auth.email, TEST_DATA.auth.password, false);
+      await loginPage.expectLoginSuccess();
+      await header.expectLoggedIn(TEST_DATA.auth.displayName);
+    });
+    await test.step('Reload still shows signed-in session', async () => {
+      await header.reloadPage();
+      await homePage.expectLoaded();
+      await header.expectLoggedIn(TEST_DATA.auth.displayName);
+    });
+    await test.step('Log out', async () => {
+      await header.clickLogout();
+      await header.expectLoggedOut();
+    });
+  });
 });
 
 test.describe('Customer login', () => {

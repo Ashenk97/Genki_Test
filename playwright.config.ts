@@ -28,6 +28,7 @@ export default defineConfig({
   projects: [
     {
       name: 'chrome',
+      testIgnore: /mobile-nav\.spec\.ts/,
       use: {
         ...devices['Desktop Chrome'],
         channel: 'chrome',
@@ -35,15 +36,26 @@ export default defineConfig({
     },
     {
       name: 'chromium',
+      testIgnore: /mobile-nav\.spec\.ts/,
       use: { ...devices['Desktop Chrome'] },
     },
     {
       name: 'firefox',
+      testIgnore: /mobile-nav\.spec\.ts/,
       use: { ...devices['Desktop Firefox'] },
     },
     {
       name: 'webkit',
+      testIgnore: /mobile-nav\.spec\.ts/,
       use: { ...devices['Desktop Safari'] },
+    },
+    {
+      name: 'mobile-chrome',
+      use: {
+        ...devices['Pixel 7'],
+        channel: 'chrome',
+      },
+      testMatch: /mobile-nav\.spec\.ts/,
     },
   ],
 });

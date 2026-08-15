@@ -9,7 +9,9 @@ export class HomePage extends BasePage {
   readonly header: Header;
 
   private readonly featuredSectionHeading: Locator;
+  private readonly searchOverlay: Locator;
   private readonly searchInput: Locator;
+  private readonly mobileSearchInput: Locator;
   private readonly firstProductLink: Locator;
   private readonly heroSlider: Locator;
   private readonly heroSlides: Locator;
@@ -22,7 +24,9 @@ export class HomePage extends BasePage {
     this.featuredSectionHeading = page.getByRole('heading', {
       name: PAGE_HEADINGS.featuredMood,
     });
-    this.searchInput = page.getByRole('searchbox', { name: /search products/i });
+    this.searchOverlay = page.locator('.search-overlay');
+    this.searchInput = this.searchOverlay.getByPlaceholder(/search products/i);
+    this.mobileSearchInput = page.locator('.offcanvas-mobile-menu__search input[type="search"]');
     this.firstProductLink = page
       .locator('a[href^="/products/"]:not([href*="undefined"])')
       .first();
@@ -47,9 +51,61 @@ export class HomePage extends BasePage {
     await expect(this.featuredSectionHeading).toBeVisible();
   }
 
+  /**
+   * Staging currently has no header control that opens search; activate the overlay
+   * the same way the app does (active class + body scroll lock) so the input is usable.
+   */
+  async openSearch(): Promise<this> {
+    await this.searchOverlay.evaluate((el) => {
+      el.classList.add('active');
+      document.querySelector('body')?.classList.add('overflow-hidden');
+    });
+    await expect(this.searchOverlay).toHaveClass(/active/);
+    await expect(this.searchInput).toBeVisible();
+    return this;
+  }
+
+  async closeSearch(): Promise<this> {
+    await this.searchOverlay.evaluate((el) => {
+      el.classList.remove('active');
+      document.querySelector('body')?.classList.remove('overflow-hidden');
+    });
+    await expect(this.searchOverlay).not.toHaveClass(/active/);
+    return this;
+  }
+
   async fillSearch(query: string): Promise<this> {
     await this.searchInput.fill(query);
     return this;
+  }
+
+  async submitSearch(): Promise<this> {
+    await this.searchInput.press('Enter');
+    await this.waitForPageLoad();
+    return this;
+  }
+
+  async expectSearchQuery(query: string): Promise<void> {
+    await expect(this.searchInput).toHaveValue(query);
+  }
+
+  async expectFeaturedProductMatching(pattern: RegExp): Promise<void> {
+    await expect(
+      this.page.getByRole('heading', { name: pattern }).or(this.page.getByText(pattern)).first(),
+    ).toBeVisible();
+  }
+
+  async expectMobileSearchVisible(): Promise<void> {
+    await expect(this.mobileSearchInput).toBeVisible();
+  }
+
+  async fillMobileSearch(query: string): Promise<this> {
+    await this.mobileSearchInput.fill(query);
+    return this;
+  }
+
+  async expectMobileSearchQuery(query: string): Promise<void> {
+    await expect(this.mobileSearchInput).toHaveValue(query);
   }
 
   async openFirstProduct(): Promise<ProductDetailsPage> {

@@ -1,6 +1,7 @@
 import { Locator, Page, expect } from '@playwright/test';
 import { AUTH_MESSAGES } from '@constants/messages';
 import { ToastType } from '@constants/payment';
+import { Timeouts } from '@constants/timeouts';
 import { ACCOUNT_PAGES } from '@data/navigation.data';
 import type { AccountSection } from '@models/auth.types';
 import { BasePage } from '@pages/BasePage';
@@ -61,6 +62,104 @@ export class AccountDashboardPage extends BasePage {
     await expect(
       this.page.getByText(/GK-\d+/).or(this.page.getByText(/no orders/i)).first(),
     ).toBeVisible();
+  }
+
+  async expectOrderVisible(orderId: string): Promise<void> {
+    await this.expectPathname(ACCOUNT_PAGES.orders.path);
+    await expect(this.page.getByText(orderId).first()).toBeVisible();
+  }
+
+  async openFirstOrderDetail(): Promise<this> {
+    await this.page.getByRole('button', { name: /^view$/i }).first().click();
+    await expect(this.page.getByText(/order details/i).first()).toBeVisible();
+    return this;
+  }
+
+  async openOrderDetail(orderId: string): Promise<this> {
+    const row = this.page.locator('tr').filter({ hasText: orderId });
+    await row.getByRole('button', { name: /^view$/i }).click();
+    await expect(this.page.getByText(/order details/i).first()).toBeVisible();
+    await expect(this.page.getByText(orderId).first()).toBeVisible();
+    return this;
+  }
+
+  async expectOrderDetailLoaded(orderId: string): Promise<void> {
+    await expect(this.page.getByText(/order details/i).first()).toBeVisible();
+    await expect(this.page.getByText(new RegExp(`Order ID:\\s*${orderId}`, 'i'))).toBeVisible();
+    await expect(this.page.getByText(/ordered products|payment type|total cost/i).first()).toBeVisible();
+  }
+
+  async updateShippingAddress(details: {
+    addressOne: string;
+    addressTwo?: string;
+    city: string;
+  }): Promise<this> {
+    const line1 = this.page.locator('#address-line1, input[name="streetAddress1"]');
+    const line2 = this.page.locator('#address-line2, input[name="streetAddress2"]');
+    const city = this.page.locator('#city, input[name="city"]');
+    await line1.fill(details.addressOne);
+    if (await line2.isVisible().catch(() => false)) {
+      await line2.fill(details.addressTwo ?? '');
+    }
+    await city.fill(details.city);
+    await this.page.getByRole('button', { name: /save changes/i }).click();
+    return this;
+  }
+
+  async expectAddressSaved(): Promise<void> {
+    await this.expectToast(/address updated successfully/i, ToastType.Success);
+  }
+
+  async updateAccountDetails(details: {
+    firstName: string;
+    lastName: string;
+    phone: string;
+  }): Promise<this> {
+    const firstName = this.page.locator('#first-name');
+    const lastName = this.page.locator('#last-name');
+    const phone = this.page.locator('#contact-number');
+    await expect(firstName).toBeVisible();
+    await firstName.fill(details.firstName);
+    await lastName.fill(details.lastName);
+    await phone.click();
+    await phone.fill('');
+    await phone.type(details.phone, { delay: 25 });
+    const save = this.page.getByRole('button', { name: /save changes/i });
+    await expect(save).toBeEnabled({ timeout: Timeouts.ShortUi });
+    await save.click();
+    return this;
+  }
+
+  async expectAccountDetailsSaved(): Promise<void> {
+    await this.expectToast(/profile updated successfully/i, ToastType.Success);
+  }
+
+  async getAccountDetails(): Promise<{ firstName: string; lastName: string; phone: string }> {
+    return {
+      firstName: await this.page.locator('#first-name, input[name="firstName"]').inputValue(),
+      lastName: await this.page.locator('#last-name, input[name="lastName"]').inputValue(),
+      phone: await this.page.locator('#contact-number, input[name="phoneNumber"]').inputValue(),
+    };
+  }
+
+  async getAccountPhone(): Promise<string> {
+    return this.page.locator('#contact-number, input[name="phoneNumber"]').inputValue();
+  }
+
+  async getAddressFields(): Promise<{ addressOne: string; addressTwo: string; city: string }> {
+    return {
+      addressOne: await this.page.locator('#address-line1, input[name="streetAddress1"]').inputValue(),
+      addressTwo: await this.page.locator('#address-line2, input[name="streetAddress2"]').inputValue(),
+      city: await this.page.locator('#city, input[name="city"]').inputValue(),
+    };
+  }
+
+  async getAddressLine2(): Promise<string> {
+    return this.page.locator('#address-line2, input[name="streetAddress2"]').inputValue();
+  }
+
+  async expectRedirectedToLogin(): Promise<void> {
+    await expect(this.page).toHaveURL(/\/login/);
   }
 
   async expectLoyaltyLoaded(): Promise<void> {

@@ -21,6 +21,8 @@ export class Header extends BasePage {
   private readonly instagramLink: Locator;
   private readonly cartButton: Locator;
   private readonly wishlistButton: Locator;
+  private readonly mobileMenuButton: Locator;
+  private readonly mobileMenu: Locator;
 
   constructor(page: Page) {
     super(page);
@@ -43,6 +45,8 @@ export class Header extends BasePage {
 
     this.cartButton = this.root.getByRole('button', { name: /open cart/i });
     this.wishlistButton = this.root.getByRole('button', { name: /open wishlist/i });
+    this.mobileMenuButton = this.root.getByRole('button', { name: /open menu/i });
+    this.mobileMenu = page.locator('.offcanvas-mobile-menu');
   }
 
   get navMenLink(): Locator {
@@ -194,6 +198,33 @@ export class Header extends BasePage {
 
   async expectCartBadgeHasItems(): Promise<void> {
     await expect(this.cartButton).toHaveAttribute('aria-label', /open cart,\s*\d+\s*item/i);
+  }
+
+  async expectCartBadgeEmpty(): Promise<void> {
+    await expect(this.cartButton).toHaveAttribute('aria-label', /^open cart$/i);
+  }
+
+  async openMobileMenu(): Promise<void> {
+    await this.mobileMenuButton.click();
+    await expect(this.mobileMenu).toHaveClass(/active/);
+  }
+
+  async expectMobileMenuVisible(): Promise<void> {
+    await expect(this.mobileMenu).toHaveClass(/active/);
+    await expect(
+      this.mobileMenu.getByRole('link', { name: /^men$/i }).or(
+        this.mobileMenu.getByText(/^men$/i),
+      ).first(),
+    ).toBeVisible();
+  }
+
+  async clickMobileNav(name: string): Promise<void> {
+    const link = this.mobileMenu.getByRole('link', {
+      name: new RegExp(`^${escapeRegExp(name)}$`, 'i'),
+    }).first();
+    await link.click();
+    await this.waitForPageLoad();
+    await this.acceptCookiesIfVisible();
   }
 
   private topLevelLink(name: string): Locator {

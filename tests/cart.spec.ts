@@ -1,5 +1,9 @@
+import { TEST_DATA } from '@data/index';
 import { test } from '@fixtures/test-fixtures';
-import { addSampleProductToCart } from '@helpers/cart.helper';
+import {
+  addSampleProductToCart,
+  addSecondaryProductToCart,
+} from '@helpers/cart.helper';
 
 test.describe('Cart', () => {
   test('should show the cart page with the added line item', async ({
@@ -28,6 +32,34 @@ test.describe('Cart', () => {
     });
   });
 
+  test('should decrease quantity on the cart page', async ({ productDetailsPage, cartPage }) => {
+    await test.step('Add product and increase quantity', async () => {
+      await addSampleProductToCart(productDetailsPage);
+      await cartPage.open();
+      await cartPage.increaseQuantity();
+      await cartPage.expectQuantity(2);
+    });
+    await test.step('Decrease quantity back to 1', async () => {
+      await cartPage.decreaseQuantity();
+      await cartPage.expectQuantity(1);
+    });
+  });
+
+  test('should show multiple line items when two products are added', async ({
+    productDetailsPage,
+    cartPage,
+  }) => {
+    await test.step('Add two different products', async () => {
+      await addSampleProductToCart(productDetailsPage);
+      await addSecondaryProductToCart(productDetailsPage);
+    });
+    await test.step('Verify cart has two lines', async () => {
+      await cartPage.open();
+      await cartPage.expectLoaded();
+      await cartPage.expectItemCount(2);
+    });
+  });
+
   test('should remove items and show an empty cart', async ({ productDetailsPage, cartPage }) => {
     await test.step('Add sample product to cart', async () => {
       await addSampleProductToCart(productDetailsPage);
@@ -36,6 +68,20 @@ test.describe('Cart', () => {
       await cartPage.open();
       await cartPage.clearCart();
       await cartPage.expectEmpty();
+      await cartPage.expectProceedToCheckoutHidden();
+    });
+  });
+
+  test('should navigate from empty cart Shop now', async ({ productDetailsPage, cartPage }) => {
+    await test.step('Empty the cart', async () => {
+      await addSampleProductToCart(productDetailsPage);
+      await cartPage.open();
+      await cartPage.clearCart();
+      await cartPage.expectEmpty();
+    });
+    await test.step('Click Shop now', async () => {
+      await cartPage.clickShopNow();
+      await cartPage.expectShopNowNavigated();
     });
   });
 
@@ -51,6 +97,45 @@ test.describe('Cart', () => {
       await cartPage.open();
       await cartPage.proceedToCheckoutPage();
       await checkoutPage.expectLoaded();
+    });
+  });
+
+  test('should proceed to checkout from the cart drawer', async ({
+    productDetailsPage,
+    header,
+    cartPage,
+    checkoutPage,
+  }) => {
+    await test.step('Add product and open cart drawer', async () => {
+      await addSampleProductToCart(productDetailsPage);
+      await header.openCart();
+      await cartPage.expectDrawerNotEmpty();
+    });
+    await test.step('Checkout from drawer', async () => {
+      await cartPage.checkoutFromDrawer();
+      await checkoutPage.expectLoaded();
+    });
+  });
+
+  test('should persist cart items for a logged-in customer after reload', async ({
+    loginPage,
+    productDetailsPage,
+    cartPage,
+    header,
+  }) => {
+    await test.step('Sign in and add a product', async () => {
+      await loginPage.open();
+      await loginPage.login(TEST_DATA.auth.email, TEST_DATA.auth.password);
+      await loginPage.expectLoginSuccess();
+      await addSampleProductToCart(productDetailsPage);
+    });
+    await test.step('Reload and confirm cart still has items', async () => {
+      await cartPage.open();
+      await cartPage.expectHasItems();
+      await header.reloadPage();
+      await cartPage.open();
+      await cartPage.expectHasItems();
+      await header.expectCartBadgeHasItems();
     });
   });
 });

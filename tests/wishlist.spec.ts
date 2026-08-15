@@ -32,7 +32,7 @@ test.describe('Wishlist', () => {
     });
   });
 
-  test('should remove an item from the wishlist', async ({
+  test('should remove an item from the wishlist drawer', async ({
     productDetailsPage,
     header,
     wishlistPage,
@@ -47,6 +47,29 @@ test.describe('Wishlist', () => {
     await test.step('Remove item from drawer', async () => {
       await wishlistPage.removeFirstItem();
       await wishlistPage.expectDrawerEmpty();
+    });
+  });
+
+  test('should convert a wishlist item into a cart line via PDP', async ({
+    productDetailsPage,
+    wishlistPage,
+    cartPage,
+  }) => {
+    await test.step('Add to wishlist and open product from wishlist page', async () => {
+      await productDetailsPage.open(PRODUCT_DATA.samplePath);
+      await productDetailsPage.addToWishlist();
+      await productDetailsPage.expectAddedToWishlist();
+      await wishlistPage.open();
+      await wishlistPage.expectHasItems();
+      await wishlistPage.openFirstProduct();
+      await productDetailsPage.expectOnProductPage();
+    });
+    await test.step('Select size and add to cart', async () => {
+      await productDetailsPage.selectFirstAvailableSize();
+      await productDetailsPage.addToCart();
+      await productDetailsPage.expectAddedToCart();
+      await cartPage.open();
+      await cartPage.expectHasItems();
     });
   });
 });

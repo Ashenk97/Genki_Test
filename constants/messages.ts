@@ -15,6 +15,11 @@ export enum ErrorMessages {
   CartEmpty = 'no items found in cart',
   WishlistEmpty = 'your wishlist is empty',
   DrawerCartEmpty = 'your cart is empty',
+  EmptyCheckout = 'no items found in cart to checkout',
+  AddressSaved = 'address',
+  AccountDetailsSaved = 'account|profile|details|saved|updated|success',
+  CreateAccountSchemaError = 'expected string, received null',
+  NoProductsFound = 'no products found',
 }
 
 export const AUTH_MESSAGES = {
@@ -34,8 +39,17 @@ export const AUTH_MESSAGES = {
   cartEmpty: new RegExp(ErrorMessages.CartEmpty, 'i'),
   wishlistEmpty: new RegExp(ErrorMessages.WishlistEmpty, 'i'),
   drawerCartEmpty: new RegExp(ErrorMessages.DrawerCartEmpty, 'i'),
+  emptyCheckout: new RegExp(ErrorMessages.EmptyCheckout, 'i'),
+  addressSaved: new RegExp(ErrorMessages.AddressSaved, 'i'),
+  accountDetailsSaved: new RegExp(ErrorMessages.AccountDetailsSaved, 'i'),
   wishlistToast: /wishlist/i,
   accountConfirmed: /confirm|verif|success|activated|thank you/i,
+  selectSizePrompt: /select a size/i,
+  createAccount: /create an account/i,
+  selectedRewards: /selected rewards/i,
+  passwordMismatch: /match|confirm|same/i,
+  createAccountSchemaError: new RegExp(ErrorMessages.CreateAccountSchemaError, 'i'),
+  noProductsFound: new RegExp(ErrorMessages.NoProductsFound, 'i'),
 } as const;
 
 export const PAGE_HEADINGS = {

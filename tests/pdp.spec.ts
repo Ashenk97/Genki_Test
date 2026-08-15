@@ -9,10 +9,25 @@ test.describe('Individual product', () => {
     });
   });
 
+  test('should require a size before add to cart is available', async ({ productDetailsPage }) => {
+    await test.step('Open PDP without selecting a size', async () => {
+      await productDetailsPage.open(PRODUCT_DATA.samplePath);
+      await productDetailsPage.expectSizeRequired();
+    });
+  });
+
   test('should enable add to cart after selecting a size', async ({ productDetailsPage }) => {
     await test.step('Select size on PDP', async () => {
       await productDetailsPage.open(PRODUCT_DATA.samplePath);
       await productDetailsPage.selectFirstAvailableSize();
+      await productDetailsPage.expectAddToCartVisible();
+    });
+  });
+
+  test('should select a specific size from the size matrix', async ({ productDetailsPage }) => {
+    await test.step('Select size M on secondary PDP', async () => {
+      await productDetailsPage.open(PRODUCT_DATA.secondaryPath);
+      await productDetailsPage.selectSize(PRODUCT_DATA.secondarySize);
       await productDetailsPage.expectAddToCartVisible();
     });
   });
@@ -23,6 +38,36 @@ test.describe('Individual product', () => {
       await productDetailsPage.selectFirstAvailableSize();
       await productDetailsPage.increaseQuantity();
       await productDetailsPage.expectQuantity(2);
+    });
+  });
+
+  test('should decrease quantity with the stepper', async ({ productDetailsPage }) => {
+    await test.step('Increase then decrease PDP quantity', async () => {
+      await productDetailsPage.open(PRODUCT_DATA.samplePath);
+      await productDetailsPage.selectFirstAvailableSize();
+      await productDetailsPage.increaseQuantity();
+      await productDetailsPage.expectQuantity(2);
+      await productDetailsPage.decreaseQuantity();
+      await productDetailsPage.expectQuantity(1);
+    });
+  });
+
+  test('should add quantity greater than one to the cart', async ({
+    productDetailsPage,
+    cartPage,
+  }) => {
+    await test.step('Add qty 2 to cart from PDP', async () => {
+      await productDetailsPage.open(PRODUCT_DATA.samplePath);
+      await productDetailsPage.selectFirstAvailableSize();
+      await productDetailsPage.increaseQuantity();
+      await productDetailsPage.expectQuantity(2);
+      await productDetailsPage.addToCart();
+      await productDetailsPage.expectAddedToCart();
+    });
+    await test.step('Cart reflects quantity 2', async () => {
+      await cartPage.open();
+      await cartPage.expectHasItems();
+      await cartPage.expectQuantity(2);
     });
   });
 

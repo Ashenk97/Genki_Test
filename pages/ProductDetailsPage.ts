@@ -8,8 +8,10 @@ export class ProductDetailsPage extends BasePage {
   private readonly price: Locator;
   private readonly addToCartButton: Locator;
   private readonly selectSizePrompt: Locator;
+  private readonly selectColorPrompt: Locator;
   private readonly addToWishlistButton: Locator;
   private readonly increaseQtyButton: Locator;
+  private readonly decreaseQtyButton: Locator;
 
   constructor(page: Page) {
     super(page);
@@ -18,10 +20,17 @@ export class ProductDetailsPage extends BasePage {
     this.price = page.getByText(/LKR\s*[\d,.]+/).first();
     this.addToCartButton = page.getByRole('button', { name: /add to cart/i });
     this.selectSizePrompt = page.getByRole('button', { name: /select a size/i });
+    this.selectColorPrompt = page.getByRole('button', { name: /select a color/i });
     this.addToWishlistButton = page.getByRole('button', { name: /add to wishlist/i });
     this.increaseQtyButton = page
       .locator('button.inc.qtybutton')
       .or(page.getByRole('button', { name: /^\+$/ }))
+      .or(page.locator('button.qtybutton').filter({ hasText: /^\+$/ }))
+      .first();
+    this.decreaseQtyButton = page
+      .locator('button.dec.qtybutton')
+      .or(page.getByRole('button', { name: /^−$|^-$/ }))
+      .or(page.locator('button.qtybutton').filter({ hasText: /^-$/ }))
       .first();
   }
 
@@ -86,6 +95,38 @@ export class ProductDetailsPage extends BasePage {
     await expect(this.addToCartButton).toBeEnabled();
   }
 
+  async expectSizeRequired(): Promise<void> {
+    await expect(this.selectSizePrompt).toBeVisible();
+    await expect(this.addToCartButton).toHaveCount(0);
+  }
+
+  async expectColorRequired(): Promise<void> {
+    await expect(this.selectColorPrompt).toBeVisible();
+    await expect(this.addToCartButton).toHaveCount(0);
+  }
+
+  async selectColor(color: string): Promise<this> {
+    const input = this.page.locator(`input[name="product-color"][value="${color}" i], input[name="product-color"]#${color}`);
+    const colorId = await input.first().getAttribute('id');
+    if (colorId) {
+      await this.page.locator(`label[for="${colorId}"]`).click({ force: true });
+    } else {
+      await input.first().check({ force: true });
+    }
+    return this;
+  }
+
+  async expectAvailableSizeCount(minCount: number): Promise<void> {
+    const sizes = this.page.locator('input[type="radio"]:not([name="product-color"])');
+    await expect.poll(async () => sizes.count()).toBeGreaterThanOrEqual(minCount);
+  }
+
+  async expectBrokenProductShell(): Promise<void> {
+    await expect(this.addToCartButton).toHaveCount(0);
+    await expect(this.selectSizePrompt).toHaveCount(0);
+    await expect(this.selectColorPrompt).toHaveCount(0);
+  }
+
   async expectAddedToCart(): Promise<void> {
     await this.expectToast(AUTH_MESSAGES.addedToCartToast, ToastType.Success);
   }
@@ -93,7 +134,9 @@ export class ProductDetailsPage extends BasePage {
   async expectProductDetailsVisible(): Promise<void> {
     await expect(this.productTitle).toBeVisible();
     await expect(this.price).toBeVisible();
-    await expect(this.addToCartButton.or(this.selectSizePrompt)).toBeVisible();
+    await expect(
+      this.addToCartButton.or(this.selectSizePrompt).or(this.selectColorPrompt),
+    ).toBeVisible();
   }
 
   async expectOnProductPage(): Promise<void> {
@@ -114,6 +157,11 @@ export class ProductDetailsPage extends BasePage {
 
   async increaseQuantity(): Promise<this> {
     await this.increaseQtyButton.click();
+    return this;
+  }
+
+  async decreaseQuantity(): Promise<this> {
+    await this.decreaseQtyButton.click();
     return this;
   }
 

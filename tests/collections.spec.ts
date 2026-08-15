@@ -29,10 +29,28 @@ test.describe('Categories and products PLP', () => {
     });
   }
 
+  test('should show products on the Anime theme collection', async ({ collectionPage }) => {
+    await test.step('Open Anime collection with products', async () => {
+      await collectionPage.open('/collection/anime');
+      await collectionPage.expectLoaded('/collection/anime', /^Anime Collection$/i);
+      await collectionPage.expectHasProducts();
+    });
+  });
+
   test('should open the first valid product from Men PLP', async ({ collectionPage }) => {
     const men = MAIN_NAV_TOP_LEVEL[0];
     await test.step('Open first product from Men PLP', async () => {
       await collectionPage.open(men.path);
+      await collectionPage.expectHasProducts();
+      const pdp = await collectionPage.openFirstProduct();
+      await pdp.expectOnProductPage();
+    });
+  });
+
+  test('should open the first valid product from Women PLP', async ({ collectionPage }) => {
+    const women = MAIN_NAV_TOP_LEVEL[1];
+    await test.step('Open first product from Women PLP', async () => {
+      await collectionPage.open(women.path);
       await collectionPage.expectHasProducts();
       const pdp = await collectionPage.openFirstProduct();
       await pdp.expectOnProductPage();

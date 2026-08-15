@@ -1,4 +1,5 @@
 import type { CheckoutPage } from '@pages/CheckoutPage';
+import type { LoginPage } from '@pages/LoginPage';
 import type { ProductDetailsPage } from '@pages/ProductDetailsPage';
 import { PaymentMethod } from '@constants/payment';
 import { guestCheckoutEmail } from '@data/checkout.data';
@@ -13,6 +14,24 @@ export async function startGuestCardCheckout(
   await checkoutPage.open();
   await checkoutPage.fillGuestBilling(guestCheckoutEmail(emailPrefix));
   await checkoutPage.selectPayment(PaymentMethod.Card);
+  await checkoutPage.acceptTerms();
+  await checkoutPage.placeOrder();
+}
+
+export async function startLoggedInCodCheckout(
+  loginPage: LoginPage,
+  productDetailsPage: ProductDetailsPage,
+  checkoutPage: CheckoutPage,
+  email: string,
+  password: string,
+): Promise<void> {
+  await loginPage.open();
+  await loginPage.login(email, password);
+  await loginPage.expectLoginSuccess();
+  await addSampleProductToCart(productDetailsPage);
+  await checkoutPage.open();
+  await checkoutPage.fillLoggedInBilling();
+  await checkoutPage.selectPayment(PaymentMethod.COD);
   await checkoutPage.acceptTerms();
   await checkoutPage.placeOrder();
 }

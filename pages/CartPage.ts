@@ -1,5 +1,7 @@
 import { Locator, Page, expect } from '@playwright/test';
+import { AUTH_MESSAGES } from '@constants/messages';
 import { CART_PAGE } from '@data/navigation.data';
+import { AppRoutes } from '@constants/routes';
 import { BasePage } from '@pages/BasePage';
 
 export class CartPage extends BasePage {
@@ -9,6 +11,7 @@ export class CartPage extends BasePage {
   private readonly proceedToCheckout: Locator;
   private readonly productRows: Locator;
   private readonly increaseQtyButton: Locator;
+  private readonly decreaseQtyButton: Locator;
   private readonly removeButtons: Locator;
   private readonly drawer: Locator;
   private readonly drawerCheckout: Locator;
@@ -23,7 +26,11 @@ export class CartPage extends BasePage {
       has: page.locator('a[href^="/products/"]:not([href*="undefined"])'),
     });
     this.increaseQtyButton = this.productRows.first().getByRole('button', { name: /^\+$/ })
-      .or(this.productRows.first().locator('button.inc.qtybutton'));
+      .or(this.productRows.first().locator('button.inc.qtybutton'))
+      .or(this.productRows.first().locator('button.qtybutton').filter({ hasText: /^\+$/ }));
+    this.decreaseQtyButton = this.productRows.first().getByRole('button', { name: /^−$|^-$/ })
+      .or(this.productRows.first().locator('button.dec.qtybutton'))
+      .or(this.productRows.first().locator('button.qtybutton').filter({ hasText: /^-$/ }));
     this.removeButtons = page.locator('table tbody tr td:last-child button');
     this.drawer = page.locator('.cart-overlay');
     this.drawerCheckout = this.drawer.getByRole('link', { name: /^checkout$/i });
@@ -43,13 +50,39 @@ export class CartPage extends BasePage {
     await expect(this.productRows.first()).toBeVisible();
   }
 
+  async expectItemCount(count: number): Promise<void> {
+    await expect(this.productRows).toHaveCount(count);
+  }
+
+  async expectLineContains(text: string | RegExp): Promise<void> {
+    await expect(this.productRows.first().getByText(text)).toBeVisible();
+  }
+
   async expectEmpty(): Promise<void> {
     await expect(this.emptyMessage).toBeVisible();
     await expect(this.shopNowLink).toBeVisible();
   }
 
+  async clickShopNow(): Promise<void> {
+    await this.shopNowLink.click();
+    await this.waitForPageLoad();
+    await this.acceptCookiesIfVisible();
+  }
+
+  async expectShopNowNavigated(): Promise<void> {
+    await expect(this.page).toHaveURL((url) => {
+      const path = url.pathname.replace(/\/$/, '');
+      return path === '' || path === '/' || path.startsWith('/collection');
+    });
+  }
+
   async increaseQuantity(): Promise<this> {
     await this.increaseQtyButton.click();
+    return this;
+  }
+
+  async decreaseQuantity(): Promise<this> {
+    await this.decreaseQtyButton.click();
     return this;
   }
 
@@ -78,8 +111,19 @@ export class CartPage extends BasePage {
     await this.acceptCookiesIfVisible();
   }
 
+  async expectProceedToCheckoutHidden(): Promise<void> {
+    await expect(this.proceedToCheckout).toHaveCount(0);
+  }
+
   async expectDrawerNotEmpty(): Promise<void> {
     await expect(this.drawer.getByText(/your cart is empty/i)).toHaveCount(0);
     await expect(this.drawerCheckout).toBeVisible();
+  }
+
+  async checkoutFromDrawer(): Promise<void> {
+    await this.drawerCheckout.click();
+    await this.waitForPageLoad();
+    await this.acceptCookiesIfVisible();
+    await this.expectPathname(AppRoutes.Checkout);
   }
 }

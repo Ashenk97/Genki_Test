@@ -53,4 +53,4 @@ export {
 export { AUTH_VALIDATION, getAuthCredentials } from './auth.data';
 export { getGuestBillingDetails, guestCheckoutEmail } from './checkout.data';
 export { getPayHereCardDefaults, PAYHERE_SANDBOX_CARDS } from './payhere.data';
-export { NEWSLETTER_DATA, PRODUCT_DATA, SEARCH_QUERIES } from './products.data';
+export { NEWSLETTER_DATA, PRODUCT_DATA, SEARCH_QUERIES, EMPTY_THEME_COLLECTIONS } from './products.data';

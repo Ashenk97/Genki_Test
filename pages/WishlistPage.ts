@@ -49,4 +49,32 @@ export class WishlistPage extends BasePage {
   async expectDrawerEmpty(): Promise<void> {
     await expect(this.drawerEmptyMessage).toBeVisible({ timeout: Timeouts.ShortUi });
   }
+
+  async openFirstProduct(): Promise<void> {
+    await this.page.getByRole('link', { name: /view product/i }).first().click();
+    await this.waitForPageLoad();
+    await this.acceptCookiesIfVisible();
+  }
+
+  async clearWishlist(): Promise<void> {
+    const clear = this.page.getByRole('button', { name: /clear wishlist/i });
+    if (await clear.isVisible().catch(() => false)) {
+      await clear.click();
+    }
+  }
+
+  async removeFirstItemFromPage(): Promise<void> {
+    const rowRemove = this.page.locator('table tbody tr td:last-child button').first();
+    if (await rowRemove.isVisible().catch(() => false)) {
+      await rowRemove.click();
+      return;
+    }
+    await this.clearWishlist();
+  }
+
+  async expectEmpty(): Promise<void> {
+    await expect(this.page.getByText(AUTH_MESSAGES.wishlistEmpty)).toBeVisible({
+      timeout: Timeouts.ShortUi,
+    });
+  }
 }
