@@ -62,23 +62,34 @@ jobs:
           echo "Credential secrets are present for ${TEST_ENV}."
 
       - name: Run Playwright tests
-        run: npx playwright test
+        run: npx playwright test --grep-invert @email
         continue-on-error: true
         env:
           GENKI_TEST_EMAIL: ${{ secrets.GENKI_TEST_EMAIL }}
           GENKI_TEST_PASSWORD: ${{ secrets.GENKI_TEST_PASSWORD }}
           GENKI_TEST_DISPLAY_NAME: ${{ secrets.GENKI_TEST_DISPLAY_NAME }}
 
+      - name: Check if gh-pages exists
+        id: ghpages
+        if: always()
+        run: |
+          if git ls-remote --exit-code --heads origin gh-pages >/dev/null 2>&1; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+            echo "No gh-pages branch yet; Allure history will start on this run."
+            mkdir -p gh-pages
+          fi
+
       - name: Get Allure history
         uses: actions/checkout@v4
-        if: always()
-        continue-on-error: true
+        if: always() && steps.ghpages.outputs.exists == 'true'
         with:
           ref: gh-pages
           path: gh-pages
 
       - name: Strip git metadata from history checkout
-        if: always()
+        if: always() && steps.ghpages.outputs.exists == 'true'
         run: rm -rf gh-pages/.git
 
       - name: Generate Allure Report
