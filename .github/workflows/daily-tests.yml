@@ -41,7 +41,7 @@ jobs:
         run: npm ci
 
       - name: Install Playwright Browsers
-        run: npx playwright install --with-deps
+        run: npx playwright install --with-deps chrome
 
       - name: Verify credentials secrets
         env:
@@ -62,7 +62,7 @@ jobs:
           echo "Credential secrets are present for ${TEST_ENV}."
 
       - name: Run Playwright tests
-        run: npx playwright test --grep-invert @email
+        run: npx playwright test --project=chrome --grep-invert @email
         continue-on-error: true
         env:
           GENKI_TEST_EMAIL: ${{ secrets.GENKI_TEST_EMAIL }}
