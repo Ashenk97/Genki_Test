@@ -29,10 +29,10 @@ jobs:
       TEST_ENV: ${{ github.event.inputs.test_env || 'staging' }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: 20
           cache: npm
@@ -82,7 +82,7 @@ jobs:
           fi
 
       - name: Get Allure history
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         if: always() && steps.ghpages.outputs.exists == 'true'
         with:
           ref: gh-pages
