@@ -47,6 +47,12 @@ jobs:
           ref: gh-pages
           path: gh-pages
 
+      # simple-elf copies gh-pages/* (including .git) into allure-history from Docker
+      # as root. Strip git metadata first so the publish dir is not a nested repo.
+      - name: Strip git metadata from history checkout
+        if: always()
+        run: rm -rf gh-pages/.git
+
       - name: Generate Allure Report
         uses: simple-elf/allure-report-action@v1.15
         if: always()
@@ -56,13 +62,11 @@ jobs:
           allure_report: allure-report
           allure_history: allure-history
 
-      # The history checkout copies .git into allure-history. If that nested repo
-      # is empty (first run) or not on gh-pages, peaceiris skips the commit and
-      # then fails with: src refspec gh-pages does not match any
       - name: Prepare GitHub Pages assets
         if: always()
         run: |
           mkdir -p allure-history
+          sudo chown -R "$(id -u):$(id -g)" allure-history allure-report 2>/dev/null || true
           rm -rf allure-history/.git
           touch allure-history/.nojekyll
           if [ ! -s allure-history/index.html ]; then
@@ -77,5 +81,5 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_branch: gh-pages
           publish_dir: ./allure-history
-          force_orphan: true
           allow_empty_commit: true
+          exclude_assets: '.github,.git'
