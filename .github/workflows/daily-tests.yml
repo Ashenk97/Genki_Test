@@ -31,6 +31,24 @@ jobs:
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps
 
+      # Empty ${{ secrets.* }} means the secret is not configured in the repo.
+      - name: Verify staging credentials secrets
+        env:
+          GENKI_TEST_EMAIL: ${{ secrets.GENKI_TEST_EMAIL }}
+          GENKI_TEST_PASSWORD: ${{ secrets.GENKI_TEST_PASSWORD }}
+        run: |
+          missing=0
+          for name in GENKI_TEST_EMAIL GENKI_TEST_PASSWORD; do
+            if [ -z "${!name}" ]; then
+              echo "::error title=Missing Actions secret::$name is empty. Add it under Settings → Secrets and variables → Actions."
+              missing=1
+            fi
+          done
+          if [ "$missing" -ne 0 ]; then
+            exit 1
+          fi
+          echo "Staging credential secrets are present."
+
       - name: Run Playwright tests
         run: npx playwright test
         continue-on-error: true # Crucial: Keeps running so the report generates

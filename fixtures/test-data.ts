@@ -3,23 +3,10 @@
  * Extend this file as new scenarios require structured input.
  *
  * Staging login credentials come from environment variables — never commit secrets.
- * Copy `.env.example` to `.env` and fill GENKI_TEST_EMAIL / GENKI_TEST_PASSWORD.
+ * Locally: copy `.env.example` to `.env`.
+ * CI: set Actions secrets GENKI_TEST_EMAIL / GENKI_TEST_PASSWORD.
  */
-import path from 'path';
-import { config as loadEnv } from 'dotenv';
-
-loadEnv({ path: path.resolve(__dirname, '../.env') });
-
-function requiredEnv(name: string): string {
-  const value = process.env[name]?.trim();
-  if (!value) {
-    throw new Error(
-      `Missing required environment variable "${name}". ` +
-        'Copy .env.example to .env and set your staging credentials.',
-    );
-  }
-  return value;
-}
+import { requiredEnv } from './env';
 
 export type NavDestination = {
   name: string;
@@ -47,10 +34,18 @@ export const TEST_DATA = {
   product: {
     defaultSize: 'M',
   },
+  // Credentials resolve on access so non-auth specs can import this module
+  // without requiring GENKI_TEST_* to be set.
   auth: {
-    email: requiredEnv('GENKI_TEST_EMAIL'),
-    password: requiredEnv('GENKI_TEST_PASSWORD'),
-    displayName: process.env.GENKI_TEST_DISPLAY_NAME?.trim() || 'Ashen',
+    get email() {
+      return requiredEnv('GENKI_TEST_EMAIL');
+    },
+    get password() {
+      return requiredEnv('GENKI_TEST_PASSWORD');
+    },
+    get displayName() {
+      return process.env.GENKI_TEST_DISPLAY_NAME?.trim() || 'Ashen';
+    },
     invalidEmail: 'not-an-email',
     unknownEmail: 'nobody-exists-xyz@example.com',
     wrongPassword: 'WrongPassword123!',
