@@ -1,5 +1,5 @@
-import { TEST_DATA } from '../fixtures/test-data';
-import { test, expect } from '../fixtures/test-fixtures';
+import { TEST_DATA } from '@data/index';
+import { test } from '@fixtures/test-fixtures';
 
 test.describe('Rewards', () => {
   test.beforeEach(async ({ loginPage }) => {
@@ -9,14 +9,18 @@ test.describe('Rewards', () => {
   });
 
   test('should show usable points and rewards catalog', async ({ rewardsPage }) => {
-    await rewardsPage.open();
-    await rewardsPage.expectLoaded();
+    await test.step('Open rewards page', async () => {
+      await rewardsPage.open();
+      await rewardsPage.expectLoaded();
+    });
   });
 
   test('should add a reward to the next order queue', async ({ rewardsPage }) => {
-    await rewardsPage.open();
-    await rewardsPage.expectLoaded();
-    await rewardsPage.addFirstAffordableReward();
-    await rewardsPage.expectRewardQueued();
+    await test.step('Queue an affordable reward', async () => {
+      await rewardsPage.open();
+      await rewardsPage.expectLoaded();
+      await rewardsPage.addFirstAffordableReward();
+      await rewardsPage.expectRewardQueued();
+    });
   });
 });

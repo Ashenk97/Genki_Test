@@ -1,12 +1,9 @@
 import fs from 'fs';
 import path from 'path';
-import { resolveTestEnv } from './environments';
+import { resolveTestEnv } from '@constants/environments';
+import type { LoadEnvOptions } from '@models/env.types';
 
-type LoadOptions = {
-  override?: boolean;
-};
-
-export function loadEnvFile(fileName = '.env', options: LoadOptions = {}): void {
+export function loadEnvFile(fileName = '.env', options: LoadEnvOptions = {}): void {
   const envPath = path.resolve(__dirname, '..', fileName);
   if (!fs.existsSync(envPath)) {
     return;

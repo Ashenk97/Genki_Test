@@ -1,13 +1,13 @@
 import { Locator, Page, expect } from '@playwright/test';
-import { ACCOUNT_PAGES } from '../fixtures/test-data';
-import { BasePage } from './BasePage';
+import { ACCOUNT_PAGES } from '@data/navigation.data';
+import { BasePage } from '@pages/BasePage';
 
 export class RewardsPage extends BasePage {
-  readonly heading: Locator;
-  readonly usablePoints: Locator;
-  readonly catalogHeading: Locator;
-  readonly addButtons: Locator;
-  readonly includedSection: Locator;
+  private readonly heading: Locator;
+  private readonly usablePoints: Locator;
+  private readonly catalogHeading: Locator;
+  private readonly addButtons: Locator;
+  private readonly includedSection: Locator;
 
   constructor(page: Page) {
     super(page);
@@ -18,24 +18,23 @@ export class RewardsPage extends BasePage {
     this.includedSection = page.getByText(/included with your next order/i);
   }
 
-  async open(): Promise<void> {
+  async open(): Promise<this> {
     await this.goto(ACCOUNT_PAGES.rewards.path);
-    await this.waitForNetworkIdle();
+    return this;
   }
 
   async expectLoaded(): Promise<void> {
-    await expect(this.page).toHaveURL(
-      (url) => url.pathname.replace(/\/$/, '') === ACCOUNT_PAGES.rewards.path,
-    );
+    await this.expectPathname(ACCOUNT_PAGES.rewards.path);
     await expect(this.heading).toBeVisible();
     await expect(this.usablePoints).toBeVisible();
     await expect(this.catalogHeading).toBeVisible();
     await expect(this.addButtons.first()).toBeVisible();
   }
 
-  async addFirstAffordableReward(): Promise<void> {
+  async addFirstAffordableReward(): Promise<this> {
     await this.addButtons.first().click();
-    await this.page.waitForTimeout(1000);
+    await expect(this.includedSection).toBeVisible({ timeout: 10_000 });
+    return this;
   }
 
   async expectRewardQueued(): Promise<void> {

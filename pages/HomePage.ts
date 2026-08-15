@@ -1,59 +1,41 @@
 import { Locator, Page, expect } from '@playwright/test';
-import { BasePage } from './BasePage';
-import { Header } from './Header';
-import { ProductDetailsPage } from './ProductDetailsPage';
+import { PAGE_HEADINGS } from '@constants/messages';
+import { AppRoutes } from '@constants/routes';
+import { BasePage } from '@pages/BasePage';
+import { Header } from '@pages/Header';
+import { ProductDetailsPage } from '@pages/ProductDetailsPage';
 
 export class HomePage extends BasePage {
   readonly header: Header;
 
-  readonly heroBanner: Locator;
-  readonly heroHeading: Locator;
-  readonly featuredSectionHeading: Locator;
-
-  readonly navHome: Locator;
-  readonly navShop: Locator;
-  readonly navCollections: Locator;
-
-  readonly searchInput: Locator;
-
-  readonly firstProductLink: Locator;
-  readonly heroSlider: Locator;
-  readonly heroSlides: Locator;
-  readonly heroNextButton: Locator;
-  readonly heroPrevButton: Locator;
-  readonly moodCategoryLinks: Locator;
+  private readonly featuredSectionHeading: Locator;
+  private readonly searchInput: Locator;
+  private readonly firstProductLink: Locator;
+  private readonly heroSlider: Locator;
+  private readonly heroSlides: Locator;
+  private readonly heroNextButton: Locator;
 
   constructor(page: Page) {
     super(page);
     this.header = new Header(page);
 
-    this.heroBanner = page.locator('.hero-slider-two, [class*="hero"], [class*="banner"], .swiper, .slider').first();
-    this.heroHeading = page.getByRole('heading', { level: 1 }).first();
     this.featuredSectionHeading = page.getByRole('heading', {
-      name: /cultural threads for every mood/i,
+      name: PAGE_HEADINGS.featuredMood,
     });
-
-    this.navHome = this.header.logoLink;
-    this.navShop = this.header.navMen;
-    this.navCollections = this.header.navCollections;
-
     this.searchInput = page.getByRole('searchbox', { name: /search products/i });
-
-    this.firstProductLink = page.locator('a[href^="/products/"]:not([href*="undefined"])').first();
+    this.firstProductLink = page
+      .locator('a[href^="/products/"]:not([href*="undefined"])')
+      .first();
     this.heroSlider = page.locator('.hero-slider-two .swiper').first();
     this.heroSlides = page.locator(
       '.hero-slider-two .swiper-slide:not(.swiper-slide-duplicate)',
     );
     this.heroNextButton = page.locator('.swiper-button-next.next-hero-swiper-two');
-    this.heroPrevButton = page.locator('.swiper-button-prev.prev-hero-swiper-two');
-    this.moodCategoryLinks = page.getByRole('link', {
-      name: /^(anime|culture|originals|jdm|kawaii)$/i,
-    });
   }
 
-  async open(): Promise<void> {
-    await this.goto('/');
-    await this.waitForNetworkIdle();
+  async open(): Promise<this> {
+    await this.goto(AppRoutes.Home);
+    return this;
   }
 
   async expectLoaded(): Promise<void> {
@@ -61,26 +43,13 @@ export class HomePage extends BasePage {
       const path = url.pathname.replace(/\/$/, '');
       return path === '' || path === '/';
     });
-    await expect(this.page).toHaveTitle(/genki/i);
+    await expect(this.page).toHaveTitle(PAGE_HEADINGS.siteTitle);
     await expect(this.featuredSectionHeading).toBeVisible();
   }
 
-  async clickNavHome(): Promise<void> {
-    await this.navHome.click();
-    await this.waitForPageLoad();
-  }
-
-  async clickNavShop(): Promise<void> {
-    await this.navShop.click();
-    await this.waitForPageLoad();
-  }
-
-  async clickNavCollections(): Promise<void> {
-    await this.navCollections.click();
-  }
-
-  async fillSearch(query: string): Promise<void> {
+  async fillSearch(query: string): Promise<this> {
     await this.searchInput.fill(query);
+    return this;
   }
 
   async openFirstProduct(): Promise<ProductDetailsPage> {
@@ -107,5 +76,9 @@ export class HomePage extends BasePage {
       .locator('.hero-slider-two .swiper-slide-active')
       .first()
       .getAttribute('data-swiper-slide-index');
+  }
+
+  async expectCarouselAdvancedFrom(previousIndex: string | null): Promise<void> {
+    await expect.poll(async () => this.activeSlideIndex()).not.toBe(previousIndex);
   }
 }

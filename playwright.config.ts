@@ -1,6 +1,7 @@
 import { defineConfig, devices } from '@playwright/test';
-import { loadProjectEnv } from './fixtures/env';
-import { getEnvConfig } from './fixtures/environments';
+import { loadProjectEnv } from '@fixtures/env';
+import { getEnvConfig } from '@constants/environments';
+import { Timeouts } from '@constants/timeouts';
 
 loadProjectEnv();
 
@@ -21,8 +22,8 @@ export default defineConfig({
     trace: 'retain-on-failure',
     video: 'retain-on-failure',
     screenshot: 'only-on-failure',
-    actionTimeout: 15_000,
-    navigationTimeout: 30_000,
+    actionTimeout: Timeouts.Action,
+    navigationTimeout: Timeouts.Navigation,
   },
   projects: [
     {

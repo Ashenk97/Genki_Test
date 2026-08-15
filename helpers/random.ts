@@ -10,3 +10,7 @@ export function randomEmail(domain = 'genki-test.com'): string {
 export function randomInt(min: number, max: number): number {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
+
+export function strongPassword(suffix = ''): string {
+  return `Genki!${randomString(10)}${suffix}`;
+}

@@ -1,14 +1,16 @@
 import { Locator, Page, expect } from '@playwright/test';
-import { FORGOT_PASSWORD_PAGE, AUTH_MESSAGES } from '../fixtures/test-data';
-import { BasePage } from './BasePage';
+import { AUTH_MESSAGES } from '@constants/messages';
+import { Timeouts } from '@constants/timeouts';
+import { FORGOT_PASSWORD_PAGE } from '@data/navigation.data';
+import { BasePage } from '@pages/BasePage';
 
 export class ForgotPasswordPage extends BasePage {
-  readonly heading: Locator;
-  readonly form: Locator;
-  readonly emailInput: Locator;
-  readonly submitButton: Locator;
-  readonly loginLink: Locator;
-  readonly successMessage: Locator;
+  private readonly heading: Locator;
+  private readonly form: Locator;
+  private readonly emailInput: Locator;
+  private readonly submitButton: Locator;
+  private readonly loginLink: Locator;
+  private readonly successMessage: Locator;
 
   constructor(page: Page) {
     super(page);
@@ -21,33 +23,38 @@ export class ForgotPasswordPage extends BasePage {
     this.successMessage = this.form.getByText(AUTH_MESSAGES.passwordResetSent);
   }
 
-  async open(): Promise<void> {
+  async open(): Promise<this> {
     await this.goto(FORGOT_PASSWORD_PAGE.path);
-    await this.waitForNetworkIdle();
+    return this;
   }
 
   async expectLoaded(): Promise<void> {
-    await expect(this.page).toHaveURL(
-      (url) => url.pathname.replace(/\/$/, '') === FORGOT_PASSWORD_PAGE.path,
-    );
+    await this.expectPathname(FORGOT_PASSWORD_PAGE.path);
     await expect(this.heading).toBeVisible();
     await expect(this.emailInput).toBeVisible();
     await expect(this.submitButton).toBeVisible();
   }
 
-  async submitEmail(email: string): Promise<void> {
+  async submitEmail(email: string): Promise<this> {
     await this.emailInput.fill(email);
     await this.submitButton.click();
+    return this;
+  }
+
+  async openLogin(): Promise<void> {
+    await this.loginLink.click();
   }
 
   async expectResetEmailSent(): Promise<void> {
-    await expect(this.successMessage).toBeVisible({ timeout: 15_000 });
+    await expect(this.successMessage).toBeVisible({ timeout: Timeouts.Assertion });
   }
 
   async expectEmailRequired(): Promise<void> {
     await this.submitButton.click();
     await expect
-      .poll(async () => this.emailInput.evaluate((el: HTMLInputElement) => el.validity.valueMissing))
+      .poll(async () =>
+        this.emailInput.evaluate((el: HTMLInputElement) => el.validity.valueMissing),
+      )
       .toBe(true);
   }
 }

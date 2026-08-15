@@ -1,53 +1,63 @@
-import { TEST_DATA } from '../fixtures/test-data';
-import { test, expect } from '../fixtures/test-fixtures';
-import { resolveTestEnv } from '../fixtures/environments';
-import { createTempMailbox, extractConfirmLink, waitForMessage } from '../utils/mail-tm';
+import { Timeouts } from '@constants/timeouts';
+import { isProductionEnv } from '@constants/environments';
+import { TEST_DATA } from '@data/index';
+import {
+  createTempMailbox,
+  extractConfirmLink,
+  waitForMessage,
+} from '@api/mail-tm/MailTmClient';
+import { test } from '@fixtures/test-fixtures';
 
 test.describe('Register email confirmation', () => {
-  test.skip(resolveTestEnv() === 'production', 'Do not create disposable accounts on production');
+  test.skip(isProductionEnv(), 'Do not create disposable accounts on production');
 
   test('should receive and accept the account confirmation email', { tag: '@email' }, async ({
     registerPage,
     loginPage,
     header,
   }) => {
-    test.setTimeout(120_000);
+    test.setTimeout(Timeouts.EmailFlow);
 
-    const mailbox = await createTempMailbox();
-
-    await registerPage.open();
-    await registerPage.register(mailbox.address, TEST_DATA.auth.password);
-    await registerPage.expectEmailConfirmation(mailbox.address);
-
-    let message;
-    try {
-      message = await waitForMessage(mailbox, {
-        timeoutMs: 90_000,
-        subjectIncludes: 'confirm',
-      });
-    } catch {
-      message = await waitForMessage(mailbox, { timeoutMs: 30_000 });
-    }
-
-    const confirmUrl = extractConfirmLink(message);
-    await registerPage.page.goto(confirmUrl);
-    await registerPage.waitForPageLoad();
-    await registerPage.acceptCookiesIfVisible();
-
-    await expect(registerPage.page.getByText(/confirm|verif|success|activated|thank you/i).first()).toBeVisible({
-      timeout: 20_000,
+    const mailbox = await test.step('Create temporary mailbox', async () => {
+      return createTempMailbox();
     });
 
-    await loginPage.open();
-    await loginPage.login(mailbox.address, TEST_DATA.auth.password);
+    await test.step('Register with temp mailbox', async () => {
+      await registerPage.open();
+      await registerPage.register(mailbox.address, TEST_DATA.auth.password);
+      await registerPage.expectEmailConfirmation(mailbox.address);
+    });
 
-    await Promise.race([
-      loginPage.expectLoginSuccess(),
-      loginPage.expectInvalidCredentials().then(() => {
-        throw new Error('Login rejected after confirmation — account may still be unverified');
-      }),
-    ]);
+    const confirmUrl = await test.step('Wait for confirmation email', async () => {
+      let message;
+      try {
+        message = await waitForMessage(mailbox, {
+          timeoutMs: Timeouts.MailPollDefault,
+          subjectIncludes: 'confirm',
+        });
+      } catch {
+        message = await waitForMessage(mailbox, { timeoutMs: Timeouts.MailPollFallback });
+      }
+      return extractConfirmLink(message);
+    });
 
-    await header.expectLoggedIn();
+    await test.step('Open confirmation link', async () => {
+      await registerPage.openExternalUrl(confirmUrl);
+      await registerPage.expectAccountConfirmed();
+    });
+
+    await test.step('Login with confirmed account', async () => {
+      await loginPage.open();
+      await loginPage.login(mailbox.address, TEST_DATA.auth.password);
+
+      await Promise.race([
+        loginPage.expectLoginSuccess(),
+        loginPage.expectInvalidCredentials().then(() => {
+          throw new Error('Login rejected after confirmation — account may still be unverified');
+        }),
+      ]);
+
+      await header.expectLoggedIn();
+    });
   });
 });

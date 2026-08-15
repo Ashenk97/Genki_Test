@@ -1,23 +1,22 @@
 import { Locator, Page, expect } from '@playwright/test';
-import { ACCOUNT_PAGES, AUTH_MESSAGES } from '../fixtures/test-data';
-import { BasePage } from './BasePage';
+import { AUTH_MESSAGES } from '@constants/messages';
+import { ToastType } from '@constants/payment';
+import { ACCOUNT_PAGES } from '@data/navigation.data';
+import type { AccountSection } from '@models/auth.types';
+import { BasePage } from '@pages/BasePage';
 
 export class AccountDashboardPage extends BasePage {
-  readonly heading: Locator;
-  readonly sidebar: Locator;
-  readonly dashboardLink: Locator;
-  readonly ordersLink: Locator;
-  readonly loyaltyLink: Locator;
-  readonly addressLink: Locator;
-  readonly accountDetailsLink: Locator;
-  readonly redeemPointsLink: Locator;
-  readonly logoutButton: Locator;
+  private readonly heading: Locator;
+  private readonly ordersLink: Locator;
+  private readonly loyaltyLink: Locator;
+  private readonly addressLink: Locator;
+  private readonly accountDetailsLink: Locator;
+  private readonly redeemPointsLink: Locator;
+  private readonly logoutButton: Locator;
 
   constructor(page: Page) {
     super(page);
     this.heading = page.getByRole('heading', { name: ACCOUNT_PAGES.dashboard.heading });
-    this.sidebar = page.locator('aside, [class*="account"]').first();
-    this.dashboardLink = page.getByRole('link', { name: /^dashboard$/i }).first();
     this.ordersLink = page.getByRole('link', { name: /^orders$/i }).first();
     this.loyaltyLink = page.getByRole('link', { name: /^loyalty$/i }).first();
     this.addressLink = page.getByRole('link', { name: /^address$/i }).first();
@@ -26,50 +25,46 @@ export class AccountDashboardPage extends BasePage {
     this.logoutButton = page.getByRole('button', { name: /^logout$/i }).first();
   }
 
-  async open(): Promise<void> {
+  async open(): Promise<this> {
     await this.goto(ACCOUNT_PAGES.dashboard.path);
-    await this.waitForNetworkIdle();
+    return this;
   }
 
   async expectLoaded(displayName: string, email: string): Promise<void> {
-    await expect(this.page).toHaveURL(
-      (url) => url.pathname.replace(/\/$/, '') === ACCOUNT_PAGES.dashboard.path,
-    );
+    await this.expectPathname(ACCOUNT_PAGES.dashboard.path);
     await expect(this.heading).toBeVisible();
-    await expect(this.page.getByText(new RegExp(`hello,?\\s*${displayName}`, 'i'))).toBeVisible();
+    await expect(
+      this.page.getByText(new RegExp(`hello,?\\s*${displayName}`, 'i')),
+    ).toBeVisible();
     await expect(this.page.getByText(email)).toBeVisible();
   }
 
-  async openSection(
-    section: 'orders' | 'loyalty' | 'address' | 'accountDetails' | 'rewards',
-  ): Promise<void> {
-    const map = {
+  async openSection(section: AccountSection): Promise<this> {
+    const map: Record<AccountSection, Locator> = {
       orders: this.ordersLink,
       loyalty: this.loyaltyLink,
       address: this.addressLink,
       accountDetails: this.accountDetailsLink,
       rewards: this.redeemPointsLink,
-    } as const;
+    };
     await map[section].click();
     await this.waitForPageLoad();
-    await this.waitForNetworkIdle();
     await this.acceptCookiesIfVisible();
+    return this;
   }
 
   async expectOrdersLoaded(): Promise<void> {
-    await expect(this.page).toHaveURL(
-      (url) => url.pathname.replace(/\/$/, '') === ACCOUNT_PAGES.orders.path,
-    );
+    await this.expectPathname(ACCOUNT_PAGES.orders.path);
     await expect(
       this.page.getByRole('heading', { name: ACCOUNT_PAGES.orders.heading }).first(),
     ).toBeVisible();
-    await expect(this.page.getByText(/GK-\d+/).or(this.page.getByText(/no orders/i)).first()).toBeVisible();
+    await expect(
+      this.page.getByText(/GK-\d+/).or(this.page.getByText(/no orders/i)).first(),
+    ).toBeVisible();
   }
 
   async expectLoyaltyLoaded(): Promise<void> {
-    await expect(this.page).toHaveURL(
-      (url) => url.pathname.replace(/\/$/, '') === ACCOUNT_PAGES.loyalty.path,
-    );
+    await this.expectPathname(ACCOUNT_PAGES.loyalty.path);
     await expect(
       this.page.getByRole('heading', { name: ACCOUNT_PAGES.loyalty.heading }).first(),
     ).toBeVisible();
@@ -77,27 +72,27 @@ export class AccountDashboardPage extends BasePage {
   }
 
   async expectAddressLoaded(): Promise<void> {
-    await expect(this.page).toHaveURL(
-      (url) => url.pathname.replace(/\/$/, '') === ACCOUNT_PAGES.address.path,
-    );
+    await this.expectPathname(ACCOUNT_PAGES.address.path);
     await expect(
       this.page.getByRole('heading', { name: ACCOUNT_PAGES.address.heading }).first(),
     ).toBeVisible();
-    await expect(this.page.getByText(/address line 1|shipping address/i).first()).toBeVisible();
+    await expect(
+      this.page.getByText(/address line 1|shipping address/i).first(),
+    ).toBeVisible();
   }
 
   async expectAccountDetailsLoaded(): Promise<void> {
-    await expect(this.page).toHaveURL(
-      (url) => url.pathname.replace(/\/$/, '') === ACCOUNT_PAGES.accountDetails.path,
-    );
+    await this.expectPathname(ACCOUNT_PAGES.accountDetails.path);
     await expect(
       this.page.getByRole('heading', { name: ACCOUNT_PAGES.accountDetails.heading }).first(),
     ).toBeVisible();
-    await expect(this.page.getByText(/personal information|first name/i).first()).toBeVisible();
+    await expect(
+      this.page.getByText(/personal information|first name/i).first(),
+    ).toBeVisible();
   }
 
   async logoutFromSidebar(): Promise<void> {
     await this.logoutButton.click();
-    await this.expectToast(AUTH_MESSAGES.logoutToast, 'success');
+    await this.expectToast(AUTH_MESSAGES.logoutToast, ToastType.Success);
   }
 }
