@@ -1,0 +1,423 @@
+# Instructions
+
+- Following Playwright test failed.
+- Explain why, be concise, respect Playwright best practices.
+- Provide a snippet of code with the fix, if possible.
+
+# Test info
+
+- Name: rewards.spec.ts >> Rewards >> should apply a queued reward on the next checkout
+- Location: tests/rewards.spec.ts:32:7
+
+# Error details
+
+```
+TimeoutError: locator.click: Timeout 15000ms exceeded.
+Call log:
+  - waiting for getByRole('button', { name: /add to cart/i })
+
+```
+
+# Page snapshot
+
+```yaml
+- generic [ref=f2e1]:
+  - alert [ref=f2e2]
+  - region "Notifications alt+T"
+  - banner [ref=f2e3]:
+    - generic [ref=f2e6]:
+      - link [ref=f2e8] [cursor=pointer]:
+        - /url: /
+        - img "Genki Wardrobe" [ref=f2e9]
+      - navigation [ref=f2e10]:
+        - list [ref=f2e11]:
+          - listitem [ref=f2e12]:
+            - link "Men" [ref=f2e13] [cursor=pointer]:
+              - /url: /collection/men
+            - text: →
+          - listitem [ref=f2e14]:
+            - link "Women" [ref=f2e15] [cursor=pointer]:
+              - /url: /collection/women
+            - text: →
+          - listitem [ref=f2e16]:
+            - link "Collections" [ref=f2e17] [cursor=pointer]:
+              - /url: /collection
+      - list [ref=f2e19]:
+        - listitem [ref=f2e20]:
+          - link "My account dashboard" [ref=f2e21] [cursor=pointer]:
+            - /url: /my-account/dashboard
+        - listitem [ref=f2e24]:
+          - button "Open wishlist" [ref=f2e25] [cursor=pointer]
+        - listitem [ref=f2e28]:
+          - button "Open cart, 1 item" [ref=f2e29] [cursor=pointer]:
+            - generic [ref=f2e34]: "1"
+  - generic [ref=f2e35]:
+    - button "Close search" [ref=f2e36] [cursor=pointer]
+    - generic [ref=f2e40]:
+      - searchbox "Search Products..." [ref=f2e42]
+      - generic [ref=f2e43]: "# Hit enter to search"
+  - generic [ref=f2e47]:
+    - heading "Berserk Oversize T-shirt" [level=1] [ref=f2e48]
+    - list [ref=f2e49]:
+      - listitem [ref=f2e50]:
+        - link "Home" [ref=f2e51] [cursor=pointer]:
+          - /url: /
+        - text: /
+      - listitem [ref=f2e52]: Berserk Oversize T-shirt
+  - generic [ref=f2e54]:
+    - generic [ref=f2e55]:
+      - generic [ref=f2e56]:
+        - generic [ref=f2e57]:
+          - generic [ref=f2e58]: "-10%"
+          - button [ref=f2e62] [cursor=pointer]
+          - generic [ref=f2e66]:
+            - generic [ref=f2e67]:
+              - group "4 / 4":
+                - button
+                - generic:
+                  - img "Berserk Oversize T-shirt"
+              - group "1 / 4" [ref=f2e68]:
+                - button [ref=f2e69] [cursor=pointer]
+                - img "Berserk Oversize T-shirt" [ref=f2e74]
+              - group "2 / 4":
+                - button
+                - generic:
+                  - img "Berserk Oversize T-shirt"
+              - group "3 / 4":
+                - button
+                - generic:
+                  - img "Berserk Oversize T-shirt"
+              - group "4 / 4":
+                - button
+                - generic:
+                  - img "Berserk Oversize T-shirt"
+              - group "1 / 4":
+                - button
+                - generic:
+                  - img "Berserk Oversize T-shirt"
+            - generic [ref=f2e75]:
+              - button "Go to slide 1" [ref=f2e76] [cursor=pointer]
+              - button "Go to slide 2" [ref=f2e77] [cursor=pointer]
+              - button "Go to slide 3" [ref=f2e78] [cursor=pointer]
+              - button "Go to slide 4" [ref=f2e79] [cursor=pointer]
+        - generic [ref=f2e81]:
+          - generic [ref=f2e83]:
+            - group "1 / 4" [ref=f2e84]:
+              - img "Berserk Oversize T-shirt" [ref=f2e86]
+            - group "2 / 4" [ref=f2e87]:
+              - img "Berserk Oversize T-shirt" [ref=f2e89]
+            - group "3 / 4" [ref=f2e90]:
+              - img "Berserk Oversize T-shirt" [ref=f2e92]
+            - group "4 / 4" [ref=f2e93]:
+              - img "Berserk Oversize T-shirt" [ref=f2e95]
+          - button "Previous slide" [disabled]
+          - button "Next slide" [ref=f2e96] [cursor=pointer]
+      - generic [ref=f2e100]:
+        - heading "Berserk Oversize T-shirt" [level=2] [ref=f2e101]
+        - generic [ref=f2e102]: LKR 3490.00
+        - paragraph [ref=f2e105]: Crafted from a premium cotton blend, this black oversize tee features bold back artwork inspired by the iconic Berserk manga. Designed for comfort and impact, it’s the perfect fit for anime fans who live and breathe dark fantasy.
+        - generic [ref=f2e106]:
+          - generic [ref=f2e107]:
+            - generic [ref=f2e108]: Color (white)
+            - generic [ref=f2e109]:
+              - 'radio "Selected: white" [checked] [disabled]'
+              - 'generic "Selected: white" [ref=f2e110]'
+          - generic [ref=f2e111]:
+            - generic [ref=f2e112]: Size
+            - generic [ref=f2e113]:
+              - radio "XS" [checked] [active]
+              - generic [ref=f2e114] [cursor=pointer]: XS
+        - generic [ref=f2e115]:
+          - generic [ref=f2e116]: Quantity
+          - generic [ref=f2e117]:
+            - button "-" [ref=f2e118] [cursor=pointer]
+            - textbox [ref=f2e119]: "1"
+            - button "+" [ref=f2e120] [cursor=pointer]
+        - generic [ref=f2e121]:
+          - button "Out of Stock" [disabled] [ref=f2e122]
+          - button "Add to wishlist" [ref=f2e123] [cursor=pointer]
+        - table [ref=f2e127]:
+          - rowgroup [ref=f2e128]:
+            - row [ref=f2e129]:
+              - cell "SKU:" [ref=f2e130]
+              - cell "berserk-oversized-tee" [ref=f2e131]
+            - row [ref=f2e132]:
+              - cell "Categories:" [ref=f2e133]
+              - cell "Oversized T-Shirts, Unisex" [ref=f2e134]
+            - row [ref=f2e135]:
+              - cell "Tags:" [ref=f2e136]
+              - cell "Anime, Street Wear" [ref=f2e137]
+            - row [ref=f2e138]:
+              - cell "Share on:" [ref=f2e139]
+              - cell [ref=f2e140]:
+                - list [ref=f2e141]:
+                  - listitem [ref=f2e142]:
+                    - button "Share on Facebook" [ref=f2e143] [cursor=pointer]
+                  - listitem [ref=f2e146]:
+                    - button "Share on Twitter" [ref=f2e147] [cursor=pointer]
+                  - listitem [ref=f2e150]:
+                    - button "Share on WhatsApp" [ref=f2e151] [cursor=pointer]
+                  - listitem [ref=f2e154]:
+                    - button "Copy URL" [ref=f2e155] [cursor=pointer]
+    - generic [ref=f2e160]:
+      - tablist [ref=f2e161]:
+        - tab "Description" [selected] [ref=f2e163] [cursor=pointer]
+        - tab "Additional Information" [ref=f2e165] [cursor=pointer]
+      - tabpanel "Description" [ref=f2e167]:
+        - generic [ref=f2e168]: Step into the world of dark fantasy with our Berserk Oversize Tee. Inspired by the legendary Berserk manga, this tee features bold back artwork that captures the raw intensity and power of the series. Made from a soft, breathable premium cotton blend, it offers a relaxed oversized fit for all-day comfort and effortless streetwear style. Whether you’re a longtime fan of Guts and his relentless journey or just love edgy anime aesthetics, this tee is a statement piece built for those who embrace their inner warrior. Pair it with cargos or denim and let the design speak for itself.
+      - generic [ref=f2e172]:
+        - heading "Oversized T-Shirt Size chart" [level=2] [ref=f2e173]
+        - img "oversized T-shirt size chart, sizes XXS through XXXL" [ref=f2e174]
+  - contentinfo [ref=f2e175]:
+    - generic [ref=f2e177]:
+      - generic [ref=f2e178]:
+        - img "Genki Wardrobe" [ref=f2e180]
+        - generic [ref=f2e181]:
+          - text: © 2026
+          - link "| Genki" [ref=f2e182] [cursor=pointer]:
+            - /url: https://genkiwardrobe.com
+          - generic [ref=f2e183]: All Rights Reserved
+      - generic [ref=f2e184]:
+        - heading "INFO" [level=5] [ref=f2e185]
+        - navigation [ref=f2e186]:
+          - list [ref=f2e187]:
+            - listitem [ref=f2e188]:
+              - link "About us" [ref=f2e189] [cursor=pointer]:
+                - /url: /about-us
+            - listitem [ref=f2e190]:
+              - link "Contact" [ref=f2e191] [cursor=pointer]:
+                - /url: /about-us#contact
+            - listitem [ref=f2e192]:
+              - link "Privacy Policy" [ref=f2e193] [cursor=pointer]:
+                - /url: /privacy-policy
+            - listitem [ref=f2e194]:
+              - link "Terms and Conditions" [ref=f2e195] [cursor=pointer]:
+                - /url: /terms-and-conditions
+      - generic [ref=f2e196]:
+        - heading "USEFUL LINKS" [level=5] [ref=f2e197]
+        - navigation [ref=f2e198]:
+          - list [ref=f2e199]:
+            - listitem [ref=f2e200]:
+              - link "Returns" [ref=f2e201] [cursor=pointer]:
+                - /url: /return-policy
+            - listitem [ref=f2e202]:
+              - link "Shipping & Delivery" [ref=f2e203] [cursor=pointer]:
+                - /url: /shipping-policy
+            - listitem [ref=f2e204]:
+              - link "Size guide" [ref=f2e205] [cursor=pointer]:
+                - /url: /size-guide
+            - listitem [ref=f2e206]:
+              - link "FAQs" [ref=f2e207] [cursor=pointer]:
+                - /url: /faq
+      - generic [ref=f2e208]:
+        - heading "FOLLOW US ON" [level=5] [ref=f2e209]
+        - navigation [ref=f2e210]:
+          - list [ref=f2e211]:
+            - listitem [ref=f2e212]:
+              - link "Facebook" [ref=f2e213] [cursor=pointer]:
+                - /url: https://facebook.com/genkiwardrobelk
+            - listitem [ref=f2e216]:
+              - link "Instagram" [ref=f2e217] [cursor=pointer]:
+                - /url: https://instagram.com/genkiwardrobelk
+            - listitem [ref=f2e220]:
+              - link "TikTok" [ref=f2e221] [cursor=pointer]:
+                - /url: https://www.tiktok.com/@genkiwardrobelk
+            - listitem [ref=f2e224]:
+              - link "WhatsApp" [ref=f2e225] [cursor=pointer]:
+                - /url: https://wa.me/94701002922
+      - generic [ref=f2e229]:
+        - heading "Subscribe." [level=2] [ref=f2e230]
+        - paragraph [ref=f2e231]: Get the latest drops, exclusive offers, and style updates.
+        - generic [ref=f2e234]:
+          - textbox "Email address" [ref=f2e235]:
+            - /placeholder: Your email address
+          - button "Subscribe to newsletter" [disabled] [ref=f2e236]
+```
+
+# Test source
+
+```ts
+  1   | import { Locator, Page, expect } from '@playwright/test';
+  2   | import { AUTH_MESSAGES } from '@constants/messages';
+  3   | import { ToastType } from '@constants/payment';
+  4   | import { BasePage } from '@pages/BasePage';
+  5   | 
+  6   | export class ProductDetailsPage extends BasePage {
+  7   |   private readonly productTitle: Locator;
+  8   |   private readonly price: Locator;
+  9   |   private readonly addToCartButton: Locator;
+  10  |   private readonly selectSizePrompt: Locator;
+  11  |   private readonly selectColorPrompt: Locator;
+  12  |   private readonly addToWishlistButton: Locator;
+  13  |   private readonly increaseQtyButton: Locator;
+  14  |   private readonly decreaseQtyButton: Locator;
+  15  | 
+  16  |   constructor(page: Page) {
+  17  |     super(page);
+  18  | 
+  19  |     this.productTitle = page.getByRole('heading', { level: 1 }).first();
+  20  |     this.price = page.getByText(/LKR\s*[\d,.]+/).first();
+  21  |     this.addToCartButton = page.getByRole('button', { name: /add to cart/i });
+  22  |     this.selectSizePrompt = page.getByRole('button', { name: /select a size/i });
+  23  |     this.selectColorPrompt = page.getByRole('button', { name: /select a color/i });
+  24  |     this.addToWishlistButton = page.getByRole('button', { name: /add to wishlist/i });
+  25  |     this.increaseQtyButton = page
+  26  |       .locator('button.inc.qtybutton')
+  27  |       .or(page.getByRole('button', { name: /^\+$/ }))
+  28  |       .or(page.locator('button.qtybutton').filter({ hasText: /^\+$/ }))
+  29  |       .first();
+  30  |     this.decreaseQtyButton = page
+  31  |       .locator('button.dec.qtybutton')
+  32  |       .or(page.getByRole('button', { name: /^−$|^-$/ }))
+  33  |       .or(page.locator('button.qtybutton').filter({ hasText: /^-$/ }))
+  34  |       .first();
+  35  |   }
+  36  | 
+  37  |   async selectFirstAvailableSize(): Promise<this> {
+  38  |     const sizeRadio = this.page.getByRole('radio', {
+  39  |       name: /^(XS|S|M|L|XL|XXL|2XL|3XL)$/i,
+  40  |     }).first();
+  41  | 
+  42  |     if (await sizeRadio.isVisible().catch(() => false)) {
+  43  |       await sizeRadio.click();
+  44  |       return this;
+  45  |     }
+  46  | 
+  47  |     const sizeInput = this.page
+  48  |       .locator('input[type="radio"]:not([name="product-color"])')
+  49  |       .first();
+  50  |     const sizeId = await sizeInput.getAttribute('id');
+  51  |     if (sizeId) {
+  52  |       const label = this.page.locator(`label[for="${sizeId}"]`);
+  53  |       if (await label.isVisible().catch(() => false)) {
+  54  |         await label.click();
+  55  |         return this;
+  56  |       }
+  57  |     }
+  58  | 
+  59  |     await sizeInput.click({ force: true });
+  60  |     return this;
+  61  |   }
+  62  | 
+  63  |   async selectSize(size: string): Promise<this> {
+  64  |     const byRole = this.page.getByRole('radio', {
+  65  |       name: new RegExp(`^${size}$`, 'i'),
+  66  |     });
+  67  |     if (await byRole.isVisible().catch(() => false)) {
+  68  |       await byRole.click();
+  69  |       return this;
+  70  |     }
+  71  | 
+  72  |     const sizeInput = this.page
+  73  |       .locator(`input[type="radio"][value="${size}" i], input[type="radio"]#${size}`)
+  74  |       .first();
+  75  |     const sizeId = await sizeInput.getAttribute('id');
+  76  |     if (sizeId) {
+  77  |       const label = this.page.locator(`label[for="${sizeId}"]`);
+  78  |       if (await label.isVisible().catch(() => false)) {
+  79  |         await label.click();
+  80  |         return this;
+  81  |       }
+  82  |     }
+  83  | 
+  84  |     await sizeInput.click({ force: true });
+  85  |     return this;
+  86  |   }
+  87  | 
+  88  |   async addToCart(): Promise<this> {
+> 89  |     await this.addToCartButton.click();
+      |                                ^ TimeoutError: locator.click: Timeout 15000ms exceeded.
+  90  |     return this;
+  91  |   }
+  92  | 
+  93  |   async expectAddToCartVisible(): Promise<void> {
+  94  |     await expect(this.addToCartButton).toBeVisible();
+  95  |     await expect(this.addToCartButton).toBeEnabled();
+  96  |   }
+  97  | 
+  98  |   async expectSizeRequired(): Promise<void> {
+  99  |     await expect(this.selectSizePrompt).toBeVisible();
+  100 |     await expect(this.addToCartButton).toHaveCount(0);
+  101 |   }
+  102 | 
+  103 |   async expectColorRequired(): Promise<void> {
+  104 |     await expect(this.selectColorPrompt).toBeVisible();
+  105 |     await expect(this.addToCartButton).toHaveCount(0);
+  106 |   }
+  107 | 
+  108 |   async selectColor(color: string): Promise<this> {
+  109 |     const input = this.page.locator(`input[name="product-color"][value="${color}" i], input[name="product-color"]#${color}`);
+  110 |     const colorId = await input.first().getAttribute('id');
+  111 |     if (colorId) {
+  112 |       await this.page.locator(`label[for="${colorId}"]`).click({ force: true });
+  113 |     } else {
+  114 |       await input.first().check({ force: true });
+  115 |     }
+  116 |     return this;
+  117 |   }
+  118 | 
+  119 |   async expectAvailableSizeCount(minCount: number): Promise<void> {
+  120 |     const sizes = this.page.locator('input[type="radio"]:not([name="product-color"])');
+  121 |     await expect.poll(async () => sizes.count()).toBeGreaterThanOrEqual(minCount);
+  122 |   }
+  123 | 
+  124 |   async expectBrokenProductShell(): Promise<void> {
+  125 |     await expect(this.addToCartButton).toHaveCount(0);
+  126 |     await expect(this.selectSizePrompt).toHaveCount(0);
+  127 |     await expect(this.selectColorPrompt).toHaveCount(0);
+  128 |   }
+  129 | 
+  130 |   async expectAddedToCart(): Promise<void> {
+  131 |     await this.expectToast(AUTH_MESSAGES.addedToCartToast, ToastType.Success);
+  132 |   }
+  133 | 
+  134 |   async expectProductDetailsVisible(): Promise<void> {
+  135 |     await expect(this.productTitle).toBeVisible();
+  136 |     await expect(this.price).toBeVisible();
+  137 |     await expect(
+  138 |       this.addToCartButton.or(this.selectSizePrompt).or(this.selectColorPrompt),
+  139 |     ).toBeVisible();
+  140 |   }
+  141 | 
+  142 |   async expectOnProductPage(): Promise<void> {
+  143 |     await expect(this.page).toHaveURL(/\/products\//);
+  144 |     await expect(this.productTitle).toBeVisible();
+  145 |   }
+  146 | 
+  147 |   async addToWishlist(): Promise<this> {
+  148 |     await this.addToWishlistButton.click();
+  149 |     return this;
+  150 |   }
+  151 | 
+  152 |   async expectAddedToWishlist(): Promise<void> {
+  153 |     await expect(
+  154 |       this.page.locator('[data-sonner-toast]').filter({ hasText: AUTH_MESSAGES.wishlistToast }),
+  155 |     ).toBeVisible();
+  156 |   }
+  157 | 
+  158 |   async increaseQuantity(): Promise<this> {
+  159 |     await this.increaseQtyButton.click();
+  160 |     return this;
+  161 |   }
+  162 | 
+  163 |   async decreaseQuantity(): Promise<this> {
+  164 |     await this.decreaseQtyButton.click();
+  165 |     return this;
+  166 |   }
+  167 | 
+  168 |   async expectQuantity(quantity: number): Promise<void> {
+  169 |     await expect(
+  170 |       this.page
+  171 |         .locator(`input[value="${quantity}"]`)
+  172 |         .or(this.page.getByText(new RegExp(`^${quantity}$`)))
+  173 |         .first(),
+  174 |     ).toBeVisible();
+  175 |   }
+  176 | 
+  177 |   async open(path: string): Promise<this> {
+  178 |     await this.goto(path);
+  179 |     return this;
+  180 |   }
+  181 | }
+  182 | 
+```
