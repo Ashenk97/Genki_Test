@@ -1,0 +1,334 @@
+# Instructions
+
+- Following Playwright test failed.
+- Explain why, be concise, respect Playwright best practices.
+- Provide a snippet of code with the fix, if possible.
+
+# Test info
+
+- Name: pdp.spec.ts >> Individual product >> should increase quantity with the stepper
+- Location: tests/pdp.spec.ts:35:7
+
+# Error details
+
+```
+Error: expect(locator).toBeVisible() failed
+
+Locator: locator('input[value="2"]').or(getByText(/^2$/)).first()
+Expected: visible
+Timeout: 5000ms
+Error: element(s) not found
+
+Call log:
+  - Expect "toBeVisible" with timeout 5000ms
+  - waiting for locator('input[value="2"]').or(getByText(/^2$/)).first()
+
+```
+
+```yaml
+- alert
+- region "Notifications alt+T"
+- banner:
+  - link "Genki Wardrobe":
+    - /url: /
+    - img "Genki Wardrobe"
+  - navigation:
+    - list:
+      - listitem:
+        - link "Men":
+          - /url: /collection/men
+      - listitem:
+        - link "Women":
+          - /url: /collection/women
+      - listitem:
+        - link "Collections":
+          - /url: /collection
+  - list:
+    - listitem:
+      - button "Open wishlist":
+        - img
+    - listitem:
+      - button "Open cart":
+        - img
+- button "Close search":
+  - img
+- searchbox "Search Products..."
+- text: "# Hit enter to search"
+- heading "Berserk Oversize T-shirt" [level=1]
+- list:
+  - listitem:
+    - link "Home":
+      - /url: /
+    - text: /
+  - listitem: Berserk Oversize T-shirt
+- text: "-10%"
+- button:
+  - img
+- group "4 / 4":
+  - button:
+    - img
+  - img "Berserk Oversize T-shirt"
+- group "1 / 4":
+  - button:
+    - img
+  - img "Berserk Oversize T-shirt"
+- group "2 / 4":
+  - button:
+    - img
+  - img "Berserk Oversize T-shirt"
+- group "3 / 4":
+  - button:
+    - img
+  - img "Berserk Oversize T-shirt"
+- group "4 / 4":
+  - button:
+    - img
+  - img "Berserk Oversize T-shirt"
+- group "1 / 4":
+  - button:
+    - img
+  - img "Berserk Oversize T-shirt"
+- button "Go to slide 1"
+- button "Go to slide 2"
+- button "Go to slide 3"
+- button "Go to slide 4"
+- group "1 / 4":
+  - img "Berserk Oversize T-shirt"
+- group "2 / 4":
+  - img "Berserk Oversize T-shirt"
+- group "3 / 4":
+  - img "Berserk Oversize T-shirt"
+- group "4 / 4":
+  - img "Berserk Oversize T-shirt"
+- button "Previous slide" [disabled]:
+  - img
+- button "Next slide":
+  - img
+- heading "Berserk Oversize T-shirt" [level=2]
+- text: LKR 3490.00
+- paragraph: Crafted from a premium cotton blend, this black oversize tee features bold back artwork inspired by the iconic Berserk manga. Designed for comfort and impact, it’s the perfect fit for anime fans who live and breathe dark fantasy.
+- text: Color (white)
+- 'radio "Selected: white" [checked] [disabled]'
+- text: Size
+- radio "XS" [checked]
+- text: XS Quantity
+- button "-"
+- textbox: "1"
+- button "+"
+- button "Out of Stock" [disabled]
+- button "Add to wishlist":
+  - img
+- table:
+  - rowgroup:
+    - 'row "SKU: berserk-oversized-tee"':
+      - cell "SKU:"
+      - cell "berserk-oversized-tee"
+    - 'row "Categories: Oversized T-Shirts, Unisex"':
+      - cell "Categories:"
+      - cell "Oversized T-Shirts, Unisex"
+    - 'row "Tags: Anime, Street Wear"':
+      - cell "Tags:"
+      - cell "Anime, Street Wear"
+    - row "Share on:":
+      - cell "Share on:"
+      - cell:
+        - list:
+          - listitem:
+            - button "Share on Facebook":
+              - img
+          - listitem:
+            - button "Share on Twitter":
+              - img
+          - listitem:
+            - button "Share on WhatsApp":
+              - img
+          - listitem:
+            - button "Copy URL":
+              - img
+- tablist:
+  - tab "Description" [selected]
+  - tab "Additional Information"
+- tabpanel "Description": Step into the world of dark fantasy with our Berserk Oversize Tee. Inspired by the legendary Berserk manga, this tee features bold back artwork that captures the raw intensity and power of the series. Made from a soft, breathable premium cotton blend, it offers a relaxed oversized fit for all-day comfort and effortless streetwear style. Whether you’re a longtime fan of Guts and his relentless journey or just love edgy anime aesthetics, this tee is a statement piece built for those who embrace their inner warrior. Pair it with cargos or denim and let the design speak for itself.
+- heading "Oversized T-Shirt Size chart" [level=2]
+- img "oversized T-shirt size chart, sizes XXS through XXXL"
+- contentinfo:
+  - img "Genki Wardrobe"
+  - text: © 2026
+  - link "| Genki":
+    - /url: https://genkiwardrobe.com
+  - text: All Rights Reserved
+  - heading "INFO" [level=5]
+  - navigation:
+    - list:
+      - listitem:
+        - link "About us":
+          - /url: /about-us
+      - listitem:
+        - link "Contact":
+          - /url: /about-us#contact
+      - listitem:
+        - link "Privacy Policy":
+          - /url: /privacy-policy
+      - listitem:
+        - link "Terms and Conditions":
+          - /url: /terms-and-conditions
+  - heading "USEFUL LINKS" [level=5]
+  - navigation:
+    - list:
+      - listitem:
+        - link "Returns":
+          - /url: /return-policy
+      - listitem:
+        - link "Shipping & Delivery":
+          - /url: /shipping-policy
+      - listitem:
+        - link "Size guide":
+          - /url: /size-guide
+      - listitem:
+        - link "FAQs":
+          - /url: /faq
+  - heading "FOLLOW US ON" [level=5]
+  - navigation:
+    - list:
+      - listitem:
+        - link "Facebook":
+          - /url: https://facebook.com/genkiwardrobelk
+          - img
+          - text: Facebook
+      - listitem:
+        - link "Instagram":
+          - /url: https://instagram.com/genkiwardrobelk
+          - img
+          - text: Instagram
+      - listitem:
+        - link "TikTok":
+          - /url: https://www.tiktok.com/@genkiwardrobelk
+          - img
+          - text: TikTok
+      - listitem:
+        - link "WhatsApp":
+          - /url: https://wa.me/94701002922
+          - img
+          - text: WhatsApp
+  - heading "Subscribe." [level=2]
+  - paragraph: Get the latest drops, exclusive offers, and style updates.
+  - textbox "Email address":
+    - /placeholder: Your email address
+  - button "Subscribe to newsletter" [disabled]:
+    - img
+```
+
+# Test source
+
+```ts
+  74  |       .first();
+  75  |     const sizeId = await sizeInput.getAttribute('id');
+  76  |     if (sizeId) {
+  77  |       const label = this.page.locator(`label[for="${sizeId}"]`);
+  78  |       if (await label.isVisible().catch(() => false)) {
+  79  |         await label.click();
+  80  |         return this;
+  81  |       }
+  82  |     }
+  83  | 
+  84  |     await sizeInput.click({ force: true });
+  85  |     return this;
+  86  |   }
+  87  | 
+  88  |   async addToCart(): Promise<this> {
+  89  |     await this.addToCartButton.click();
+  90  |     return this;
+  91  |   }
+  92  | 
+  93  |   async expectAddToCartVisible(): Promise<void> {
+  94  |     await expect(this.addToCartButton).toBeVisible();
+  95  |     await expect(this.addToCartButton).toBeEnabled();
+  96  |   }
+  97  | 
+  98  |   async expectSizeRequired(): Promise<void> {
+  99  |     await expect(this.selectSizePrompt).toBeVisible();
+  100 |     await expect(this.addToCartButton).toHaveCount(0);
+  101 |   }
+  102 | 
+  103 |   async expectColorRequired(): Promise<void> {
+  104 |     await expect(this.selectColorPrompt).toBeVisible();
+  105 |     await expect(this.addToCartButton).toHaveCount(0);
+  106 |   }
+  107 | 
+  108 |   async selectColor(color: string): Promise<this> {
+  109 |     const input = this.page.locator(`input[name="product-color"][value="${color}" i], input[name="product-color"]#${color}`);
+  110 |     const colorId = await input.first().getAttribute('id');
+  111 |     if (colorId) {
+  112 |       await this.page.locator(`label[for="${colorId}"]`).click({ force: true });
+  113 |     } else {
+  114 |       await input.first().check({ force: true });
+  115 |     }
+  116 |     return this;
+  117 |   }
+  118 | 
+  119 |   async expectAvailableSizeCount(minCount: number): Promise<void> {
+  120 |     const sizes = this.page.locator('input[type="radio"]:not([name="product-color"])');
+  121 |     await expect.poll(async () => sizes.count()).toBeGreaterThanOrEqual(minCount);
+  122 |   }
+  123 | 
+  124 |   async expectBrokenProductShell(): Promise<void> {
+  125 |     await expect(this.addToCartButton).toHaveCount(0);
+  126 |     await expect(this.selectSizePrompt).toHaveCount(0);
+  127 |     await expect(this.selectColorPrompt).toHaveCount(0);
+  128 |   }
+  129 | 
+  130 |   async expectAddedToCart(): Promise<void> {
+  131 |     await this.expectToast(AUTH_MESSAGES.addedToCartToast, ToastType.Success);
+  132 |   }
+  133 | 
+  134 |   async expectProductDetailsVisible(): Promise<void> {
+  135 |     await expect(this.productTitle).toBeVisible();
+  136 |     await expect(this.price).toBeVisible();
+  137 |     await expect(
+  138 |       this.addToCartButton.or(this.selectSizePrompt).or(this.selectColorPrompt),
+  139 |     ).toBeVisible();
+  140 |   }
+  141 | 
+  142 |   async expectOnProductPage(): Promise<void> {
+  143 |     await expect(this.page).toHaveURL(/\/products\//);
+  144 |     await expect(this.productTitle).toBeVisible();
+  145 |   }
+  146 | 
+  147 |   async addToWishlist(): Promise<this> {
+  148 |     await this.addToWishlistButton.click();
+  149 |     return this;
+  150 |   }
+  151 | 
+  152 |   async expectAddedToWishlist(): Promise<void> {
+  153 |     await expect(
+  154 |       this.page.locator('[data-sonner-toast]').filter({ hasText: AUTH_MESSAGES.wishlistToast }),
+  155 |     ).toBeVisible();
+  156 |   }
+  157 | 
+  158 |   async increaseQuantity(): Promise<this> {
+  159 |     await this.increaseQtyButton.click();
+  160 |     return this;
+  161 |   }
+  162 | 
+  163 |   async decreaseQuantity(): Promise<this> {
+  164 |     await this.decreaseQtyButton.click();
+  165 |     return this;
+  166 |   }
+  167 | 
+  168 |   async expectQuantity(quantity: number): Promise<void> {
+  169 |     await expect(
+  170 |       this.page
+  171 |         .locator(`input[value="${quantity}"]`)
+  172 |         .or(this.page.getByText(new RegExp(`^${quantity}$`)))
+  173 |         .first(),
+> 174 |     ).toBeVisible();
+      |       ^ Error: expect(locator).toBeVisible() failed
+  175 |   }
+  176 | 
+  177 |   async open(path: string): Promise<this> {
+  178 |     await this.goto(path);
+  179 |     return this;
+  180 |   }
+  181 | }
+  182 | 
+```
