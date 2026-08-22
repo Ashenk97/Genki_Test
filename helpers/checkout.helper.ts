@@ -27,3 +27,14 @@ export async function startLoggedInCodCheckout(
   await checkoutPage.selectPayment(PaymentMethod.COD);
   await checkoutPage.acceptTerms();
 }
+
+export async function startLoggedInCardCheckout(
+  productDetailsPage: ProductDetailsPage,
+  checkoutPage: CheckoutPage,
+): Promise<void> {
+  await addSampleProductToCart(productDetailsPage);
+  await checkoutPage.open();
+  await checkoutPage.fillLoggedInBilling();
+  await checkoutPage.selectPayment(PaymentMethod.Card);
+  await checkoutPage.acceptTerms();
+}

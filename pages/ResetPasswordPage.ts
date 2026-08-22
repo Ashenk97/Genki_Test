@@ -20,12 +20,36 @@ export class ResetPasswordPage extends BasePage {
     this.submitButton = this.form.getByRole('button', { name: /^submit$/i });
   }
 
+  async open(path: string = AppRoutes.ResetPassword): Promise<this> {
+    await this.goto(path);
+    return this;
+  }
+
   async expectLoaded(): Promise<void> {
     await expect(this.page).toHaveURL(new RegExp(AppRoutes.ResetPassword));
     await expect(this.heading).toBeVisible();
     await expect(this.passwordInput).toBeVisible();
     await expect(this.confirmPasswordInput).toBeVisible();
     await expect(this.submitButton).toBeVisible();
+  }
+
+  async expectInvalidOrExpiredToken(): Promise<void> {
+    await expect(this.page).toHaveURL(new RegExp(AppRoutes.ResetPassword));
+    const formReady = await this.passwordInput.isVisible().catch(() => false);
+    if (formReady) {
+      await this.resetPassword('Genki!Valid1', 'Genki!Valid1');
+    }
+    await expect(
+      this.page.getByText(/invalid|expired|already used|token is (invalid|missing)|missing token/i).first(),
+    ).toBeVisible();
+    await expect(this.page).not.toHaveURL(new RegExp(AppRoutes.Login));
+  }
+
+  async expectPasswordMismatch(): Promise<void> {
+    await expect(
+      this.page.getByText(/passwords? (do not|don't) match|must match|not match/i).first(),
+    ).toBeVisible();
+    await expect(this.page).toHaveURL(new RegExp(AppRoutes.ResetPassword));
   }
 
   async resetPassword(password: string, confirmPassword = password): Promise<this> {

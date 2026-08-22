@@ -35,7 +35,7 @@ export default defineConfig({
     {
       name: 'chrome',
       dependencies: ['setup'],
-      testIgnore: /mobile-nav\.spec\.ts|auth\.setup\.ts/,
+      testIgnore: /mobile-.*\.spec\.ts|auth\.setup\.ts/,
       use: {
         ...devices['Desktop Chrome'],
         channel: 'chrome',
@@ -44,19 +44,19 @@ export default defineConfig({
     {
       name: 'chromium',
       dependencies: ['setup'],
-      testIgnore: /mobile-nav\.spec\.ts|auth\.setup\.ts/,
+      testIgnore: /mobile-.*\.spec\.ts|auth\.setup\.ts/,
       use: { ...devices['Desktop Chrome'] },
     },
     {
       name: 'firefox',
       dependencies: ['setup'],
-      testIgnore: /mobile-nav\.spec\.ts|auth\.setup\.ts/,
+      testIgnore: /mobile-.*\.spec\.ts|auth\.setup\.ts/,
       use: { ...devices['Desktop Firefox'] },
     },
     {
       name: 'webkit',
       dependencies: ['setup'],
-      testIgnore: /mobile-nav\.spec\.ts|auth\.setup\.ts/,
+      testIgnore: /mobile-.*\.spec\.ts|auth\.setup\.ts/,
       use: { ...devices['Desktop Safari'] },
     },
     {
@@ -65,7 +65,7 @@ export default defineConfig({
         ...devices['Pixel 7'],
         channel: 'chrome',
       },
-      testMatch: /mobile-nav\.spec\.ts/,
+      testMatch: /mobile-.*\.spec\.ts/,
     },
   ],
 });

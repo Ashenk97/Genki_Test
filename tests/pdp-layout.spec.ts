@@ -31,6 +31,28 @@ test.describe('PDP layout', () => {
     await productDetailsPage.expectNoHorizontalOverflow();
   });
 
+  test('should keep a visible row gap when size chips wrap at laptop width', async ({
+    page,
+    productDetailsPage,
+  }) => {
+    test.fail(true, 'GENKI: size chips wrap with 0px row gap');
+    await page.setViewportSize({ width: 1024, height: 768 });
+    await productDetailsPage.open(WHITE_ONLY_PRODUCT.path);
+    await productDetailsPage.expectListedSizes(WHITE_ONLY_PRODUCT.sizes);
+    await productDetailsPage.expectWrappedSizeLabelsHaveRowGap(8);
+  });
+
+  test('should keep a visible row gap when size chips wrap on a mobile viewport', async ({
+    page,
+    productDetailsPage,
+  }) => {
+    test.fail(true, 'GENKI: size chips wrap with 0px row gap');
+    await page.setViewportSize({ width: 390, height: 844 });
+    await productDetailsPage.open(WHITE_ONLY_PRODUCT.path);
+    await productDetailsPage.expectListedSizes(WHITE_ONLY_PRODUCT.sizes);
+    await productDetailsPage.expectWrappedSizeLabelsHaveRowGap(8);
+  });
+
   test('should list dual-color sizes after a color is chosen without page overflow', async ({
     productDetailsPage,
   }) => {

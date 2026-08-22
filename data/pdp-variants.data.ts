@@ -6,7 +6,11 @@ export const SIZE_RADIO_PATTERN = /^(XXS|XS|S|M|L|XL|XXL|XXXL)$/i;
 
 export const PRODUCT_PRICE = {
   unit: 3490,
+  xxs: 3390,
+  xxxl: 3590,
 } as const;
+
+export const SIZE_CHART_EXCESS_SIZE = 'XXXXL';
 
 export const FREE_DELIVERY = {
   threshold: 5000,

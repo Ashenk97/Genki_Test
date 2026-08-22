@@ -4,6 +4,7 @@ import { PaymentMethod } from '@constants/payment';
 import { Timeouts } from '@constants/timeouts';
 import { CHECKOUT_PAGE } from '@data/navigation.data';
 import { getGuestBillingDetails } from '@data/checkout.data';
+import { lkrAmountPattern } from '@helpers/string';
 import { BasePage } from '@pages/BasePage';
 import { AppRoutes } from '@constants/routes';
 
@@ -19,7 +20,7 @@ export class CheckoutPage extends BasePage {
   private readonly createAccount: Locator;
   private readonly createAccountLabel: Locator;
   private readonly accountPassword: Locator;
-  private readonly termsLabel: Locator;
+  private readonly termsCheckbox: Locator;
   private readonly placeOrderButton: Locator;
   private readonly cardPaymentInput: Locator;
   private readonly bankPaymentInput: Locator;
@@ -52,7 +53,9 @@ export class CheckoutPage extends BasePage {
     this.accountPassword = page.locator('input[name="userPassword"]').or(
       page.locator('input[name="password"]'),
     );
-    this.termsLabel = page.locator('label').filter({ hasText: /terms & conditions/i });
+    this.termsCheckbox = page.getByRole('checkbox', {
+      name: /read and accept the terms/i,
+    });
     this.placeOrderButton = page.getByRole('button', { name: /place order/i });
     this.cardPaymentInput = page.locator('#payment_check');
     this.bankPaymentInput = page.locator('#payment_bank');
@@ -99,12 +102,15 @@ export class CheckoutPage extends BasePage {
     await expect(this.placeOrderButton).toHaveCount(0);
   }
 
-  async fillGuestBilling(email: string): Promise<this> {
+  async fillGuestBilling(
+    email: string,
+    overrides: { phone?: string } = {},
+  ): Promise<this> {
     const checkout = getGuestBillingDetails();
     await this.firstName.fill(checkout.firstName);
     await this.lastName.fill(checkout.lastName);
     await this.email.fill(email);
-    await this.phone.fill(checkout.phone);
+    await this.phone.fill(overrides.phone ?? checkout.phone);
     await this.addressOne.fill(checkout.addressOne);
     if (await this.addressTwo.isVisible().catch(() => false)) {
       await this.addressTwo.fill(checkout.addressTwo);
@@ -216,7 +222,12 @@ export class CheckoutPage extends BasePage {
   }
 
   async acceptTerms(): Promise<this> {
-    await this.termsLabel.click();
+    await this.page.locator('#accept_terms').evaluate((el: HTMLInputElement) => {
+      if (!el.checked) {
+        el.click();
+      }
+    });
+    await expect(this.termsCheckbox).toBeChecked();
     return this;
   }
 
@@ -280,8 +291,16 @@ export class CheckoutPage extends BasePage {
     ).toBeVisible();
   }
 
+  unpublishedProductError(): Locator {
+    return this.page.getByText(/not available or not published/i);
+  }
+
   async hasUnpublishedProductError(): Promise<boolean> {
-    return this.page.getByText(/not available or not published/i).isVisible().catch(() => false);
+    return this.unpublishedProductError().isVisible().catch(() => false);
+  }
+
+  async expectUnpublishedProductError(): Promise<void> {
+    await expect(this.unpublishedProductError()).toBeVisible();
   }
 
   async canPlaceOrder(): Promise<boolean> {
@@ -289,7 +308,7 @@ export class CheckoutPage extends BasePage {
   }
 
   async waitUntilPlaceableOrBlocked(): Promise<'placeable' | 'blocked'> {
-    const unpublished = this.page.getByText(/not available or not published/i);
+    const unpublished = this.unpublishedProductError();
     const blocked = await unpublished
       .waitFor({ state: 'visible', timeout: 5_000 })
       .then(() => true)
@@ -298,6 +317,23 @@ export class CheckoutPage extends BasePage {
       return 'blocked';
     }
     return (await this.canPlaceOrder()) ? 'placeable' : 'blocked';
+  }
+
+  async waitForPayHereOrUnpublished(): Promise<'payhere' | 'blocked'> {
+    const unpublished = this.unpublishedProductError();
+    const iframe = this.page.locator('#ph-iframe');
+    try {
+      return await Promise.race([
+        unpublished
+          .waitFor({ state: 'visible', timeout: Timeouts.PayHereFrame })
+          .then(() => 'blocked' as const),
+        iframe
+          .waitFor({ state: 'visible', timeout: Timeouts.PayHereFrame })
+          .then(() => 'payhere' as const),
+      ]);
+    } catch {
+      return 'blocked';
+    }
   }
 
   async reachedOrderSuccess(timeout = Timeouts.MediumUi): Promise<boolean> {
@@ -401,7 +437,29 @@ export class CheckoutPage extends BasePage {
 
   async expectOrderSubtotal(amount: number): Promise<void> {
     await expect(
-      this.page.getByText(new RegExp(`lkr\\s*${amount}(?:\\.00)?`, 'i')).filter({ visible: true }).first(),
+      this.page.getByText(lkrAmountPattern(amount)).filter({ visible: true }).first(),
+    ).toBeVisible();
+  }
+
+  couponField(): Locator {
+    return this.page
+      .locator('#coupon, input[name="coupon"], input[name="promoCode"]')
+      .or(this.page.getByPlaceholder(/coupon|promo/i));
+  }
+
+  async expectCouponControlAbsentOrApplyRejected(code = 'INVALIDQA'): Promise<void> {
+    const field = this.couponField();
+    if ((await field.count()) === 0) {
+      await expect(this.page.getByText(/apply coupon|promo code/i)).toHaveCount(0);
+      return;
+    }
+    await field.first().fill(code);
+    const apply = this.page.getByRole('button', { name: /apply/i }).first();
+    if (await apply.isVisible().catch(() => false)) {
+      await apply.click();
+    }
+    await expect(
+      this.page.getByText(/invalid|not found|expired|does not apply/i).first(),
     ).toBeVisible();
   }
 

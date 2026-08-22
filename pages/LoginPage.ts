@@ -159,6 +159,15 @@ export class LoginPage extends BasePage {
     await expect(this.submitButton).toBeVisible();
   }
 
+  async expectLoginRejected(): Promise<void> {
+    await this.expectPathname(LOGIN_PAGE.path);
+    await expect(
+      this.page
+        .getByText(/invalid email or password|confirm your email|not verified|activate/i)
+        .first(),
+    ).toBeVisible({ timeout: Timeouts.Assertion });
+  }
+
   async toggleShowPassword(): Promise<void> {
     await expect(this.passwordInput).toHaveAttribute('type', 'password');
     await this.showPasswordButton.click();

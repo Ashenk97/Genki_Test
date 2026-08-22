@@ -32,6 +32,36 @@ export class CollectionPage extends BasePage {
     await expect(this.productLinks).not.toHaveCount(0);
   }
 
+  sortAndFilterControls(): Locator {
+    return this.page
+      .locator('select')
+      .filter({ visible: true })
+      .or(this.page.getByRole('combobox'))
+      .or(this.page.getByRole('button', { name: /^(filter|sort|sort by)/i }))
+      .or(this.page.getByLabel(/sort by|filter/i));
+  }
+
+  async expectSortOrFilterIfPresent(): Promise<void> {
+    const controls = this.sortAndFilterControls();
+    if ((await controls.count()) === 0) {
+      await this.expectHasProducts();
+      return;
+    }
+    const first = controls.first();
+    await expect(first).toBeVisible();
+    const tag = await first.evaluate((el) => el.tagName.toLowerCase());
+    if (tag === 'select') {
+      const options = first.locator('option');
+      if ((await options.count()) > 1) {
+        await first.selectOption({ index: 1 });
+      }
+    } else {
+      await first.click();
+    }
+    await this.waitForPageLoad();
+    await this.expectHasProducts();
+  }
+
   async expectEmptyCollection(): Promise<void> {
     await expect(this.page.getByText(/no products found/i)).toBeVisible();
   }

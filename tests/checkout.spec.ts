@@ -3,9 +3,13 @@ import { Timeouts } from '@constants/timeouts';
 import { TEST_DATA } from '@data/index';
 import { guestCheckoutEmail } from '@data/checkout.data';
 import { strongPassword } from '@helpers/random';
-import { test } from '@fixtures/test-fixtures';
+import { expect, test } from '@fixtures/test-fixtures';
 import { addSampleProductToCart } from '@helpers/cart.helper';
-import { startGuestCardCheckout, startLoggedInCodCheckout } from '@helpers/checkout.helper';
+import {
+  startGuestCardCheckout,
+  startLoggedInCardCheckout,
+  startLoggedInCodCheckout,
+} from '@helpers/checkout.helper';
 
 test.describe('Checkout', () => {
   test.describe.configure({ mode: 'parallel' });
@@ -104,17 +108,21 @@ test.describe('Checkout', () => {
         await test.step('Place logged-in COD order', async () => {
           await startLoggedInCodCheckout(productDetailsPage, checkoutPage);
           const readiness = await checkoutPage.waitUntilPlaceableOrBlocked();
-          if (readiness === 'blocked') {
-            await checkoutPage.expectStillOnCheckout();
-            test.skip(true, 'Checkout blocked by unpublished milestone gift on staging');
+          if (readiness === 'placeable') {
+            await checkoutPage.placeOrder();
           }
-          await checkoutPage.placeOrder();
+          const completed = await checkoutPage.reachedOrderSuccess();
+          const blocked =
+            readiness === 'blocked' ||
+            (await checkoutPage.hasUnpublishedProductError()) ||
+            !completed;
+          test.fail(
+            blocked,
+            'GENKI: unpublished Daimyo FREE gift blocks logged-in checkout',
+          );
+          expect(blocked, 'logged-in checkout should complete').toBe(false);
         });
         const orderId = await test.step('Verify order success and capture id', async () => {
-          if (!(await checkoutPage.reachedOrderSuccess())) {
-            await checkoutPage.expectStillOnCheckout();
-            test.skip(true, 'Logged-in COD did not reach order success on staging');
-          }
           await checkoutPage.expectOrderSuccess(PaymentMethod.COD);
           await checkoutPage.expectCodInstructions();
           return checkoutPage.getOrderId();
@@ -123,6 +131,42 @@ test.describe('Checkout', () => {
           await accountDashboardPage.open();
           await accountDashboardPage.openSection('orders');
           await accountDashboardPage.expectOrderVisible(orderId);
+        });
+      },
+    );
+
+    test(
+      'should place a Visa order via PayHere while logged in',
+      { tag: ['@checkout', '@payment'] },
+      async ({ productDetailsPage, checkoutPage, cartPage, rewardsPage, payHereCheckout }) => {
+        test.setTimeout(Timeouts.PayHereCheckout);
+        await test.step('Clear rewards queue and cart', async () => {
+          await rewardsPage.open();
+          await rewardsPage.expectLoaded();
+          await rewardsPage.clearQueuedRewards();
+          await cartPage.open();
+          await cartPage.clearCart();
+        });
+        await test.step('Start logged-in card checkout', async () => {
+          await startLoggedInCardCheckout(productDetailsPage, checkoutPage);
+          const readiness = await checkoutPage.waitUntilPlaceableOrBlocked();
+          if (readiness === 'placeable') {
+            await checkoutPage.placeOrder();
+          }
+          const next =
+            readiness === 'blocked'
+              ? 'blocked'
+              : await checkoutPage.waitForPayHereOrUnpublished();
+          test.fail(
+            next === 'blocked',
+            'GENKI: unpublished Daimyo FREE gift blocks logged-in checkout',
+          );
+          expect(next, 'logged-in card checkout should open PayHere').toBe('payhere');
+        });
+        await test.step('Pay with sandbox Visa', async () => {
+          await payHereCheckout.payWithCard(TEST_DATA.payhere.cards.success.visa);
+          await payHereCheckout.expectPaymentApproved();
+          await checkoutPage.expectCardPaymentReceived();
         });
       },
     );

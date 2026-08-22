@@ -23,6 +23,12 @@ export class RewardsPage extends BasePage {
     return this;
   }
 
+  async expectGuestSignInPrompt(): Promise<void> {
+    await this.expectPathname(ACCOUNT_PAGES.rewards.path);
+    await expect(this.page.getByText(/sign in to view your points balance/i)).toBeVisible();
+    await expect(this.catalogHeading).toBeVisible();
+  }
+
   async expectLoaded(): Promise<void> {
     await this.expectPathname(ACCOUNT_PAGES.rewards.path);
     await expect(this.heading).toBeVisible();

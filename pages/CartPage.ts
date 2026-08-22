@@ -1,7 +1,7 @@
 import { Locator, Page, expect } from '@playwright/test';
-import { AUTH_MESSAGES } from '@constants/messages';
 import { CART_PAGE } from '@data/navigation.data';
 import { AppRoutes } from '@constants/routes';
+import { lkrAmountPattern } from '@helpers/string';
 import { BasePage } from '@pages/BasePage';
 
 export class CartPage extends BasePage {
@@ -90,8 +90,15 @@ export class CartPage extends BasePage {
 
   async expectSubtotal(amount: number): Promise<void> {
     await expect(
-      this.page.getByText(new RegExp(`lkr\\s*${amount}(?:\\.00)?`, 'i')).filter({ visible: true }).first(),
+      this.page.getByText(lkrAmountPattern(amount)).filter({ visible: true }).first(),
     ).toBeVisible();
+  }
+
+  async expectLineAttributesReadOnly(): Promise<void> {
+    await expect(this.productRows.locator('select, [role="combobox"]')).toHaveCount(0);
+    await expect(
+      this.productRows.getByRole('button', { name: /edit (size|color)|change (size|color)/i }),
+    ).toHaveCount(0);
   }
 
   async expectEmpty(): Promise<void> {

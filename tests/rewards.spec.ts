@@ -20,7 +20,6 @@ test.describe('Rewards', () => {
     cartPage,
   }) => {
     test.setTimeout(90_000);
-    let ordered = false;
     const pointsBefore = await test.step('Capture points before purchase', async () => {
       await rewardsPage.open();
       await rewardsPage.expectLoaded();
@@ -37,22 +36,22 @@ test.describe('Rewards', () => {
       await checkoutPage.fillLoggedInBilling();
       await checkoutPage.selectPayment(PaymentMethod.COD);
       await checkoutPage.acceptTerms();
-      if ((await checkoutPage.waitUntilPlaceableOrBlocked()) === 'blocked') {
-        await checkoutPage.expectStillOnCheckout();
-        return;
+      const readiness = await checkoutPage.waitUntilPlaceableOrBlocked();
+      if (readiness === 'placeable') {
+        await checkoutPage.placeOrder();
       }
-      await checkoutPage.placeOrder();
-      if (!(await checkoutPage.reachedOrderSuccess())) {
-        await checkoutPage.expectStillOnCheckout();
-        return;
-      }
+      const completed = await checkoutPage.reachedOrderSuccess();
+      const blocked =
+        readiness === 'blocked' ||
+        (await checkoutPage.hasUnpublishedProductError()) ||
+        !completed;
+      test.fail(
+        blocked,
+        'GENKI: unpublished Daimyo FREE gift blocks logged-in checkout',
+      );
+      expect(blocked, 'reward earn checkout should complete').toBe(false);
       await checkoutPage.expectOrderSuccess(PaymentMethod.COD);
-      ordered = true;
     });
-
-    if (!ordered) {
-      return;
-    }
 
     await test.step('Usable points increased after the purchase', async () => {
       await rewardsPage.open();
@@ -115,21 +114,21 @@ test.describe('Rewards', () => {
       await checkoutPage.fillLoggedInBilling();
       await checkoutPage.selectPayment(PaymentMethod.COD);
       await checkoutPage.acceptTerms();
-      if ((await checkoutPage.waitUntilPlaceableOrBlocked()) === 'blocked') {
-        await checkoutPage.expectStillOnCheckout();
-        return;
+      const readiness = await checkoutPage.waitUntilPlaceableOrBlocked();
+      if (readiness === 'placeable') {
+        await checkoutPage.placeOrder();
       }
-      await checkoutPage.placeOrder();
+      const completed = await checkoutPage.reachedOrderSuccess();
+      const blocked =
+        readiness === 'blocked' ||
+        (await checkoutPage.hasUnpublishedProductError()) ||
+        !completed;
+      test.fail(
+        blocked,
+        'GENKI: unpublished Daimyo FREE gift blocks reward checkout',
+      );
+      expect(blocked, 'reward redeem checkout should complete').toBe(false);
     });
-
-    const landedOnSuccess = /order-success/i.test(checkoutPage.page.url());
-    if (!landedOnSuccess) {
-      await test.step('GENKI-BUG-009: reward checkout did not complete (remove when fixed)', async () => {
-        await checkoutPage.expectStillOnCheckout();
-        await checkoutPage.expectNotOnOrderSuccess();
-      });
-      return;
-    }
 
     await test.step('Order succeeded and points decreased', async () => {
       await checkoutPage.expectOrderSuccess(PaymentMethod.COD);

@@ -152,4 +152,38 @@ test.describe('Account deep links as guest', () => {
       await accountDashboardPage.expectRedirectedToLogin();
     });
   });
+
+  test('should redirect guests from loyalty to login', async ({ accountDashboardPage }) => {
+    await test.step('Open loyalty while logged out', async () => {
+      await accountDashboardPage.goto(AppRoutes.AccountLoyalty);
+      await accountDashboardPage.expectRedirectedToLogin();
+    });
+  });
+
+  test('should redirect guests from address to login', async ({ accountDashboardPage }) => {
+    await test.step('Open address while logged out', async () => {
+      await accountDashboardPage.goto(AppRoutes.AccountAddress);
+      await accountDashboardPage.expectRedirectedToLogin();
+    });
+  });
+
+  test('should redirect guests from account details to login', async ({
+    accountDashboardPage,
+  }) => {
+    await test.step('Open account details while logged out', async () => {
+      await accountDashboardPage.goto(AppRoutes.AccountDetails);
+      await accountDashboardPage.expectRedirectedToLogin();
+    });
+  });
+
+  test('should prompt guests to sign in on the public rewards page', async ({
+    rewardsPage,
+    header,
+  }) => {
+    await test.step('Open rewards while logged out', async () => {
+      await rewardsPage.open();
+      await rewardsPage.expectGuestSignInPrompt();
+      await header.expectLoggedOut();
+    });
+  });
 });

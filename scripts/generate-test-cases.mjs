@@ -83,7 +83,7 @@ add('Categories', 'Open Men collection PLP', 'Men PLP', 'P0', 'smoke,plp', 'Desk
 add('Categories', 'Open Women collection PLP', 'Women PLP', 'P0', 'smoke,plp', 'Desktop', '1. Navigate Women', 'Women H1 and products', 'Covered');
 add('Categories', 'Open theme collections', 'Anime Originals Culture JDM Kawaii', 'P0', 'smoke,plp', 'Desktop', '1. Open each theme collection', 'Correct H1', 'Covered');
 add('Products', 'PLP shows product grid and opens PDP', 'Grid to PDP', 'P0', 'smoke,plp', 'On Men collection', '1. Assert products 2. Open first valid product', 'PDP URL /products/', 'Covered');
-add('Products', 'PLP filters or sort if present', 'Optional filters', 'P2', 'regression,plp', 'Collection with filters', '1. Apply filter/sort if UI exists', 'Results update or control visible', 'Planned');
+add('Products', 'PLP filters or sort if present', 'Optional filters', 'P2', 'regression,plp', 'Collection with filters', '1. Apply filter/sort if UI exists', 'Results update or products remain when no control exists', 'Covered');
 
 add('Individual product', 'PDP shows title price and ATC', 'PDP smoke', 'P0', 'smoke,pdp', 'Product URL', '1. Open PDP', 'Title price ATC visible', 'Covered');
 add('Individual product', 'Select size enables ATC', 'Size selection', 'P0', 'smoke,pdp', 'PDP with sizes', '1. Select size', 'ATC enabled', 'Covered');
@@ -114,6 +114,11 @@ add('PDP layout', 'White-only PDP has no horizontal overflow', 'Page does not sc
 add('PDP layout', 'Size options listed at laptop width', '1024px size list', 'P1', 'regression,pdp,layout', '1024×768', '1. Open white-only PDP', 'XXS–XXXL listed; no horizontal overflow', 'Covered');
 add('PDP layout', 'Size options listed on mobile viewport', '390px size list', 'P1', 'regression,pdp,layout', '390×844', '1. Open white-only PDP', 'XXS–XXXL listed; no horizontal overflow', 'Covered');
 add('PDP layout', 'Dual-color sizes listed after color select', 'Color-first size list', 'P1', 'regression,pdp,layout', 'Dual-color PDP', '1. Select black 2. Measure sizes', 'XXS–XXXL listed; no horizontal overflow', 'Covered');
+add('PDP layout', 'Wrapped size chips have row gap at 1024', 'Laptop wrap spacing', 'P1', 'regression,pdp,layout', '1024×768 white-only PDP', '1. Open PDP 2. Measure size-chip row gap', 'Wrapped chips have at least 8px row gap', 'Covered');
+add('PDP layout', 'Wrapped size chips have row gap at 390', 'Mobile wrap spacing', 'P1', 'regression,pdp,layout', '390×844 white-only PDP', '1. Open PDP 2. Measure size-chip row gap', 'Wrapped chips have at least 8px row gap', 'Covered');
+add('PDP merchandising', 'Homepage first tile is in stock', 'Featured product purchasable', 'P1', 'regression,home,pdp', 'Homepage', '1. Click first product tile 2. Enable ATC', 'First featured product can be added to cart', 'Covered');
+add('PDP merchandising', 'Berserk copy matches selected color', 'Color copy consistency', 'P2', 'regression,pdp', 'Berserk PDP', '1. Open Berserk 2. Compare copy to checked color', 'Copy does not describe the opposite color', 'Covered');
+add('PDP merchandising', 'Size chart does not list XXXXL when PDP stops at XXXL', 'Size range consistency', 'P2', 'regression,pdp', 'White-only PDP and size guide', '1. List PDP sizes 2. Inspect size chart and size guide', 'XXXXL is not offered on PDP or advertised as a purchasable size', 'Covered');
 
 add('Wishlist', 'Add product to wishlist and open drawer', 'Wishlist add', 'P0', 'smoke,wishlist', 'Empty wishlist', '1. Add from PDP 2. Open wishlist', 'Item listed', 'Covered');
 add('Wishlist', 'Remove item from wishlist', 'Wishlist remove', 'P1', 'regression,wishlist', 'Item in wishlist', '1. Remove item', 'Empty or item gone', 'Covered');
@@ -126,6 +131,10 @@ add('Cart', 'Proceed to checkout from cart', 'Checkout entry', 'P0', 'smoke,cart
 add('Cart', 'Free delivery remaining under 5000', 'Below threshold', 'P0', 'smoke,cart,checkout', 'Qty 1 of LKR 3490 SKU', '1. ATC qty 1 2. Open cart', 'You are LKR 1,510 away from free delivery', 'Covered');
 add('Cart', 'Free delivery unlocked over 5000', 'Above threshold', 'P0', 'smoke,cart,checkout', 'Qty 2 of LKR 3490 SKU', '1. ATC qty 2 2. Open cart', 'Free delivery unlocked on this order', 'Covered');
 add('Cart', 'Free delivery boundary qty 1 to 2', 'Cross threshold on cart', 'P1', 'regression,cart', 'Qty 1 in cart', '1. Increase to 2 2. Decrease to 1', 'Unlocked at 2; remaining at 1', 'Covered');
+add('Cart', 'Same variant added twice merges quantity', 'Qty merge', 'P1', 'regression,cart', 'Empty guest cart', '1. ATC size M 2. ATC size M again', 'One cart line with qty 2', 'Covered');
+add('Cart', 'Price differs for XXS and XXXL', 'Size-based pricing', 'P1', 'regression,cart,pdp', 'White-only PDP', '1. ATC XXS 2. ATC XXXL 3. Open cart', 'XXS 3390; XXXL 3590; subtotal 6980', 'Covered');
+add('Cart', 'Cart line size and color are read-only', 'No in-cart variant edit', 'P2', 'regression,cart', 'Item in cart', '1. Open cart', 'No size/color editor on the line', 'Covered');
+add('Cart', 'OOS product cannot join an in-stock checkout', 'OOS blocked at ATC', 'P1', 'regression,cart,checkout', 'In-stock line in cart', '1. Open Berserk 2. Confirm OOS 3. Checkout', 'Cart still has one in-stock line; checkout loads', 'Covered');
 
 add('Info', 'About us page', 'About CMS', 'P1', 'regression,footer', 'Home', '1. Footer About us', '/about-us content loads', 'Covered');
 add('Info', 'Contact section', 'Contact anchor', 'P1', 'regression,footer', 'Home', '1. Footer Contact', '/about-us#contact', 'Covered');
@@ -145,6 +154,10 @@ add('Profile', 'Address page loads editable fields', 'Address', 'P1', 'regressio
 add('Profile', 'Account details page loads', 'Account details', 'P1', 'regression,profile', 'Logged in', '1. Open Account Details', 'Personal info fields', 'Covered');
 add('Profile', 'Logout from account sidebar', 'Sidebar logout', 'P0', 'smoke,profile,auth', 'Logged in on dashboard', '1. Click Logout in sidebar', 'Logged out', 'Covered');
 add('Profile', 'Redeem points link to rewards', 'Redeem entry', 'P1', 'smoke,profile,rewards', 'Logged in dashboard', '1. Click Redeem Points', '/rewards', 'Covered');
+add('Profile', 'Guest deep link loyalty redirects to login', 'Auth guard loyalty', 'P1', 'regression,profile,auth', 'Logged out', '1. Open /my-account/loyalty', 'Redirect to /login', 'Covered');
+add('Profile', 'Guest deep link address redirects to login', 'Auth guard address', 'P1', 'regression,profile,auth', 'Logged out', '1. Open /my-account/address', 'Redirect to /login', 'Covered');
+add('Profile', 'Guest deep link account details redirects to login', 'Auth guard account details', 'P1', 'regression,profile,auth', 'Logged out', '1. Open /my-account/account-details', 'Redirect to /login', 'Covered');
+add('Profile', 'Guest rewards page prompts sign in', 'Public rewards catalog', 'P1', 'regression,profile,auth', 'Logged out', '1. Open /rewards', 'Catalog visible; sign-in prompt; still logged out', 'Covered');
 
 add('Rewards', 'Rewards page shows usable points and catalog', 'Rewards load', 'P0', 'smoke,rewards', 'Logged in with points', '1. Open /rewards', 'Points and catalog visible', 'Covered');
 add('Rewards', 'Add reward to next order', 'Redeem add', 'P1', 'regression,rewards', 'Usable points >= reward cost', '1. Click ADD on a reward', 'Reward queued for next order', 'Covered');
@@ -173,6 +186,15 @@ add('Checkout', 'Decline Visa insufficient funds', 'Sandbox decline insufficient
 add('Checkout', 'Decline MasterCard limit exceeded', 'Sandbox decline limit exceeded', 'P1', 'regression,checkout,payment', 'Guest cart; PayHere sandbox', '1. Card payment 2. Enter 5491182243178283 3. Submit', 'Payment Declined; stay off order-success', 'Covered');
 add('Checkout', 'Decline Visa do not honor', 'Sandbox decline do not honor', 'P1', 'regression,checkout,payment', 'Guest cart; PayHere sandbox', '1. Card payment 2. Enter 4929768900837248 3. Submit', 'Payment Declined; stay off order-success', 'Covered');
 add('Checkout', 'Decline Visa network error', 'Sandbox decline network error', 'P1', 'regression,checkout,payment', 'Guest cart; PayHere sandbox', '1. Card payment 2. Enter 4024007120869333 3. Submit', 'Payment Declined; stay off order-success', 'Covered');
+add('Checkout', 'Logged-in PayHere Visa order', 'Signed-in card payment', 'P1', 'regression,checkout,payment', 'Logged-in storage state', '1. Clear rewards/cart 2. Card checkout 3. Pay Visa', 'order-success Card unless unpublished gift blocks checkout', 'Covered');
+add('Checkout', 'Invalid phone keeps place order disabled', 'Phone validation', 'P1', 'regression,checkout', 'Guest cart', '1. Fill billing with letters in phone 2. COD 3. Accept terms', 'Place Order stays disabled', 'Covered');
+add('Checkout', 'Coupon control absent or invalid code rejected', 'Coupon edge', 'P2', 'regression,checkout', 'Guest cart', '1. Open checkout 2. Apply INVALIDQA if coupon UI exists', 'No coupon field or invalid-code error', 'Covered');
+add('Checkout', 'Mobile checkout loads without overflow', 'Phone viewport checkout', 'P1', 'regression,checkout,mobile', 'Pixel 7 viewport', '1. ATC 2. Open checkout', 'Checkout loaded; no horizontal overflow', 'Covered');
+add('Checkout', 'Mobile guest COD order', 'Phone viewport COD', 'P1', 'regression,checkout,mobile,payment', 'Pixel 7 viewport; guest cart', '1. Fill billing 2. COD 3. Place order', 'order-success COD', 'Covered');
+add('Lost Password', 'Invalid reset token is rejected', 'Expired/bogus reset link', 'P1', 'regression,auth', 'Logged out', '1. Open /reset-password?token=invalid', 'Error for invalid or expired token; not logged in', 'Covered');
+add('Lost Password', 'Reset password mismatch validation', 'Confirm password mismatch', 'P1', 'regression,auth', 'Reset form visible', '1. Enter different password and confirm', 'Mismatch error; stay on reset page', 'Covered');
+add('Register', 'Login before email confirmation is blocked', 'Unverified login', 'P1', 'regression,auth', 'Fresh unconfirmed account', '1. Register 2. Login before confirming', 'Login rejected as unverified or invalid', 'Covered');
+add('Register', 'Email confirmation without token does not sign in', 'Empty confirmation link', 'P2', 'regression,auth', 'Logged out', '1. Open /email-confirmation', 'Guest remains logged out', 'Covered');
 
 function csvEscape(value) {
   const s = String(value ?? '');

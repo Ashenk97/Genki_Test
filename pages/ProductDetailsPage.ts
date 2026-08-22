@@ -2,6 +2,7 @@ import { Locator, Page, expect } from '@playwright/test';
 import { AUTH_MESSAGES } from '@constants/messages';
 import { ToastType } from '@constants/payment';
 import { SIZE_RADIO_PATTERN } from '@data/pdp-variants.data';
+import { lkrAmountPattern } from '@helpers/string';
 import { BasePage } from '@pages/BasePage';
 
 export class ProductDetailsPage extends BasePage {
@@ -27,7 +28,7 @@ export class ProductDetailsPage extends BasePage {
     super(page);
 
     this.productTitle = page.getByRole('heading', { level: 1 }).first();
-    this.price = page.getByText(/LKR\s*[\d,.]+/).first();
+    this.price = page.locator('span.discounted-price').or(page.getByText(/LKR\s*[\d,.]+/)).first();
     this.addToCartButton = page.getByRole('button', { name: /add to cart/i });
     this.outOfStockButton = page.getByRole('button', { name: /out of stock/i });
     this.selectSizePrompt = page.getByRole('button', { name: /select a size/i });
@@ -223,6 +224,66 @@ export class ProductDetailsPage extends BasePage {
 
   async expectListedSizes(sizes: readonly string[]): Promise<void> {
     await expect(this.sizeLabels).toHaveText([...sizes]);
+  }
+
+  async expectSizeNotListed(size: string): Promise<void> {
+    const listed = await this.getListedSizes();
+    expect(listed.map((s) => s.trim().toUpperCase())).not.toContain(size.toUpperCase());
+  }
+
+  async expectDisplayedPrice(amount: number): Promise<void> {
+    await expect(this.page.getByText(lkrAmountPattern(amount)).first()).toBeVisible();
+  }
+
+  async expectSizeChartDoesNotList(size: string): Promise<void> {
+    await this.expectSizeChartVisible();
+    const listed = await this.getListedSizes();
+    expect(listed.map((s) => s.trim().toUpperCase())).not.toContain(size.toUpperCase());
+    await expect(this.page.getByRole('img', { name: new RegExp(size, 'i') })).toHaveCount(0);
+  }
+
+  async expectProductCopyColorConsistent(): Promise<void> {
+    const body = await this.page.locator('.product-content, main').first().innerText();
+    const checked = this.page.locator('input[name="product-color"]:checked');
+    const color = ((await checked.getAttribute('value')) ?? '').toLowerCase();
+    const mentionsBlack = /\bblack\b/i.test(body);
+    const mentionsWhite = /\bwhite\b/i.test(body);
+    if (color === 'white') {
+      expect(mentionsBlack, 'product copy should not describe a white SKU as black').toBe(false);
+    }
+    if (color === 'black') {
+      expect(mentionsWhite, 'product copy should not describe a black SKU as white').toBe(false);
+    }
+  }
+
+  async wrappedSizeLabelRowGap(): Promise<number | null> {
+    const boxes = await this.sizeLabels.evaluateAll((els) =>
+      els.map((el) => {
+        const rect = el.getBoundingClientRect();
+        return { top: rect.top, bottom: rect.bottom };
+      }),
+    );
+    if (boxes.length < 2) {
+      return null;
+    }
+    const rowTolerance = 8;
+    const firstTop = boxes[0].top;
+    const firstRow = boxes.filter((box) => Math.abs(box.top - firstTop) <= rowTolerance);
+    const nextRow = boxes.filter((box) => box.top > firstTop + rowTolerance);
+    if (nextRow.length === 0) {
+      return null;
+    }
+    const firstRowBottom = Math.max(...firstRow.map((box) => box.bottom));
+    const nextRowTop = Math.min(...nextRow.map((box) => box.top));
+    return nextRowTop - firstRowBottom;
+  }
+
+  async expectWrappedSizeLabelsHaveRowGap(minGap = 8): Promise<void> {
+    const gap = await this.wrappedSizeLabelRowGap();
+    expect(gap, 'size chips should wrap onto a second row at this viewport').not.toBeNull();
+    expect(gap as number, 'wrapped size chips should have a visible row gap').toBeGreaterThanOrEqual(
+      minGap,
+    );
   }
 
   async getListedSizes(): Promise<string[]> {

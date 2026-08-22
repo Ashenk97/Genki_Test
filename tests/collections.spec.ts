@@ -56,4 +56,16 @@ test.describe('Categories and products PLP', () => {
       await pdp.expectOnProductPage();
     });
   });
+
+  test('should apply PLP sort or filter when the control is present', async ({
+    collectionPage,
+  }) => {
+    const men = MAIN_NAV_TOP_LEVEL[0];
+    await test.step('Open Men collection and use sort/filter if shown', async () => {
+      await collectionPage.open(men.path);
+      await collectionPage.expectLoaded(men.path, men.heading);
+      await collectionPage.expectHasProducts();
+      await collectionPage.expectSortOrFilterIfPresent();
+    });
+  });
 });
