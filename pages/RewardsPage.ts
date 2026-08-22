@@ -57,6 +57,12 @@ export class RewardsPage extends BasePage {
       .toBeLessThanOrEqual(maxPoints);
   }
 
+  async expectUsablePointsGreaterThan(minPoints: number): Promise<void> {
+    await expect
+      .poll(async () => this.getUsablePoints(), { timeout: 20_000 })
+      .toBeGreaterThan(minPoints);
+  }
+
   async proceedToCheckoutFromQueue(): Promise<void> {
     await this.page.getByRole('link', { name: /proceed to checkout/i }).click();
     await this.waitForPageLoad();

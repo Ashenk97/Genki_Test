@@ -25,7 +25,10 @@ export enum AppRoutes {
   ShippingPolicy = '/shipping-policy',
   SizeGuide = '/size-guide',
   Faq = '/faq',
-  SampleProduct = '/products/berserk-oversized-tee',
+  SampleProduct = '/products/test-white-only',
+  BlackOnlyProduct = '/products/test-black-only',
+  DualColorProduct = '/products/test-black-white-both',
+  OutOfStockProduct = '/products/berserk-oversized-tee',
 }
 
 export enum UserRoles {

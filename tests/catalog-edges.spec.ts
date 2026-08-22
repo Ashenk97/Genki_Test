@@ -1,12 +1,29 @@
 import { EMPTY_THEME_COLLECTIONS, PRODUCT_DATA } from '@data/products.data';
+import {
+  DUAL_COLOR_PRODUCT,
+  OUT_OF_STOCK_PRODUCT,
+} from '@data/pdp-variants.data';
 import { TEST_DATA } from '@data/index';
 import { test } from '@fixtures/test-fixtures';
 
 test.describe('Color and stock PDP', () => {
   test('should require a color before sizes are available', async ({ productDetailsPage }) => {
-    await test.step('Open color-variant PDP', async () => {
-      await productDetailsPage.open(PRODUCT_DATA.colorVariantPath);
+    await test.step('Open dual-color PDP', async () => {
+      await productDetailsPage.open(DUAL_COLOR_PRODUCT.path);
       await productDetailsPage.expectColorRequired();
+      await productDetailsPage.expectSizesHidden();
+      await productDetailsPage.expectQuantityStepperDisabled();
+      await productDetailsPage.expectColorOptions(DUAL_COLOR_PRODUCT.colors);
+    });
+  });
+
+  test('should reveal sizes after a color is selected', async ({ productDetailsPage }) => {
+    await test.step('Select black then expect the size matrix', async () => {
+      await productDetailsPage.open(DUAL_COLOR_PRODUCT.path);
+      await productDetailsPage.selectColor('black');
+      await productDetailsPage.expectSelectedColor('black');
+      await productDetailsPage.expectSizesVisible();
+      await productDetailsPage.expectSizeRequired();
     });
   });
 
@@ -30,23 +47,59 @@ test.describe('Color and stock PDP', () => {
     });
   });
 
-  test('should expose at least one purchasable size on the sample tee', async ({
+  test('should add the white variant of the dual-color product to cart', async ({
+    productDetailsPage,
+    cartPage,
+  }) => {
+    await test.step('Select white and XXXL then add to cart', async () => {
+      await productDetailsPage.open(DUAL_COLOR_PRODUCT.path);
+      await productDetailsPage.selectColor('white');
+      await productDetailsPage.selectSize('XXXL');
+      await productDetailsPage.addToCart();
+      await productDetailsPage.expectAddedToCart();
+    });
+    await test.step('Cart shows white and XXXL', async () => {
+      await cartPage.open();
+      await cartPage.expectLineWithAttributes({ color: 'white', size: 'XXXL' });
+    });
+  });
+
+  test('should expose every purchasable size on the white-only tee', async ({
     productDetailsPage,
   }) => {
-    await test.step('Sample PDP has selectable sizes', async () => {
+    await test.step('White-only PDP has selectable sizes', async () => {
       await productDetailsPage.open(PRODUCT_DATA.samplePath);
-      await productDetailsPage.expectAvailableSizeCount(1);
+      await productDetailsPage.expectAvailableSizeCount(PRODUCT_DATA.sizes.length);
       await productDetailsPage.selectFirstAvailableSize();
       await productDetailsPage.expectAddToCartVisible();
     });
   });
 
-  test('should fail to render PDP controls for lowercase product slug', async ({
+  test('should block add to cart on an out-of-stock product', async ({ productDetailsPage }) => {
+    await test.step('Select the only Berserk size and expect out of stock', async () => {
+      await productDetailsPage.open(OUT_OF_STOCK_PRODUCT.path);
+      await productDetailsPage.expectProductDetailsVisible();
+      await productDetailsPage.selectSize(OUT_OF_STOCK_PRODUCT.size);
+      await productDetailsPage.expectOutOfStock();
+    });
+  });
+
+  test('should load the Gojo PDP for the lowercase product slug', async ({
     productDetailsPage,
   }) => {
-    await test.step('Open lowercase slug (GENKI-BUG-006)', async () => {
-      await productDetailsPage.open(PRODUCT_DATA.caseSensitiveLowerPath);
-      await productDetailsPage.expectBrokenProductShell();
+    await test.step('Open lowercase /products/jjk', async () => {
+      await productDetailsPage.open(PRODUCT_DATA.canonicalSlugPath);
+      await productDetailsPage.expectProductDetailsVisible();
+      await productDetailsPage.expectProductTitle(/gojo/i);
+    });
+  });
+
+  test('should 404 for a non-canonical uppercase product slug', async ({
+    productDetailsPage,
+  }) => {
+    await test.step('Open uppercase /products/JJK', async () => {
+      await productDetailsPage.open(PRODUCT_DATA.nonCanonicalSlugPath);
+      await productDetailsPage.expectPageNotFound();
     });
   });
 });

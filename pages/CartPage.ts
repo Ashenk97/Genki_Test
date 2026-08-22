@@ -58,6 +58,42 @@ export class CartPage extends BasePage {
     await expect(this.productRows.first().getByText(text)).toBeVisible();
   }
 
+  async expectLineWithAttributes(attrs: {
+    name?: string | RegExp;
+    color?: string;
+    size?: string;
+  }): Promise<void> {
+    let row = this.productRows;
+    if (attrs.name) {
+      row = row.filter({ hasText: attrs.name });
+    }
+    if (attrs.color) {
+      row = row.filter({ hasText: `Color: ${attrs.color}` });
+    }
+    if (attrs.size) {
+      row = row.filter({ hasText: `Size: ${attrs.size}` });
+    }
+    await expect(row.first()).toBeVisible();
+  }
+
+  async expectFreeDeliveryRemaining(): Promise<void> {
+    await expect(this.page.locator('.free-shipping-progress__message').first()).toHaveText(
+      /you're\s+lkr\s*1,?510\s+away from free delivery/i,
+    );
+  }
+
+  async expectFreeDeliveryUnlocked(): Promise<void> {
+    await expect(this.page.locator('.free-shipping-progress__message').first()).toHaveText(
+      /free delivery unlocked on this order/i,
+    );
+  }
+
+  async expectSubtotal(amount: number): Promise<void> {
+    await expect(
+      this.page.getByText(new RegExp(`lkr\\s*${amount}(?:\\.00)?`, 'i')).filter({ visible: true }).first(),
+    ).toBeVisible();
+  }
+
   async expectEmpty(): Promise<void> {
     await expect(this.emptyMessage).toBeVisible();
     await expect(this.shopNowLink).toBeVisible();
@@ -88,8 +124,8 @@ export class CartPage extends BasePage {
 
   async expectQuantity(quantity: number): Promise<void> {
     await expect(
-      this.productRows.first().locator(`input[value="${quantity}"]`),
-    ).toBeVisible();
+      this.productRows.first().locator('input.cart-plus-minus-box'),
+    ).toHaveValue(String(quantity));
   }
 
   async clearCart(): Promise<void> {

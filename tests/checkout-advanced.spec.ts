@@ -2,6 +2,7 @@ import { PaymentMethod } from '@constants/payment';
 import { Timeouts } from '@constants/timeouts';
 import { guestCheckoutEmail } from '@data/checkout.data';
 import { TEST_DATA } from '@data/index';
+import { PRODUCT_PRICE } from '@data/pdp-variants.data';
 import { strongPassword } from '@helpers/random';
 import { test } from '@fixtures/test-fixtures';
 import { addSampleProductToCart, addSecondaryProductToCart } from '@helpers/cart.helper';
@@ -43,20 +44,32 @@ test.describe('Checkout advanced flows', () => {
   });
 
   test(
-    'should surface create-account checkout schema error until GENKI-BUG-002 is fixed',
+    'should place a COD order and create an account at checkout',
     { tag: '@checkout' },
-    async ({ productDetailsPage, checkoutPage }) => {
-      await test.step('Attempt create-account COD checkout', async () => {
+    async ({ productDetailsPage, checkoutPage, loginPage, header }) => {
+      const email = guestCheckoutEmail('guest-create');
+      const password = strongPassword();
+
+      await test.step('Place COD checkout with create account', async () => {
         await addSampleProductToCart(productDetailsPage);
         await checkoutPage.open();
-        await checkoutPage.fillGuestBilling(guestCheckoutEmail('guest-create-bug'));
-        await checkoutPage.enableCreateAccount(strongPassword());
+        await checkoutPage.fillGuestBilling(email);
+        await checkoutPage.enableCreateAccount(password);
         await checkoutPage.selectPayment(PaymentMethod.COD);
         await checkoutPage.acceptTerms();
         await checkoutPage.placeOrder();
       });
-      await test.step('Expect known schema failure (remove when bug is fixed)', async () => {
-        await checkoutPage.expectCreateAccountSchemaError();
+      await test.step('Order succeeds', async () => {
+        await checkoutPage.expectOrderSuccess(PaymentMethod.COD);
+      });
+      await test.step('New account can log in', async () => {
+        await loginPage.open();
+        const loginFormVisible = await loginPage.page.locator('.login-form').isVisible().catch(() => false);
+        if (loginFormVisible) {
+          await loginPage.login(email, password);
+          await loginPage.expectLoginSuccess();
+        }
+        await header.expectLoggedIn();
       });
     },
   );
@@ -282,4 +295,45 @@ test.describe('PayHere abandon', () => {
       });
     },
   );
+});
+
+test.describe('Free delivery at checkout', () => {
+  test.describe.configure({ mode: 'parallel' });
+
+  test('should show remaining amount at checkout when subtotal is below LKR 5,000', async ({
+    productDetailsPage,
+    checkoutPage,
+  }) => {
+    await test.step('Checkout with qty 1 (LKR 3,490)', async () => {
+      await addSampleProductToCart(productDetailsPage, { quantity: 1 });
+      await checkoutPage.open();
+      await checkoutPage.expectLoaded();
+      await checkoutPage.expectOrderSubtotal(PRODUCT_PRICE.unit);
+      await checkoutPage.expectFreeDeliveryRemaining();
+    });
+  });
+
+  test('should unlock free delivery at checkout when subtotal is over LKR 5,000', async ({
+    productDetailsPage,
+    checkoutPage,
+  }) => {
+    await test.step('Checkout with qty 2 (LKR 6,980)', async () => {
+      await addSampleProductToCart(productDetailsPage, { quantity: 2 });
+      await checkoutPage.open();
+      await checkoutPage.expectLoaded();
+      await checkoutPage.expectOrderSubtotal(PRODUCT_PRICE.unit * 2);
+      await checkoutPage.expectFreeDeliveryUnlocked();
+    });
+  });
+
+  test('should keep the below-threshold message at the LKR 3,490 boundary', async ({
+    productDetailsPage,
+    checkoutPage,
+  }) => {
+    await test.step('Single unit is under 5,000', async () => {
+      await addSampleProductToCart(productDetailsPage);
+      await checkoutPage.open();
+      await checkoutPage.expectFreeDeliveryRemaining();
+    });
+  });
 });

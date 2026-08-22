@@ -8,7 +8,7 @@ Regenerate from the source script:
 npm run docs:cases
 ```
 
-Related docs: [`BUG_REPORT.md`](./BUG_REPORT.md) (staging defects) · [`TODO.md`](./TODO.md) (follow-ups) · [root README](../README.md) (setup & scripts).
+Related docs: [root README](../README.md) (setup & scripts).
 
 ## Columns
 

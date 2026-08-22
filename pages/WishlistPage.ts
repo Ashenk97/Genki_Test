@@ -25,7 +25,10 @@ export class WishlistPage extends BasePage {
 
   async expectHasItems(): Promise<void> {
     await expect(
-      this.page.getByRole('link', { name: /view product|berserk/i }).first(),
+      this.page
+        .getByRole('link', { name: /view product|test product|berserk/i })
+        .or(this.page.locator('a[href^="/products/"]'))
+        .first(),
     ).toBeVisible();
   }
 

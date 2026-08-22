@@ -18,7 +18,6 @@ export enum ErrorMessages {
   EmptyCheckout = 'no items found in cart to checkout',
   AddressSaved = 'address',
   AccountDetailsSaved = 'account|profile|details|saved|updated|success',
-  CreateAccountSchemaError = 'expected string, received null',
   NoProductsFound = 'no products found',
 }
 
@@ -48,7 +47,6 @@ export const AUTH_MESSAGES = {
   createAccount: /create an account/i,
   selectedRewards: /selected rewards/i,
   passwordMismatch: /match|confirm|same/i,
-  createAccountSchemaError: new RegExp(ErrorMessages.CreateAccountSchemaError, 'i'),
   noProductsFound: new RegExp(ErrorMessages.NoProductsFound, 'i'),
 } as const;
 

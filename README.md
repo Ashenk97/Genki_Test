@@ -60,7 +60,7 @@ Genki_Test/
 ├── auth/                     # Reserved for Playwright storageState
 ├── constants/                # Routes, timeouts, payment enums, env config
 ├── data/                     # Auth, checkout, products, PayHere cards, nav copy
-├── docs/                     # Test-case CSV, bug report, TODOs
+├── docs/                     # Test-case CSV inventory
 ├── fixtures/                 # Custom test fixtures + env loader
 ├── helpers/                  # Cart / checkout / random helpers
 ├── pages/                    # Page Object Model classes
@@ -80,7 +80,7 @@ Genki_Test/
 | **`/helpers`** | Reusable flows (add sample product, start guest card checkout) |
 | **`/data`** | Test inputs and product paths |
 | **`/api`** | External APIs used by tests (mail.tm) |
-| **`/docs`** | Living test inventory, staging bug report, follow-ups |
+| **`/docs`** | Living test inventory |
 | **`/constants`** | Routes, messages, timeouts, payment methods |
 
 ---
@@ -192,9 +192,9 @@ Inventory: [`docs/test-cases.csv`](./docs/test-cases.csv) (~95 cases; regenerate
 |:-----|:-----------------|
 | **Nav / chrome** | `home`, `main-nav`, `navigation`, `mobile-nav`, `top-bar`, `footer` |
 | **Auth** | `auth`, `register-email`, `forgot-password-email` |
-| **Catalog / PDP** | `collections`, `pdp`, `catalog-edges`, `search` |
+| **Catalog / PDP** | `collections`, `pdp`, `pdp-variants` (color × size matrix), `catalog-edges`, `search` (intentionally disabled) |
 | **Cart / wishlist** | `cart`, `wishlist` |
-| **Checkout** | `checkout` (COD, bank, PayHere), `checkout-advanced` (shipping, gift, create-account bug guard) |
+| **Checkout** | `checkout` (COD, bank, PayHere), `checkout-advanced` (shipping, gift, create-account COD) |
 | **Account / loyalty** | `profile`, `rewards` |
 | **Email** | `order-confirmation-email`, register / reset (`@email`) |
 
@@ -202,14 +202,16 @@ Inventory: [`docs/test-cases.csv`](./docs/test-cases.csv) (~95 cases; regenerate
 
 Marking **This order is a gift** disables **Cash on Delivery**; card and bank transfer stay available. Covered under `Gift checkout` in `tests/checkout-advanced.spec.ts`.
 
+### Search (intentional product rule)
+
+Product search is **disabled**. Desktop header and mobile menu must not expose a search control. Covered in `tests/search.spec.ts` and `tests/mobile-nav.spec.ts`.
+
 ---
 
 ## Docs
 
 | Doc | Purpose |
 |:----|:--------|
-| [`docs/TODO.md`](./docs/TODO.md) | Follow-ups (PDP variants and process) |
-| [`docs/PDP_VARIANT_TODO.md`](./docs/PDP_VARIANT_TODO.md) | Color/size matrix automation backlog |
 | [`docs/test-cases.csv`](./docs/test-cases.csv) | Living case inventory |
 | [`docs/README.md`](./docs/README.md) | How to read / regenerate the CSV |
 
@@ -230,8 +232,8 @@ npx playwright show-trace test-results/<test-folder>/trace.zip
 |:------|:------:|:------|
 | **Core browse + PDP** | Done | Home, nav, collections, PDP, cart/wishlist |
 | **Auth + checkout + payments** | Done | Login/register/reset, COD/bank/PayHere, gift rules, email confirms |
-| **Hardening** | In progress | Search coverage once fixed, fuller PDP variant matrix |
-| **Later** | Planned | `storageState` reuse, broader visual checks |
+| **Hardening** | Planned | `storageState` reuse |
+| **Later** | Planned | Broader visual checks |
 
 ---
 

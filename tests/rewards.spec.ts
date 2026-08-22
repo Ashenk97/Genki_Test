@@ -20,6 +20,35 @@ test.describe('Rewards', () => {
     });
   });
 
+  test('should gain usable points after purchasing an item', async ({
+    rewardsPage,
+    productDetailsPage,
+    checkoutPage,
+  }) => {
+    test.setTimeout(90_000);
+    const pointsBefore = await test.step('Capture points before purchase', async () => {
+      await rewardsPage.open();
+      await rewardsPage.expectLoaded();
+      return rewardsPage.getUsablePoints();
+    });
+
+    await test.step('Place a COD order without redeeming a reward', async () => {
+      await addSampleProductToCart(productDetailsPage);
+      await checkoutPage.open();
+      await checkoutPage.fillLoggedInBilling();
+      await checkoutPage.selectPayment(PaymentMethod.COD);
+      await checkoutPage.acceptTerms();
+      await checkoutPage.placeOrder();
+      await checkoutPage.expectOrderSuccess(PaymentMethod.COD);
+    });
+
+    await test.step('Usable points increased after the purchase', async () => {
+      await rewardsPage.open();
+      await rewardsPage.expectLoaded();
+      await rewardsPage.expectUsablePointsGreaterThan(pointsBefore);
+    });
+  });
+
   test('should add a reward to the next order queue', async ({ rewardsPage }) => {
     await test.step('Queue an affordable reward', async () => {
       await rewardsPage.open();
