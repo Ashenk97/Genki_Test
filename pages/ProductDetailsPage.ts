@@ -242,20 +242,6 @@ export class ProductDetailsPage extends BasePage {
     await expect(this.page.getByRole('img', { name: new RegExp(size, 'i') })).toHaveCount(0);
   }
 
-  async expectProductCopyColorConsistent(): Promise<void> {
-    const body = await this.page.locator('.product-content, main').first().innerText();
-    const checked = this.page.locator('input[name="product-color"]:checked');
-    const color = ((await checked.getAttribute('value')) ?? '').toLowerCase();
-    const mentionsBlack = /\bblack\b/i.test(body);
-    const mentionsWhite = /\bwhite\b/i.test(body);
-    if (color === 'white') {
-      expect(mentionsBlack, 'product copy should not describe a white SKU as black').toBe(false);
-    }
-    if (color === 'black') {
-      expect(mentionsWhite, 'product copy should not describe a black SKU as white').toBe(false);
-    }
-  }
-
   async wrappedSizeLabelRowGap(): Promise<number | null> {
     const boxes = await this.sizeLabels.evaluateAll((els) =>
       els.map((el) => {

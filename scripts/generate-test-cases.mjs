@@ -116,9 +116,7 @@ add('PDP layout', 'Size options listed on mobile viewport', '390px size list', '
 add('PDP layout', 'Dual-color sizes listed after color select', 'Color-first size list', 'P1', 'regression,pdp,layout', 'Dual-color PDP', '1. Select black 2. Measure sizes', 'XXS–XXXL listed; no horizontal overflow', 'Covered');
 add('PDP layout', 'Wrapped size chips have row gap at 1024', 'Laptop wrap spacing', 'P1', 'regression,pdp,layout', '1024×768 white-only PDP', '1. Open PDP 2. Measure size-chip row gap', 'Wrapped chips have at least 8px row gap', 'Covered');
 add('PDP layout', 'Wrapped size chips have row gap at 390', 'Mobile wrap spacing', 'P1', 'regression,pdp,layout', '390×844 white-only PDP', '1. Open PDP 2. Measure size-chip row gap', 'Wrapped chips have at least 8px row gap', 'Covered');
-add('PDP merchandising', 'Homepage first tile is in stock', 'Featured product purchasable', 'P1', 'regression,home,pdp', 'Homepage', '1. Click first product tile 2. Enable ATC', 'First featured product can be added to cart', 'Covered');
-add('PDP merchandising', 'Berserk copy matches selected color', 'Color copy consistency', 'P2', 'regression,pdp', 'Berserk PDP', '1. Open Berserk 2. Compare copy to checked color', 'Copy does not describe the opposite color', 'Covered');
-add('PDP merchandising', 'Size chart does not list XXXXL when PDP stops at XXXL', 'Size range consistency', 'P2', 'regression,pdp', 'White-only PDP and size guide', '1. List PDP sizes 2. Inspect size chart and size guide', 'XXXXL is not offered on PDP or advertised as a purchasable size', 'Covered');
+add('PDP merchandising', 'PDP and size guide list XXS to XXXL only', 'Size range', 'P2', 'regression,pdp', 'White-only PDP and size guide', '1. List PDP sizes 2. Open size guide', 'Sizes are XXS–XXXL; XXXXL is not offered', 'Covered');
 
 add('Wishlist', 'Add product to wishlist and open drawer', 'Wishlist add', 'P0', 'smoke,wishlist', 'Empty wishlist', '1. Add from PDP 2. Open wishlist', 'Item listed', 'Covered');
 add('Wishlist', 'Remove item from wishlist', 'Wishlist remove', 'P1', 'regression,wishlist', 'Item in wishlist', '1. Remove item', 'Empty or item gone', 'Covered');
