@@ -9,6 +9,7 @@ const { baseURL } = getEnvConfig();
 
 export default defineConfig({
   testDir: './tests',
+  timeout: 60_000,
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
@@ -27,8 +28,14 @@ export default defineConfig({
   },
   projects: [
     {
+      name: 'setup',
+      testMatch: /auth\.setup\.ts/,
+      retries: 2,
+    },
+    {
       name: 'chrome',
-      testIgnore: /mobile-nav\.spec\.ts/,
+      dependencies: ['setup'],
+      testIgnore: /mobile-nav\.spec\.ts|auth\.setup\.ts/,
       use: {
         ...devices['Desktop Chrome'],
         channel: 'chrome',
@@ -36,17 +43,20 @@ export default defineConfig({
     },
     {
       name: 'chromium',
-      testIgnore: /mobile-nav\.spec\.ts/,
+      dependencies: ['setup'],
+      testIgnore: /mobile-nav\.spec\.ts|auth\.setup\.ts/,
       use: { ...devices['Desktop Chrome'] },
     },
     {
       name: 'firefox',
-      testIgnore: /mobile-nav\.spec\.ts/,
+      dependencies: ['setup'],
+      testIgnore: /mobile-nav\.spec\.ts|auth\.setup\.ts/,
       use: { ...devices['Desktop Firefox'] },
     },
     {
       name: 'webkit',
-      testIgnore: /mobile-nav\.spec\.ts/,
+      dependencies: ['setup'],
+      testIgnore: /mobile-nav\.spec\.ts|auth\.setup\.ts/,
       use: { ...devices['Desktop Safari'] },
     },
     {

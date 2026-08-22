@@ -64,6 +64,29 @@ export class HomePage extends BasePage {
     return new ProductDetailsPage(this.page);
   }
 
+  async openPurchasableProduct(): Promise<ProductDetailsPage> {
+    const hrefs = await this.page
+      .locator('a[href^="/products/"]:not([href*="undefined"])')
+      .evaluateAll((els) => [
+        ...new Set(
+          els
+            .map((el) => el.getAttribute('href'))
+            .filter((href): href is string => Boolean(href)),
+        ),
+      ]);
+
+    for (const href of hrefs) {
+      await this.goto(href);
+      const productPage = new ProductDetailsPage(this.page);
+      await productPage.expectOnProductPage();
+      if (await productPage.tryEnableAddToCart()) {
+        return productPage;
+      }
+    }
+
+    throw new Error('No in-stock product found from homepage links');
+  }
+
   async expectCarouselVisible(): Promise<void> {
     await expect(this.heroSlider).toBeVisible();
     await expect(this.heroSlides.first()).toBeVisible();

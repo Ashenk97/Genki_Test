@@ -1,4 +1,3 @@
-import { TEST_DATA } from '@data/index';
 import { PRODUCT_PRICE } from '@data/pdp-variants.data';
 import { test } from '@fixtures/test-fixtures';
 import {
@@ -118,25 +117,25 @@ test.describe('Cart', () => {
     });
   });
 
-  test('should persist cart items for a logged-in customer after reload', async ({
-    loginPage,
-    productDetailsPage,
-    cartPage,
-    header,
-  }) => {
-    await test.step('Sign in and add a product', async () => {
-      await loginPage.open();
-      await loginPage.login(TEST_DATA.auth.email, TEST_DATA.auth.password);
-      await loginPage.expectLoginSuccess();
-      await addSampleProductToCart(productDetailsPage);
-    });
-    await test.step('Reload and confirm cart still has items', async () => {
-      await cartPage.open();
-      await cartPage.expectHasItems();
-      await header.reloadPage();
-      await cartPage.open();
-      await cartPage.expectHasItems();
-      await header.expectCartBadgeHasItems();
+  test.describe('logged-in cart', () => {
+    test.use({ storageState: '.auth/user.json' });
+
+    test('should persist cart items for a logged-in customer after reload', async ({
+      productDetailsPage,
+      cartPage,
+      header,
+    }) => {
+      await test.step('Add a product while signed in', async () => {
+        await addSampleProductToCart(productDetailsPage);
+      });
+      await test.step('Reload and confirm cart still has items', async () => {
+        await cartPage.open();
+        await cartPage.expectHasItems();
+        await header.reloadPage();
+        await cartPage.open();
+        await cartPage.expectHasItems();
+        await header.expectCartBadgeHasItems();
+      });
     });
   });
 });

@@ -8,10 +8,9 @@ test.describe('Homepage navigation', () => {
       await homePage.open();
       await homePage.expectLoaded();
     });
-    await test.step('Open first product and select size', async () => {
-      const productPage = await homePage.openFirstProduct();
+    await test.step('Open an in-stock product and select a variant', async () => {
+      const productPage = await homePage.openPurchasableProduct();
       await productPage.expectOnProductPage();
-      await productPage.selectFirstAvailableSize();
       await productPage.expectAddToCartVisible();
     });
   });
@@ -24,9 +23,8 @@ test.describe('Homepage navigation', () => {
       await homePage.open();
       await homePage.expectLoaded();
     });
-    await test.step('Add first product to cart', async () => {
-      const productPage = await homePage.openFirstProduct();
-      await productPage.selectFirstAvailableSize();
+    await test.step('Add an in-stock product to cart', async () => {
+      const productPage = await homePage.openPurchasableProduct();
       await productPage.expectAddToCartVisible();
       await productPage.addToCart();
       await productPage.expectAddedToCart();

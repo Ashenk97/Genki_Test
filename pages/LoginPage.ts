@@ -93,10 +93,43 @@ export class LoginPage extends BasePage {
   }
 
   async login(email: string, password: string, rememberMe = false): Promise<this> {
-    await this.fillCredentials(email, password);
-    await this.setRememberMe(rememberMe);
-    await this.submit();
-    return this;
+    for (let attempt = 1; attempt <= 3; attempt += 1) {
+      if (!/\/login/.test(this.page.url())) {
+        await this.open();
+      }
+      await this.fillCredentials(email, password);
+      await this.setRememberMe(rememberMe);
+      await this.submit();
+
+      const loggedIn = await this.loggedInLocator()
+        .first()
+        .waitFor({ state: 'visible', timeout: 8_000 })
+        .then(() => true)
+        .catch(() => false);
+      if (loggedIn) {
+        return this;
+      }
+      if (attempt < 3) {
+        await this.page.waitForTimeout(4000 * attempt);
+      }
+    }
+    throw new Error('Login did not succeed after retries');
+  }
+
+  private loggedInLocator(): Locator {
+    return this.page
+      .getByRole('button', { name: /^logout$/i })
+      .or(this.page.getByRole('link', { name: /signed in as/i }));
+  }
+
+  async expectLoginSuccess(): Promise<void> {
+    await expect(this.loggedInLocator().first()).toBeVisible({ timeout: Timeouts.Toast });
+    await expect(this.page).toHaveURL((url) => {
+      const path = url.pathname.replace(/\/$/, '');
+      return path === '' || path === '/';
+    }, { timeout: Timeouts.Assertion });
+    await expect(this.page).toHaveTitle(PAGE_HEADINGS.siteTitle);
+    await this.acceptCookiesIfVisible();
   }
 
   async openForgotPassword(): Promise<void> {
@@ -117,16 +150,6 @@ export class LoginPage extends BasePage {
     await this.expectPathname(LOGIN_PAGE.path);
     await expect(this.emailInput).toBeVisible();
     await expect(this.submitButton).toBeVisible();
-  }
-
-  async expectLoginSuccess(): Promise<void> {
-    await this.expectToast(AUTH_MESSAGES.loginSuccessToast, ToastType.Success);
-    await expect(this.page).toHaveURL((url) => {
-      const path = url.pathname.replace(/\/$/, '');
-      return path === '' || path === '/';
-    }, { timeout: Timeouts.Assertion });
-    await expect(this.page).toHaveTitle(PAGE_HEADINGS.siteTitle);
-    await this.acceptCookiesIfVisible();
   }
 
   async toggleShowPassword(): Promise<void> {

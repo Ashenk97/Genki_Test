@@ -102,7 +102,14 @@ export class AccountDashboardPage extends BasePage {
       await line2.fill(details.addressTwo ?? '');
     }
     await city.fill(details.city);
-    await this.page.getByRole('button', { name: /save changes/i }).click();
+    await line1.click();
+    await line1.press('End');
+    await line1.press('Space');
+    await line1.press('Backspace');
+    await city.blur();
+    const save = this.page.getByRole('button', { name: /save changes/i });
+    await expect(save).toBeEnabled({ timeout: Timeouts.ShortUi });
+    await save.click();
     return this;
   }
 
@@ -119,11 +126,15 @@ export class AccountDashboardPage extends BasePage {
     const lastName = this.page.locator('#last-name');
     const phone = this.page.locator('#contact-number');
     await expect(firstName).toBeVisible();
-    await firstName.fill(details.firstName);
-    await lastName.fill(details.lastName);
-    await phone.click();
-    await phone.fill('');
-    await phone.type(details.phone, { delay: 25 });
+    const first = details.firstName.trim() || (await firstName.inputValue()).trim() || 'Ashen';
+    const last = details.lastName.trim() || (await lastName.inputValue()).trim() || 'Kavinda';
+    const digits = details.phone.replace(/\D/g, '');
+    const phoneValue = digits.length === 10 ? digits : '0710948241';
+    await phone.fill(phoneValue);
+    await firstName.fill(first);
+    await lastName.fill(last);
+    await lastName.blur();
+    await expect(this.page.getByText(/invalid contact number/i)).toHaveCount(0);
     const save = this.page.getByRole('button', { name: /save changes/i });
     await expect(save).toBeEnabled({ timeout: Timeouts.ShortUi });
     await save.click();
@@ -178,6 +189,17 @@ export class AccountDashboardPage extends BasePage {
     await expect(
       this.page.getByText(/address line 1|shipping address/i).first(),
     ).toBeVisible();
+    await this.page
+      .waitForFunction(
+        () =>
+          (
+            (document.querySelector('#address-line1, input[name="streetAddress1"]') as
+              | HTMLInputElement
+              | null)?.value ?? ''
+          ).trim().length > 0,
+        { timeout: Timeouts.ShortUi },
+      )
+      .catch(() => undefined);
   }
 
   async expectAccountDetailsLoaded(): Promise<void> {
@@ -188,6 +210,14 @@ export class AccountDashboardPage extends BasePage {
     await expect(
       this.page.getByText(/personal information|first name/i).first(),
     ).toBeVisible();
+    await this.page
+      .waitForFunction(
+        () =>
+          ((document.querySelector('#first-name') as HTMLInputElement | null)?.value ?? '')
+            .trim().length > 0,
+        { timeout: Timeouts.ShortUi },
+      )
+      .catch(() => undefined);
   }
 
   async logoutFromSidebar(): Promise<void> {

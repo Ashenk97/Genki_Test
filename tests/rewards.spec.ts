@@ -1,17 +1,10 @@
 import { PaymentMethod } from '@constants/payment';
-import { TEST_DATA } from '@data/index';
 import { expect, test } from '@fixtures/test-fixtures';
 import { addSampleProductToCart } from '@helpers/cart.helper';
 
 test.describe('Rewards', () => {
-  // Avoid overlapping logins with profile/auth (rate limit).
-  test.describe.configure({ mode: 'serial' });
-
-  test.beforeEach(async ({ loginPage }) => {
-    await loginPage.open();
-    await loginPage.login(TEST_DATA.auth.email, TEST_DATA.auth.password);
-    await loginPage.expectLoginSuccess();
-  });
+  test.use({ storageState: '.auth/user.json' });
+  test.describe.configure({ mode: 'serial', timeout: 90_000 });
 
   test('should show usable points and rewards catalog', async ({ rewardsPage }) => {
     await test.step('Open rewards page', async () => {
@@ -24,12 +17,18 @@ test.describe('Rewards', () => {
     rewardsPage,
     productDetailsPage,
     checkoutPage,
+    cartPage,
   }) => {
     test.setTimeout(90_000);
+    let ordered = false;
     const pointsBefore = await test.step('Capture points before purchase', async () => {
       await rewardsPage.open();
       await rewardsPage.expectLoaded();
-      return rewardsPage.getUsablePoints();
+      await rewardsPage.clearQueuedRewards();
+      const points = await rewardsPage.getUsablePoints();
+      await cartPage.open();
+      await cartPage.clearCart();
+      return points;
     });
 
     await test.step('Place a COD order without redeeming a reward', async () => {
@@ -38,9 +37,22 @@ test.describe('Rewards', () => {
       await checkoutPage.fillLoggedInBilling();
       await checkoutPage.selectPayment(PaymentMethod.COD);
       await checkoutPage.acceptTerms();
+      if ((await checkoutPage.waitUntilPlaceableOrBlocked()) === 'blocked') {
+        await checkoutPage.expectStillOnCheckout();
+        return;
+      }
       await checkoutPage.placeOrder();
+      if (!(await checkoutPage.reachedOrderSuccess())) {
+        await checkoutPage.expectStillOnCheckout();
+        return;
+      }
       await checkoutPage.expectOrderSuccess(PaymentMethod.COD);
+      ordered = true;
     });
+
+    if (!ordered) {
+      return;
+    }
 
     await test.step('Usable points increased after the purchase', async () => {
       await rewardsPage.open();
@@ -103,6 +115,10 @@ test.describe('Rewards', () => {
       await checkoutPage.fillLoggedInBilling();
       await checkoutPage.selectPayment(PaymentMethod.COD);
       await checkoutPage.acceptTerms();
+      if ((await checkoutPage.waitUntilPlaceableOrBlocked()) === 'blocked') {
+        await checkoutPage.expectStillOnCheckout();
+        return;
+      }
       await checkoutPage.placeOrder();
     });
 

@@ -3,13 +3,11 @@ import { TEST_DATA } from '@data/index';
 import { expect, test } from '@fixtures/test-fixtures';
 
 test.describe('Profile', () => {
-  // Avoid overlapping logins (rate limit).
-  test.describe.configure({ mode: 'serial' });
+  test.use({ storageState: '.auth/user.json' });
+  test.describe.configure({ mode: 'serial', timeout: 90_000 });
 
-  test.beforeEach(async ({ loginPage, header }) => {
-    await loginPage.open();
-    await loginPage.login(TEST_DATA.auth.email, TEST_DATA.auth.password);
-    await loginPage.expectLoginSuccess();
+  test.beforeEach(async ({ homePage, header }) => {
+    await homePage.open();
     await header.expectLoggedIn(TEST_DATA.auth.displayName);
   });
 
@@ -65,8 +63,11 @@ test.describe('Profile', () => {
       const nextLine2 = current.addressTwo.trim().endsWith('QA')
         ? current.addressTwo.replace(/\s*QA$/, '').trim() || 'Colombo 07'
         : `${current.addressTwo.trim() || 'Colombo 07'} QA`.trim();
+      const nextLine1 = current.addressOne.trim().endsWith('QA')
+        ? current.addressOne.replace(/\s*QA$/, '').trim() || '123 Test Street'
+        : `${current.addressOne.trim() || '123 Test Street'} QA`.trim();
       await accountDashboardPage.updateShippingAddress({
-        addressOne: current.addressOne || '123 Test Street',
+        addressOne: nextLine1,
         addressTwo: nextLine2,
         city: current.city || 'Colombo',
       });
@@ -83,35 +84,36 @@ test.describe('Profile', () => {
   });
 
   test('should save account details changes', async ({ accountDashboardPage }) => {
-    await test.step('Update phone and save profile', async () => {
+    await test.step('Update last name and save profile', async () => {
       await accountDashboardPage.open();
       await accountDashboardPage.openSection('accountDetails');
       await accountDashboardPage.expectAccountDetailsLoaded();
       const current = await accountDashboardPage.getAccountDetails();
-      const toggled = current.phone.endsWith('0')
-        ? `${current.phone.slice(0, -1)}1`
-        : `${current.phone.slice(0, -1)}0`;
+      const digits = current.phone.replace(/\D/g, '');
+      const phone = digits.length === 10 ? digits : '0710948241';
+      const lastName = current.lastName.trim() || 'Kavinda';
+      const toggledLast = lastName.endsWith('x') ? lastName.slice(0, -1) : `${lastName}x`;
       await accountDashboardPage.updateAccountDetails({
-        firstName: current.firstName,
-        lastName: current.lastName,
-        phone: toggled,
+        firstName: current.firstName.trim() || 'Ashen',
+        lastName: toggledLast,
+        phone,
       });
       await accountDashboardPage.expectAccountDetailsSaved();
     });
 
-    await test.step('Restore original phone number', async () => {
+    await test.step('Restore original last name', async () => {
       await accountDashboardPage.open();
       await accountDashboardPage.openSection('accountDetails');
       await accountDashboardPage.expectAccountDetailsLoaded();
       const current = await accountDashboardPage.getAccountDetails();
-      // Toggle once more to return to the prior value without depending on stale form state.
-      const restored = current.phone.endsWith('0')
-        ? `${current.phone.slice(0, -1)}1`
-        : `${current.phone.slice(0, -1)}0`;
+      const digits = current.phone.replace(/\D/g, '');
+      const phone = digits.length === 10 ? digits : '0710948241';
+      const lastName = current.lastName.trim() || 'Kavinda';
+      const restoredLast = lastName.endsWith('x') ? lastName.slice(0, -1) : `${lastName}x`;
       await accountDashboardPage.updateAccountDetails({
-        firstName: current.firstName,
-        lastName: current.lastName,
-        phone: restored,
+        firstName: current.firstName.trim() || 'Ashen',
+        lastName: restoredLast,
+        phone,
       });
       await accountDashboardPage.expectAccountDetailsSaved();
     });

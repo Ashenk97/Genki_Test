@@ -1,6 +1,7 @@
 import { Locator, Page, expect } from '@playwright/test';
 import { AUTH_MESSAGES } from '@constants/messages';
 import { ToastType } from '@constants/payment';
+import { Timeouts } from '@constants/timeouts';
 import { escapeRegExp } from '@helpers/string';
 import { AppRoutes } from '@constants/routes';
 import { BasePage } from '@pages/BasePage';
@@ -104,7 +105,7 @@ export class Header extends BasePage {
 
   async expectLoggedOut(): Promise<void> {
     await this.revealHeader();
-    await expect(this.loginLink).toBeVisible();
+    await expect(this.loginLink).toBeVisible({ timeout: Timeouts.Assertion });
     await expect(this.logoutLink).toHaveCount(0);
     await expect(this.accountLink).toHaveCount(0);
   }
@@ -129,7 +130,8 @@ export class Header extends BasePage {
   async clickLogout(): Promise<void> {
     await this.logoutLink.click();
     await this.expectToast(AUTH_MESSAGES.logoutToast, ToastType.Success);
-    await expect(this.loginLink).toBeVisible({ timeout: 15_000 });
+    await expect(this.logoutLink).toHaveCount(0, { timeout: Timeouts.Assertion });
+    await expect(this.loginLink).toBeVisible({ timeout: Timeouts.Assertion });
     await this.acceptCookiesIfVisible();
   }
 

@@ -280,6 +280,33 @@ export class CheckoutPage extends BasePage {
     ).toBeVisible();
   }
 
+  async hasUnpublishedProductError(): Promise<boolean> {
+    return this.page.getByText(/not available or not published/i).isVisible().catch(() => false);
+  }
+
+  async canPlaceOrder(): Promise<boolean> {
+    return this.placeOrderButton.isEnabled();
+  }
+
+  async waitUntilPlaceableOrBlocked(): Promise<'placeable' | 'blocked'> {
+    const unpublished = this.page.getByText(/not available or not published/i);
+    const blocked = await unpublished
+      .waitFor({ state: 'visible', timeout: 5_000 })
+      .then(() => true)
+      .catch(() => false);
+    if (blocked) {
+      return 'blocked';
+    }
+    return (await this.canPlaceOrder()) ? 'placeable' : 'blocked';
+  }
+
+  async reachedOrderSuccess(timeout = Timeouts.MediumUi): Promise<boolean> {
+    return this.page
+      .waitForURL(new RegExp(CHECKOUT_PAGE.successPath), { timeout })
+      .then(() => true)
+      .catch(() => false);
+  }
+
   async useSeparateShippingAddress(): Promise<this> {
     const checkbox = this.page.locator('#sameAddress');
     if (await checkbox.isChecked()) {

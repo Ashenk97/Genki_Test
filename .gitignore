@@ -4,6 +4,7 @@ playwright-report/
 allure-results/
 allure-report/
 test-results/
+tmp/
 blob-report/
 .auth/
 *.log

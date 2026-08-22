@@ -48,6 +48,21 @@ export class RegisterPage extends BasePage {
     return this;
   }
 
+  async waitForConfirmationOrMailFailure(): Promise<'confirmed' | 'mail-failure' | 'stuck'> {
+    return Promise.race([
+      this.page
+        .waitForURL(new RegExp(AppRoutes.EmailConfirmation), { timeout: Timeouts.OrderSuccess })
+        .then(() => 'confirmed' as const)
+        .catch(() => 'stuck' as const),
+      this.page
+        .getByText(/internal server error|failed to send|could not send/i)
+        .first()
+        .waitFor({ state: 'visible', timeout: Timeouts.OrderSuccess })
+        .then(() => 'mail-failure' as const)
+        .catch(() => 'stuck' as const),
+    ]);
+  }
+
   async fillEmailOnly(email: string): Promise<this> {
     await this.emailInput.fill(email);
     return this;
@@ -70,7 +85,7 @@ export class RegisterPage extends BasePage {
 
   async expectEmailConfirmation(email: string): Promise<void> {
     await expect(this.page).toHaveURL(new RegExp(AppRoutes.EmailConfirmation), {
-      timeout: Timeouts.MediumUi,
+      timeout: Timeouts.OrderSuccess,
     });
     await expect(this.confirmationHeading).toBeVisible();
     await expect(this.page.getByText(email)).toBeVisible();

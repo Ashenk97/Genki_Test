@@ -131,6 +131,61 @@ export class ProductDetailsPage extends BasePage {
     await expect(this.sizeLabels.first()).toBeVisible();
   }
 
+  async selectFirstColor(): Promise<this> {
+    const input = this.colorRadios.first();
+    const colorId = await input.getAttribute('id');
+    if (colorId) {
+      await this.page.locator(`label[for="${colorId}"]`).click({ force: true });
+    } else {
+      await input.check({ force: true });
+    }
+    await expect(
+      this.sizeLabels.first().or(this.addToCartButton).or(this.outOfStockButton),
+    ).toBeVisible();
+    return this;
+  }
+
+  /**
+   * Select color/size if the PDP requires them. Returns false when the variant is out of stock.
+   */
+  async tryEnableAddToCart(): Promise<boolean> {
+    await this.expectProductDetailsVisible();
+
+    if (await this.selectColorPrompt.isVisible().catch(() => false)) {
+      await this.selectFirstColor();
+    }
+
+    const sizeByRole = this.page.getByRole('radio', { name: SIZE_RADIO_PATTERN }).first();
+    await expect
+      .poll(async () => {
+        if (await this.outOfStockButton.isVisible().catch(() => false)) {
+          return 'oos';
+        }
+        if (await this.addToCartButton.isVisible().catch(() => false)) {
+          return 'atc';
+        }
+        if (
+          (await sizeByRole.isVisible().catch(() => false)) ||
+          (await this.sizeRadios.count()) > 0
+        ) {
+          return 'size';
+        }
+        return '';
+      })
+      .not.toBe('');
+
+    if (await this.outOfStockButton.isVisible().catch(() => false)) {
+      return false;
+    }
+    if (await this.addToCartButton.isVisible().catch(() => false)) {
+      return true;
+    }
+
+    await this.selectFirstAvailableSize();
+    await expect(this.addToCartButton.or(this.outOfStockButton)).toBeVisible();
+    return this.addToCartButton.isVisible().catch(() => false);
+  }
+
   async selectColor(color: string): Promise<this> {
     const input = this.page.locator(
       `input[name="product-color"][value="${color}" i], input[name="product-color"]#${color}`,

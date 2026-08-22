@@ -79,8 +79,27 @@ export class PayHereCheckout extends BasePage {
     return frame;
   }
 
+  private async clickTryAgainIfDeclined(): Promise<void> {
+    for (const frame of this.page.frames()) {
+      const tryAgain = frame.getByRole('link', { name: /^try again$/i }).or(
+        frame.getByText(/^try again$/i),
+      );
+      if (await tryAgain.first().isVisible().catch(() => false)) {
+        await tryAgain.first().click();
+        return;
+      }
+    }
+  }
+
   async fillCard(card: PayHereCardDetails): Promise<this> {
-    await this.selectCardBrand(card.brand);
+    await this.clickTryAgainIfDeclined();
+    const existingIpg = this.page.frames().find((f) => /test_ipg/i.test(f.url()));
+    const cardFormReady = existingIpg
+      ? await existingIpg.locator('#cardNo').isVisible().catch(() => false)
+      : false;
+    if (!cardFormReady) {
+      await this.selectCardBrand(card.brand);
+    }
     const ipg = await this.waitForIpgFrame();
     const defaults = getPayHereCardDefaults();
     const cvv =
@@ -121,6 +140,27 @@ export class PayHereCheckout extends BasePage {
       timeout: Timeouts.PayHereResult,
     });
     await expect(outer.getByText(/payment approved/i)).toBeVisible();
+  }
+
+  async expectPaymentMethodUnavailable(): Promise<void> {
+    await expect
+      .poll(
+        async () => {
+          for (const frame of this.page.frames()) {
+            const hit = await frame
+              .getByText(/payment method unavailable|not enabled in sandbox/i)
+              .first()
+              .isVisible()
+              .catch(() => false);
+            if (hit) {
+              return true;
+            }
+          }
+          return false;
+        },
+        { timeout: Timeouts.PayHereIpg },
+      )
+      .toBe(true);
   }
 
   async expectPaymentDeclined(): Promise<void> {

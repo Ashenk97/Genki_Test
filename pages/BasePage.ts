@@ -45,6 +45,13 @@ export abstract class BasePage {
     });
   }
 
+  async expectNoHorizontalOverflow(): Promise<void> {
+    const extra = await this.page.evaluate(
+      () => document.documentElement.scrollWidth - window.innerWidth,
+    );
+    expect(extra, 'page should not scroll horizontally').toBeLessThanOrEqual(2);
+  }
+
   async expectPathname(path: string): Promise<void> {
     const normalized = normalizePathname(path);
     await expect(this.page).toHaveURL((url) => normalizePathname(url.pathname) === normalized);

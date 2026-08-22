@@ -40,7 +40,7 @@ add('Navigation', 'Open empty wishlist drawer', 'Empty wishlist drawer copy', 'P
 add('Follow Us', 'Top bar phone WhatsApp Facebook Instagram', 'Header utility links', 'P0', 'smoke,social', 'Desktop', '1. Open home 2. Assert each utility link', 'Visible with correct href and target', 'Covered');
 
 add('Login', 'Open login from header', 'Header Login link', 'P0', 'smoke,auth', 'Logged out', '1. Click Login', '/login Customer login', 'Covered');
-add('Login', 'Successful login', 'Valid credentials', 'P0', 'smoke,auth', 'Valid test account', '1. Submit email/password', 'Success toast; homepage; Logout visible', 'Covered');
+add('Login', 'Successful login', 'Valid credentials', 'P0', 'smoke,auth', 'Valid test account', '1. Submit email/password', 'Homepage; Logout visible', 'Covered');
 add('Login', 'Logout restores Login link', 'Logout', 'P0', 'smoke,auth', 'Logged in', '1. Logout', 'Login link restored; logout toast', 'Covered');
 add('Login', 'Open account dashboard from greeting', 'Account entry', 'P0', 'smoke,auth,profile', 'Logged in', '1. Click Signed in as', '/my-account/dashboard', 'Covered');
 add('Login', 'Toggle show hide password', 'Password visibility', 'P2', 'regression,auth', 'On login', '1. Toggle show/hide', 'Input type password/text', 'Covered');
@@ -53,7 +53,7 @@ add('Login', 'Unknown email', 'Unknown account', 'P1', 'regression,auth', 'On lo
 add('Login', 'Wrong password', 'Wrong password', 'P1', 'regression,auth', 'On login', '1. Wrong password', 'Invalid credentials', 'Covered');
 add('Login', 'Remember me default unchecked', 'Default remember me', 'P2', 'regression,auth', 'On login', '1. Open login', 'Remember me unchecked', 'Covered');
 add('Login', 'Remember me toggle', 'Toggle remember me', 'P2', 'regression,auth', 'On login', '1. Check/uncheck', 'Checkbox state updates', 'Covered');
-add('Login', 'Remember me persists after reload', 'Session persistence', 'P1', 'regression,auth', 'Valid account', '1. Login with remember me 2. Reload', 'Still logged in', 'Covered');
+add('Login', 'Session persists after reload', 'Session persistence', 'P1', 'regression,auth', 'Logged-in storage state', '1. Open home 2. Reload', 'Still logged in', 'Covered');
 
 add('Lost Password', 'Email required on forgot password', 'Required email', 'P1', 'regression,auth', 'On forgot password', '1. Submit empty', 'Email required', 'Covered');
 add('Lost Password', 'Send password reset email message', 'Reset request success copy', 'P0', 'smoke,auth', 'On forgot password', '1. Submit known email', 'Password reset email sent message', 'Covered');
@@ -110,6 +110,10 @@ add('PDP variants', 'Dual-color qty 3 with attributes in cart', 'Color size qty 
 add('PDP variants', 'Berserk size is out of stock', 'OOS ATC blocked', 'P0', 'smoke,pdp', '/products/berserk-oversized-tee', '1. Select XS', 'Out of Stock disabled; no Add to cart', 'Covered');
 add('PDP variants', 'Lowercase jjk slug loads Gojo PDP', 'Canonical lowercase slug', 'P1', 'regression,pdp', '/products/jjk', '1. Open lowercase slug', 'Gojo PDP with size controls', 'Covered');
 add('PDP variants', 'Uppercase JJK slug 404s', 'Non-canonical slug casing', 'P2', 'regression,pdp', '/products/JJK', '1. Open uppercase slug', 'Page Not Found', 'Covered');
+add('PDP layout', 'White-only PDP has no horizontal overflow', 'Page does not scroll sideways', 'P1', 'regression,pdp,layout', 'White-only PDP desktop', '1. Open PDP 2. Measure document width', 'All sizes listed; scrollWidth fits the viewport', 'Covered');
+add('PDP layout', 'Size options listed at laptop width', '1024px size list', 'P1', 'regression,pdp,layout', '1024×768', '1. Open white-only PDP', 'XXS–XXXL listed; no horizontal overflow', 'Covered');
+add('PDP layout', 'Size options listed on mobile viewport', '390px size list', 'P1', 'regression,pdp,layout', '390×844', '1. Open white-only PDP', 'XXS–XXXL listed; no horizontal overflow', 'Covered');
+add('PDP layout', 'Dual-color sizes listed after color select', 'Color-first size list', 'P1', 'regression,pdp,layout', 'Dual-color PDP', '1. Select black 2. Measure sizes', 'XXS–XXXL listed; no horizontal overflow', 'Covered');
 
 add('Wishlist', 'Add product to wishlist and open drawer', 'Wishlist add', 'P0', 'smoke,wishlist', 'Empty wishlist', '1. Add from PDP 2. Open wishlist', 'Item listed', 'Covered');
 add('Wishlist', 'Remove item from wishlist', 'Wishlist remove', 'P1', 'regression,wishlist', 'Item in wishlist', '1. Remove item', 'Empty or item gone', 'Covered');
@@ -164,6 +168,7 @@ add('Checkout', 'Gift bank transfer with notes and separate shipping', 'Full gif
 add('Checkout', 'Gift card payment opens PayHere', 'Gift card PayHere entry', 'P1', 'regression,checkout,gift,payment', 'Guest cart with in-stock SKU', '1. Enable gift 2. Card 3. Place order', 'PayHere checkout frame visible', 'Covered');
 add('Checkout', 'Place order Visa success via PayHere', 'Sandbox Visa success', 'P0', 'smoke,checkout,payment', 'Guest cart; PayHere sandbox iframe', '1. Card payment 2. Select Visa 3. Enter 4916217501611292 4. Submit', 'Payment Approved then order-success Card', 'Covered');
 add('Checkout', 'Place order MasterCard success via PayHere', 'Sandbox Master success', 'P1', 'regression,checkout,payment', 'Guest cart; PayHere sandbox', '1. Card payment 2. Select Master 3. Enter 5307732125531191 4. Submit', 'Payment Approved then order-success Card', 'Covered');
+add('Checkout', 'Amex unavailable in PayHere sandbox', 'Sandbox Amex not enabled', 'P1', 'regression,checkout,payment', 'Guest cart; PayHere sandbox', '1. Card payment 2. Select Amex', 'Payment method unavailable in sandbox', 'Covered');
 add('Checkout', 'Decline Visa insufficient funds', 'Sandbox decline insufficient funds', 'P1', 'regression,checkout,payment', 'Guest cart; PayHere sandbox', '1. Card payment 2. Enter 4024007194349121 3. Submit', 'Payment Declined; stay off order-success', 'Covered');
 add('Checkout', 'Decline MasterCard limit exceeded', 'Sandbox decline limit exceeded', 'P1', 'regression,checkout,payment', 'Guest cart; PayHere sandbox', '1. Card payment 2. Enter 5491182243178283 3. Submit', 'Payment Declined; stay off order-success', 'Covered');
 add('Checkout', 'Decline Visa do not honor', 'Sandbox decline do not honor', 'P1', 'regression,checkout,payment', 'Guest cart; PayHere sandbox', '1. Card payment 2. Enter 4929768900837248 3. Submit', 'Payment Declined; stay off order-success', 'Covered');

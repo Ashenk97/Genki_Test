@@ -37,12 +37,38 @@ export class ForgotPasswordPage extends BasePage {
 
   async submitEmail(email: string): Promise<this> {
     await this.emailInput.fill(email);
-    await this.submitButton.click();
+    for (let attempt = 1; attempt <= 3; attempt += 1) {
+      await this.submitButton.click();
+      const sent = await this.successMessage
+        .waitFor({ state: 'visible', timeout: 8_000 })
+        .then(() => true)
+        .catch(() => false);
+      if (sent) {
+        return this;
+      }
+      const serverError = await this.page
+        .getByText(/failed to send reset password email|internal server error/i)
+        .first()
+        .isVisible()
+        .catch(() => false);
+      if (!serverError || attempt === 3) {
+        break;
+      }
+      await this.page.waitForTimeout(2000 * attempt);
+    }
     return this;
   }
 
   async openLogin(): Promise<void> {
     await this.loginLink.click();
+  }
+
+  async hasSendFailure(): Promise<boolean> {
+    return this.page
+      .getByText(/failed to send reset password email|internal server error/i)
+      .first()
+      .isVisible()
+      .catch(() => false);
   }
 
   async expectResetEmailSent(): Promise<void> {

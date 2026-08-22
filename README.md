@@ -192,7 +192,7 @@ Inventory: [`docs/test-cases.csv`](./docs/test-cases.csv) (~95 cases; regenerate
 |:-----|:-----------------|
 | **Nav / chrome** | `home`, `main-nav`, `navigation`, `mobile-nav`, `top-bar`, `footer` |
 | **Auth** | `auth`, `register-email`, `forgot-password-email` |
-| **Catalog / PDP** | `collections`, `pdp`, `pdp-variants` (color × size matrix), `catalog-edges`, `search` (intentionally disabled) |
+| **Catalog / PDP** | `collections`, `pdp`, `pdp-variants` (color × size matrix), `pdp-layout` (size wrap / overflow), `catalog-edges`, `search` (intentionally disabled) |
 | **Cart / wishlist** | `cart`, `wishlist` |
 | **Checkout** | `checkout` (COD, bank, PayHere), `checkout-advanced` (shipping, gift, create-account COD) |
 | **Account / loyalty** | `profile`, `rewards` |

@@ -42,6 +42,20 @@ export class RewardsPage extends BasePage {
     await expect(this.page.getByText(/sticker|keytag|reward/i).first()).toBeVisible();
   }
 
+  async clearQueuedRewards(): Promise<void> {
+    for (let i = 0; i < 6; i += 1) {
+      if (!(await this.includedSection.isVisible().catch(() => false))) {
+        return;
+      }
+      const remove = this.page.getByRole('button', { name: /remove/i }).first();
+      if (!(await remove.isVisible().catch(() => false))) {
+        return;
+      }
+      await remove.click();
+      await this.page.waitForTimeout(500);
+    }
+  }
+
   async getUsablePoints(): Promise<number> {
     const body = await this.page.locator('body').innerText();
     const normalized = body.replace(/,/g, '');
