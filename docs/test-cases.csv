@@ -35,6 +35,8 @@ Register,Already registered email,Duplicate email,P1,"regression,auth",QA,Existi
 Register,New register shows email confirmation,Confirmation page,P0,"smoke,auth",QA,Fresh email,1. Register valid user,Email confirmation page,Covered
 Register,Confirm email and login,Full email confirm,P0,"smoke,auth,@email",QA,mail.tm on staging,1. Register 2. Confirm link 3. Login,Account active,Covered
 Home,Homepage loads with title and featured heading,Home smoke,P0,"smoke,home",QA,None,1. Open /,Title Genki; featured heading visible,Covered
+Search,Desktop search is disabled,Search hidden by requirement,P0,"smoke,search",QA,Desktop homepage,1. Open / 2. Inspect header,"No search control, overlay, or search input",Covered
+Search,Mobile menu search is disabled,Mobile search hidden by requirement,P1,"regression,search,nav",QA,Mobile viewport,1. Open hamburger menu,No search input in the menu,Covered
 Carousel,Hero carousel is visible with slides,Carousel presence,P0,"smoke,home,carousel",QA,Home,1. Open home,Hero slider with multiple slides,Covered
 Carousel,Carousel next navigation changes slide,Carousel control,P1,"regression,home,carousel",QA,Home,1. Click next,Active slide changes,Covered
 Newsletter,Subscribe button disabled when empty,Empty newsletter,P2,"regression,newsletter",QA,Home footer,1. Leave email empty,Subscribe disabled or validation,Covered
@@ -50,6 +52,25 @@ Individual product,Select size enables ATC,Size selection,P0,"smoke,pdp",QA,PDP 
 Individual product,Add to cart success toast and badge,ATC happy path,P0,"smoke,pdp,cart",QA,PDP,1. Select size 2. ATC,Toast; cart badge count,Covered
 Individual product,Add to wishlist from PDP,Wishlist from PDP,P0,"smoke,pdp,wishlist",QA,PDP,1. Click add to wishlist,Item in wishlist drawer or toast,Covered
 Individual product,Quantity stepper on PDP,Qty controls,P2,"regression,pdp",QA,PDP,1. Increase qty,Qty value updates,Covered
+Individual product,Qty 3 from PDP lands in cart,Higher qty ATC,P1,"regression,pdp,cart",QA,White-only PDP,1. Select size 2. Set qty 3 3. ATC 4. Open cart,Cart qty is 3,Covered
+Individual product,Qty stepper disabled until size selected,Qty gated on size,P1,"regression,pdp",QA,White-only PDP,1. Open PDP without size,Plus/minus disabled; Select a size shown,Covered
+Individual product,All sizes XXS to XXXL listed,Full size matrix,P1,"regression,pdp",QA,White-only PDP,1. Open PDP,XXS XS S M L XL XXL XXXL visible,Covered
+Individual product,Gallery size chart additional info,PDP chrome,P2,"regression,pdp",QA,White-only PDP,1. Open PDP,"Gallery thumbs, size chart, additional information",Covered
+PDP variants,White-only locks white and lists all sizes,Single-color white SKU,P0,"smoke,pdp",QA,/products/test-white-only,1. Open PDP,White color locked; sizes XXS-XXXL; size required,Covered
+PDP variants,White-only every size enables ATC,Per-size ATC enable,P1,"regression,pdp",QA,White-only PDP,1. Select each size XXS-XXXL,Add to cart enabled for every size,Covered
+PDP variants,White-only every size added to cart,Per-size ATC cart lines,P1,"regression,pdp,cart",QA,White-only PDP,1. Add each size 2. Open cart,8 lines each Color white with matching size,Covered
+PDP variants,Black-only locks black and lists all sizes,Single-color black SKU,P0,"smoke,pdp",QA,/products/test-black-only,1. Open PDP,Black color locked; sizes XXS-XXXL; size required,Covered
+PDP variants,Black-only every size enables ATC,Per-size ATC enable,P1,"regression,pdp",QA,Black-only PDP,1. Select each size XXS-XXXL,Add to cart enabled for every size,Covered
+PDP variants,Black-only every size added to cart,Per-size ATC cart lines,P1,"regression,pdp,cart",QA,Black-only PDP,1. Add each size 2. Open cart,8 lines each Color black with matching size,Covered
+PDP variants,Dual-color requires color before sizes,Color-first UX,P0,"smoke,pdp",QA,/products/test-black-white-both,1. Open PDP,Select a color; sizes hidden,Covered
+PDP variants,Dual-color switching color clears size,Color change resets size,P1,"regression,pdp",QA,Dual-color PDP,1. Select black+M 2. Switch to white,Size required again; then XXS enables ATC,Covered
+PDP variants,Dual-color every color x size enables ATC,Full color-size matrix,P1,"regression,pdp",QA,Dual-color PDP,1. For black and white select each size,ATC enabled for all 16 pairs,Covered
+PDP variants,Dual-color every black size in cart,Black matrix ATC,P1,"regression,pdp,cart",QA,Dual-color PDP,1. Select black 2. Add every size,8 cart lines Color black,Covered
+PDP variants,Dual-color every white size in cart,White matrix ATC,P1,"regression,pdp,cart",QA,Dual-color PDP,1. Select white 2. Add every size,8 cart lines Color white,Covered
+PDP variants,Dual-color qty 3 with attributes in cart,Color size qty cart,P1,"regression,pdp,cart",QA,Dual-color PDP,1. White + XL + qty 3 2. ATC,Cart line white XL qty 3,Covered
+PDP variants,Berserk size is out of stock,OOS ATC blocked,P0,"smoke,pdp",QA,/products/berserk-oversized-tee,1. Select XS,Out of Stock disabled; no Add to cart,Covered
+PDP variants,Lowercase jjk slug loads Gojo PDP,Canonical lowercase slug,P1,"regression,pdp",QA,/products/jjk,1. Open lowercase slug,Gojo PDP with size controls,Covered
+PDP variants,Uppercase JJK slug 404s,Non-canonical slug casing,P2,"regression,pdp",QA,/products/JJK,1. Open uppercase slug,Page Not Found,Covered
 Wishlist,Add product to wishlist and open drawer,Wishlist add,P0,"smoke,wishlist",QA,Empty wishlist,1. Add from PDP 2. Open wishlist,Item listed,Covered
 Wishlist,Remove item from wishlist,Wishlist remove,P1,"regression,wishlist",QA,Item in wishlist,1. Remove item,Empty or item gone,Covered
 Wishlist,Wishlist page view,/wishlist page,P1,"regression,wishlist",QA,Item in wishlist,1. Open /wishlist,Item visible,Covered
@@ -57,6 +78,9 @@ Cart,View cart page after ATC,Cart view,P0,"smoke,cart",QA,Item added,1. ATC 2. 
 Cart,Increase quantity on cart page,Qty increase,P1,"regression,cart",QA,Item in cart,1. Click +,Qty and totals update,Covered
 Cart,Remove item empties cart,Remove line,P1,"regression,cart",QA,Item in cart,1. Remove,No items found; shop now,Covered
 Cart,Proceed to checkout from cart,Checkout entry,P0,"smoke,cart,checkout",QA,Item in cart,1. Click proceed to checkout,/checkout loads,Covered
+Cart,Free delivery remaining under 5000,Below threshold,P0,"smoke,cart,checkout",QA,Qty 1 of LKR 3490 SKU,1. ATC qty 1 2. Open cart,"You are LKR 1,510 away from free delivery",Covered
+Cart,Free delivery unlocked over 5000,Above threshold,P0,"smoke,cart,checkout",QA,Qty 2 of LKR 3490 SKU,1. ATC qty 2 2. Open cart,Free delivery unlocked on this order,Covered
+Cart,Free delivery boundary qty 1 to 2,Cross threshold on cart,P1,"regression,cart",QA,Qty 1 in cart,1. Increase to 2 2. Decrease to 1,Unlocked at 2; remaining at 1,Covered
 Info,About us page,About CMS,P1,"regression,footer",QA,Home,1. Footer About us,/about-us content loads,Covered
 Info,Contact section,Contact anchor,P1,"regression,footer",QA,Home,1. Footer Contact,/about-us#contact,Covered
 Info,Privacy Policy page,Privacy CMS,P1,"regression,footer",QA,Home,1. Footer Privacy,/privacy-policy loads,Covered
@@ -76,9 +100,14 @@ Profile,Logout from account sidebar,Sidebar logout,P0,"smoke,profile,auth",QA,Lo
 Profile,Redeem points link to rewards,Redeem entry,P1,"smoke,profile,rewards",QA,Logged in dashboard,1. Click Redeem Points,/rewards,Covered
 Rewards,Rewards page shows usable points and catalog,Rewards load,P0,"smoke,rewards",QA,Logged in with points,1. Open /rewards,Points and catalog visible,Covered
 Rewards,Add reward to next order,Redeem add,P1,"regression,rewards",QA,Usable points >= reward cost,1. Click ADD on a reward,Reward queued for next order,Covered
+Rewards,Redeeming a reward decreases points,Points debit,P1,"regression,rewards,checkout",QA,Logged in; affordable reward,1. Queue reward 2. Place COD order,Usable points decrease after order (or known checkout bug),Covered
+Rewards,Purchasing an item increases points,Points earn,P1,"regression,rewards,checkout",QA,Logged in; no reward queued,1. Capture points 2. Place COD order 3. Reopen rewards,Usable points greater than before purchase,Covered
 Checkout,Checkout loads with billing and payment methods,Checkout smoke,P0,"smoke,checkout",QA,Guest cart with item,1. Open /checkout,Billing fields; Card Bank COD,Covered
 Checkout,Place order disabled when billing incomplete,Billing required,P1,"regression,checkout",QA,Guest cart,1. Open checkout without billing 2. Select COD,Place Order stays disabled,Covered
 Checkout,Place order COD guest,Full COD order,P0,"smoke,checkout,payment",QA,Guest cart,1. Fill billing 2. COD 3. Accept terms 4. Place order,order-success COD,Covered
+Checkout,Create account at checkout COD,Guest create-account order,P0,"smoke,checkout,auth",QA,Guest cart; new email,1. Check Create an account 2. Password 3. COD place order 4. Log in,order-success COD; account can log in,Covered
+Checkout,Free delivery remaining under 5000,Checkout below threshold,P0,"smoke,checkout",QA,Qty 1 of LKR 3490 SKU,1. Open checkout,"You are LKR 1,510 away from free delivery",Covered
+Checkout,Free delivery unlocked over 5000,Checkout above threshold,P0,"smoke,checkout",QA,Qty 2 of LKR 3490 SKU,1. Open checkout,Free delivery unlocked on this order,Covered
 Checkout,Order confirmation email after guest COD,Order confirmation email,P0,"smoke,checkout,@email",QA,Staging; mail.tm disposable inbox,1. Place guest COD with temp email 2. Poll inbox for Order Confirmation,Email subject Order Confirmation #GK-*; body includes order id,Covered
 Checkout,Place order bank transfer guest,Full bank order,P0,"smoke,checkout,payment",QA,Guest cart,1. Fill billing 2. Bank 3. Place order,order-success BankTransfer with bank details,Covered
 Checkout,Gift order disables COD keeps card and bank,Gift payment rules,P0,"smoke,checkout,gift",QA,Guest cart,1. Check This order is a gift,COD disabled with not-available copy; Card and Bank enabled; gift message shown,Covered

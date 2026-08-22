@@ -1,5 +1,4 @@
 import { MAIN_NAV_TOP_LEVEL } from '@data/navigation.data';
-import { SEARCH_QUERIES } from '@data/products.data';
 import { test } from '@fixtures/test-fixtures';
 
 test.describe('Mobile navigation', () => {
@@ -29,13 +28,12 @@ test.describe('Mobile navigation', () => {
     });
   });
 
-  test('should expose search in the mobile menu', async ({ header, homePage }) => {
-    await test.step('Open menu and type a search query', async () => {
+  test('should not expose search in the mobile menu', async ({ header, homePage }) => {
+    await test.step('Open menu and confirm search is disabled', async () => {
       await homePage.open();
       await header.openMobileMenu();
-      await homePage.expectMobileSearchVisible();
-      await homePage.fillMobileSearch(SEARCH_QUERIES.valid);
-      await homePage.expectMobileSearchQuery(SEARCH_QUERIES.valid);
+      await header.expectMobileMenuVisible();
+      await homePage.expectSearchDisabled();
     });
   });
 });

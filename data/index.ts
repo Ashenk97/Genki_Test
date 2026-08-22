@@ -3,6 +3,14 @@ import { AUTH_VALIDATION, getAuthCredentials } from './auth.data';
 import { getGuestBillingDetails } from './checkout.data';
 import { getPayHereCardDefaults, PAYHERE_SANDBOX_CARDS } from './payhere.data';
 import { NEWSLETTER_DATA, PRODUCT_DATA, SEARCH_QUERIES } from './products.data';
+import {
+  BLACK_ONLY_PRODUCT,
+  DUAL_COLOR_PRODUCT,
+  FREE_DELIVERY,
+  OUT_OF_STOCK_PRODUCT,
+  PRODUCT_SIZES,
+  WHITE_ONLY_PRODUCT,
+} from './pdp-variants.data';
 
 /**
  * Facade for commonly accessed runtime test data.
@@ -14,6 +22,12 @@ export const TEST_DATA = {
   },
   searchQueries: SEARCH_QUERIES,
   product: PRODUCT_DATA,
+  sizes: PRODUCT_SIZES,
+  freeDelivery: FREE_DELIVERY,
+  whiteOnly: WHITE_ONLY_PRODUCT,
+  blackOnly: BLACK_ONLY_PRODUCT,
+  dualColor: DUAL_COLOR_PRODUCT,
+  outOfStock: OUT_OF_STOCK_PRODUCT,
   get auth() {
     return {
       ...getAuthCredentials(),
@@ -54,3 +68,14 @@ export { AUTH_VALIDATION, getAuthCredentials } from './auth.data';
 export { getGuestBillingDetails, guestCheckoutEmail } from './checkout.data';
 export { getPayHereCardDefaults, PAYHERE_SANDBOX_CARDS } from './payhere.data';
 export { NEWSLETTER_DATA, PRODUCT_DATA, SEARCH_QUERIES, EMPTY_THEME_COLLECTIONS } from './products.data';
+export {
+  BLACK_ONLY_PRODUCT,
+  DUAL_COLOR_PRODUCT,
+  DUAL_COLOR_SIZE_MATRIX,
+  FREE_DELIVERY,
+  OUT_OF_STOCK_PRODUCT,
+  PRODUCT_PRICE,
+  PRODUCT_SIZES,
+  SIZE_RADIO_PATTERN,
+  WHITE_ONLY_PRODUCT,
+} from './pdp-variants.data';

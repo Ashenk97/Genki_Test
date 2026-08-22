@@ -49,7 +49,9 @@ export class CheckoutPage extends BasePage {
     this.city = page.locator('#city');
     this.createAccount = page.locator('#createAccount');
     this.createAccountLabel = page.locator('label[for="createAccount"]');
-    this.accountPassword = page.locator('input[name="password"]');
+    this.accountPassword = page.locator('input[name="userPassword"]').or(
+      page.locator('input[name="password"]'),
+    );
     this.termsLabel = page.locator('label').filter({ hasText: /terms & conditions/i });
     this.placeOrderButton = page.getByRole('button', { name: /place order/i });
     this.cardPaymentInput = page.locator('#payment_check');
@@ -358,10 +360,22 @@ export class CheckoutPage extends BasePage {
     await expect(this.giftMessage).toHaveValue(expected);
   }
 
-  async expectCreateAccountSchemaError(): Promise<void> {
-    await expect(this.page.getByText(AUTH_MESSAGES.createAccountSchemaError)).toBeVisible();
-    await this.expectStillOnCheckout();
-    await this.expectNotOnOrderSuccess();
+  async expectFreeDeliveryRemaining(): Promise<void> {
+    await expect(this.page.locator('.free-shipping-progress__message').first()).toHaveText(
+      /you're\s+lkr\s*1,?510\s+away from free delivery/i,
+    );
+  }
+
+  async expectFreeDeliveryUnlocked(): Promise<void> {
+    await expect(this.page.locator('.free-shipping-progress__message').first()).toHaveText(
+      /free delivery unlocked on this order/i,
+    );
+  }
+
+  async expectOrderSubtotal(amount: number): Promise<void> {
+    await expect(
+      this.page.getByText(new RegExp(`lkr\\s*${amount}(?:\\.00)?`, 'i')).filter({ visible: true }).first(),
+    ).toBeVisible();
   }
 
   async expectPlaceOrderEnabled(): Promise<void> {

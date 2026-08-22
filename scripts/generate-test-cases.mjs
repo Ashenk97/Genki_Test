@@ -71,6 +71,8 @@ add('Register', 'New register shows email confirmation', 'Confirmation page', 'P
 add('Register', 'Confirm email and login', 'Full email confirm', 'P0', 'smoke,auth,@email', 'mail.tm on staging', '1. Register 2. Confirm link 3. Login', 'Account active', 'Covered');
 
 add('Home', 'Homepage loads with title and featured heading', 'Home smoke', 'P0', 'smoke,home', 'None', '1. Open /', 'Title Genki; featured heading visible', 'Covered');
+add('Search', 'Desktop search is disabled', 'Search hidden by requirement', 'P0', 'smoke,search', 'Desktop homepage', '1. Open / 2. Inspect header', 'No search control, overlay, or search input', 'Covered');
+add('Search', 'Mobile menu search is disabled', 'Mobile search hidden by requirement', 'P1', 'regression,search,nav', 'Mobile viewport', '1. Open hamburger menu', 'No search input in the menu', 'Covered');
 add('Carousel', 'Hero carousel is visible with slides', 'Carousel presence', 'P0', 'smoke,home,carousel', 'Home', '1. Open home', 'Hero slider with multiple slides', 'Covered');
 add('Carousel', 'Carousel next navigation changes slide', 'Carousel control', 'P1', 'regression,home,carousel', 'Home', '1. Click next', 'Active slide changes', 'Covered');
 add('Newsletter', 'Subscribe button disabled when empty', 'Empty newsletter', 'P2', 'regression,newsletter', 'Home footer', '1. Leave email empty', 'Subscribe disabled or validation', 'Covered');
@@ -88,6 +90,26 @@ add('Individual product', 'Select size enables ATC', 'Size selection', 'P0', 'sm
 add('Individual product', 'Add to cart success toast and badge', 'ATC happy path', 'P0', 'smoke,pdp,cart', 'PDP', '1. Select size 2. ATC', 'Toast; cart badge count', 'Covered');
 add('Individual product', 'Add to wishlist from PDP', 'Wishlist from PDP', 'P0', 'smoke,pdp,wishlist', 'PDP', '1. Click add to wishlist', 'Item in wishlist drawer or toast', 'Covered');
 add('Individual product', 'Quantity stepper on PDP', 'Qty controls', 'P2', 'regression,pdp', 'PDP', '1. Increase qty', 'Qty value updates', 'Covered');
+add('Individual product', 'Qty 3 from PDP lands in cart', 'Higher qty ATC', 'P1', 'regression,pdp,cart', 'White-only PDP', '1. Select size 2. Set qty 3 3. ATC 4. Open cart', 'Cart qty is 3', 'Covered');
+add('Individual product', 'Qty stepper disabled until size selected', 'Qty gated on size', 'P1', 'regression,pdp', 'White-only PDP', '1. Open PDP without size', 'Plus/minus disabled; Select a size shown', 'Covered');
+add('Individual product', 'All sizes XXS to XXXL listed', 'Full size matrix', 'P1', 'regression,pdp', 'White-only PDP', '1. Open PDP', 'XXS XS S M L XL XXL XXXL visible', 'Covered');
+add('Individual product', 'Gallery size chart additional info', 'PDP chrome', 'P2', 'regression,pdp', 'White-only PDP', '1. Open PDP', 'Gallery thumbs, size chart, additional information', 'Covered');
+
+add('PDP variants', 'White-only locks white and lists all sizes', 'Single-color white SKU', 'P0', 'smoke,pdp', '/products/test-white-only', '1. Open PDP', 'White color locked; sizes XXS-XXXL; size required', 'Covered');
+add('PDP variants', 'White-only every size enables ATC', 'Per-size ATC enable', 'P1', 'regression,pdp', 'White-only PDP', '1. Select each size XXS-XXXL', 'Add to cart enabled for every size', 'Covered');
+add('PDP variants', 'White-only every size added to cart', 'Per-size ATC cart lines', 'P1', 'regression,pdp,cart', 'White-only PDP', '1. Add each size 2. Open cart', '8 lines each Color white with matching size', 'Covered');
+add('PDP variants', 'Black-only locks black and lists all sizes', 'Single-color black SKU', 'P0', 'smoke,pdp', '/products/test-black-only', '1. Open PDP', 'Black color locked; sizes XXS-XXXL; size required', 'Covered');
+add('PDP variants', 'Black-only every size enables ATC', 'Per-size ATC enable', 'P1', 'regression,pdp', 'Black-only PDP', '1. Select each size XXS-XXXL', 'Add to cart enabled for every size', 'Covered');
+add('PDP variants', 'Black-only every size added to cart', 'Per-size ATC cart lines', 'P1', 'regression,pdp,cart', 'Black-only PDP', '1. Add each size 2. Open cart', '8 lines each Color black with matching size', 'Covered');
+add('PDP variants', 'Dual-color requires color before sizes', 'Color-first UX', 'P0', 'smoke,pdp', '/products/test-black-white-both', '1. Open PDP', 'Select a color; sizes hidden', 'Covered');
+add('PDP variants', 'Dual-color switching color clears size', 'Color change resets size', 'P1', 'regression,pdp', 'Dual-color PDP', '1. Select black+M 2. Switch to white', 'Size required again; then XXS enables ATC', 'Covered');
+add('PDP variants', 'Dual-color every color x size enables ATC', 'Full color-size matrix', 'P1', 'regression,pdp', 'Dual-color PDP', '1. For black and white select each size', 'ATC enabled for all 16 pairs', 'Covered');
+add('PDP variants', 'Dual-color every black size in cart', 'Black matrix ATC', 'P1', 'regression,pdp,cart', 'Dual-color PDP', '1. Select black 2. Add every size', '8 cart lines Color black', 'Covered');
+add('PDP variants', 'Dual-color every white size in cart', 'White matrix ATC', 'P1', 'regression,pdp,cart', 'Dual-color PDP', '1. Select white 2. Add every size', '8 cart lines Color white', 'Covered');
+add('PDP variants', 'Dual-color qty 3 with attributes in cart', 'Color size qty cart', 'P1', 'regression,pdp,cart', 'Dual-color PDP', '1. White + XL + qty 3 2. ATC', 'Cart line white XL qty 3', 'Covered');
+add('PDP variants', 'Berserk size is out of stock', 'OOS ATC blocked', 'P0', 'smoke,pdp', '/products/berserk-oversized-tee', '1. Select XS', 'Out of Stock disabled; no Add to cart', 'Covered');
+add('PDP variants', 'Lowercase jjk slug loads Gojo PDP', 'Canonical lowercase slug', 'P1', 'regression,pdp', '/products/jjk', '1. Open lowercase slug', 'Gojo PDP with size controls', 'Covered');
+add('PDP variants', 'Uppercase JJK slug 404s', 'Non-canonical slug casing', 'P2', 'regression,pdp', '/products/JJK', '1. Open uppercase slug', 'Page Not Found', 'Covered');
 
 add('Wishlist', 'Add product to wishlist and open drawer', 'Wishlist add', 'P0', 'smoke,wishlist', 'Empty wishlist', '1. Add from PDP 2. Open wishlist', 'Item listed', 'Covered');
 add('Wishlist', 'Remove item from wishlist', 'Wishlist remove', 'P1', 'regression,wishlist', 'Item in wishlist', '1. Remove item', 'Empty or item gone', 'Covered');
@@ -97,6 +119,9 @@ add('Cart', 'View cart page after ATC', 'Cart view', 'P0', 'smoke,cart', 'Item a
 add('Cart', 'Increase quantity on cart page', 'Qty increase', 'P1', 'regression,cart', 'Item in cart', '1. Click +', 'Qty and totals update', 'Covered');
 add('Cart', 'Remove item empties cart', 'Remove line', 'P1', 'regression,cart', 'Item in cart', '1. Remove', 'No items found; shop now', 'Covered');
 add('Cart', 'Proceed to checkout from cart', 'Checkout entry', 'P0', 'smoke,cart,checkout', 'Item in cart', '1. Click proceed to checkout', '/checkout loads', 'Covered');
+add('Cart', 'Free delivery remaining under 5000', 'Below threshold', 'P0', 'smoke,cart,checkout', 'Qty 1 of LKR 3490 SKU', '1. ATC qty 1 2. Open cart', 'You are LKR 1,510 away from free delivery', 'Covered');
+add('Cart', 'Free delivery unlocked over 5000', 'Above threshold', 'P0', 'smoke,cart,checkout', 'Qty 2 of LKR 3490 SKU', '1. ATC qty 2 2. Open cart', 'Free delivery unlocked on this order', 'Covered');
+add('Cart', 'Free delivery boundary qty 1 to 2', 'Cross threshold on cart', 'P1', 'regression,cart', 'Qty 1 in cart', '1. Increase to 2 2. Decrease to 1', 'Unlocked at 2; remaining at 1', 'Covered');
 
 add('Info', 'About us page', 'About CMS', 'P1', 'regression,footer', 'Home', '1. Footer About us', '/about-us content loads', 'Covered');
 add('Info', 'Contact section', 'Contact anchor', 'P1', 'regression,footer', 'Home', '1. Footer Contact', '/about-us#contact', 'Covered');
@@ -119,10 +144,15 @@ add('Profile', 'Redeem points link to rewards', 'Redeem entry', 'P1', 'smoke,pro
 
 add('Rewards', 'Rewards page shows usable points and catalog', 'Rewards load', 'P0', 'smoke,rewards', 'Logged in with points', '1. Open /rewards', 'Points and catalog visible', 'Covered');
 add('Rewards', 'Add reward to next order', 'Redeem add', 'P1', 'regression,rewards', 'Usable points >= reward cost', '1. Click ADD on a reward', 'Reward queued for next order', 'Covered');
+add('Rewards', 'Redeeming a reward decreases points', 'Points debit', 'P1', 'regression,rewards,checkout', 'Logged in; affordable reward', '1. Queue reward 2. Place COD order', 'Usable points decrease after order (or known checkout bug)', 'Covered');
+add('Rewards', 'Purchasing an item increases points', 'Points earn', 'P1', 'regression,rewards,checkout', 'Logged in; no reward queued', '1. Capture points 2. Place COD order 3. Reopen rewards', 'Usable points greater than before purchase', 'Covered');
 
 add('Checkout', 'Checkout loads with billing and payment methods', 'Checkout smoke', 'P0', 'smoke,checkout', 'Guest cart with item', '1. Open /checkout', 'Billing fields; Card Bank COD', 'Covered');
 add('Checkout', 'Place order disabled when billing incomplete', 'Billing required', 'P1', 'regression,checkout', 'Guest cart', '1. Open checkout without billing 2. Select COD', 'Place Order stays disabled', 'Covered');
 add('Checkout', 'Place order COD guest', 'Full COD order', 'P0', 'smoke,checkout,payment', 'Guest cart', '1. Fill billing 2. COD 3. Accept terms 4. Place order', 'order-success COD', 'Covered');
+add('Checkout', 'Create account at checkout COD', 'Guest create-account order', 'P0', 'smoke,checkout,auth', 'Guest cart; new email', '1. Check Create an account 2. Password 3. COD place order 4. Log in', 'order-success COD; account can log in', 'Covered');
+add('Checkout', 'Free delivery remaining under 5000', 'Checkout below threshold', 'P0', 'smoke,checkout', 'Qty 1 of LKR 3490 SKU', '1. Open checkout', 'You are LKR 1,510 away from free delivery', 'Covered');
+add('Checkout', 'Free delivery unlocked over 5000', 'Checkout above threshold', 'P0', 'smoke,checkout', 'Qty 2 of LKR 3490 SKU', '1. Open checkout', 'Free delivery unlocked on this order', 'Covered');
 add('Checkout', 'Order confirmation email after guest COD', 'Order confirmation email', 'P0', 'smoke,checkout,@email', 'Staging; mail.tm disposable inbox', '1. Place guest COD with temp email 2. Poll inbox for Order Confirmation', 'Email subject Order Confirmation #GK-*; body includes order id', 'Covered');
 add('Checkout', 'Place order bank transfer guest', 'Full bank order', 'P0', 'smoke,checkout,payment', 'Guest cart', '1. Fill billing 2. Bank 3. Place order', 'order-success BankTransfer with bank details', 'Covered');
 add('Checkout', 'Gift order disables COD keeps card and bank', 'Gift payment rules', 'P0', 'smoke,checkout,gift', 'Guest cart', '1. Check This order is a gift', 'COD disabled with not-available copy; Card and Bank enabled; gift message shown', 'Covered');

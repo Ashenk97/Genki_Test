@@ -1,4 +1,5 @@
 import { TEST_DATA } from '@data/index';
+import { PRODUCT_PRICE } from '@data/pdp-variants.data';
 import { test } from '@fixtures/test-fixtures';
 import {
   addSampleProductToCart,
@@ -136,6 +137,56 @@ test.describe('Cart', () => {
       await cartPage.open();
       await cartPage.expectHasItems();
       await header.expectCartBadgeHasItems();
+    });
+  });
+});
+
+test.describe('Free delivery threshold', () => {
+  test('should show remaining amount when the cart is below LKR 5,000', async ({
+    productDetailsPage,
+    cartPage,
+  }) => {
+    await test.step('Add qty 1 (LKR 3,490)', async () => {
+      await addSampleProductToCart(productDetailsPage, { quantity: 1 });
+      await cartPage.open();
+      await cartPage.expectHasItems();
+      await cartPage.expectSubtotal(PRODUCT_PRICE.unit);
+      await cartPage.expectFreeDeliveryRemaining();
+    });
+  });
+
+  test('should unlock free delivery when the cart is over LKR 5,000', async ({
+    productDetailsPage,
+    cartPage,
+  }) => {
+    await test.step('Add qty 2 (LKR 6,980)', async () => {
+      await addSampleProductToCart(productDetailsPage, { quantity: 2 });
+      await cartPage.open();
+      await cartPage.expectHasItems();
+      await cartPage.expectQuantity(2);
+      await cartPage.expectSubtotal(PRODUCT_PRICE.unit * 2);
+      await cartPage.expectFreeDeliveryUnlocked();
+    });
+  });
+
+  test('should cross the free-delivery boundary when cart qty goes from 1 to 2', async ({
+    productDetailsPage,
+    cartPage,
+  }) => {
+    await test.step('Start below the threshold', async () => {
+      await addSampleProductToCart(productDetailsPage);
+      await cartPage.open();
+      await cartPage.expectFreeDeliveryRemaining();
+    });
+    await test.step('Increase qty to cross LKR 5,000', async () => {
+      await cartPage.increaseQuantity();
+      await cartPage.expectQuantity(2);
+      await cartPage.expectFreeDeliveryUnlocked();
+    });
+    await test.step('Decrease qty back below the threshold', async () => {
+      await cartPage.decreaseQuantity();
+      await cartPage.expectQuantity(1);
+      await cartPage.expectFreeDeliveryRemaining();
     });
   });
 });
