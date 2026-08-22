@@ -92,6 +92,13 @@ export class LoginPage extends BasePage {
     return this;
   }
 
+  async submitLogin(email: string, password: string, rememberMe = false): Promise<this> {
+    await this.fillCredentials(email, password);
+    await this.setRememberMe(rememberMe);
+    await this.submit();
+    return this;
+  }
+
   async login(email: string, password: string, rememberMe = false): Promise<this> {
     for (let attempt = 1; attempt <= 3; attempt += 1) {
       if (!/\/login/.test(this.page.url())) {

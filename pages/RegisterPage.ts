@@ -1,5 +1,5 @@
 import { Locator, Page, expect } from '@playwright/test';
-import { PAGE_HEADINGS } from '@constants/messages';
+import { AUTH_MESSAGES, PAGE_HEADINGS } from '@constants/messages';
 import { AppRoutes } from '@constants/routes';
 import { Timeouts } from '@constants/timeouts';
 import { REGISTER_PAGE } from '@data/navigation.data';
@@ -55,7 +55,7 @@ export class RegisterPage extends BasePage {
         .then(() => 'confirmed' as const)
         .catch(() => 'stuck' as const),
       this.page
-        .getByText(/internal server error|failed to send|could not send/i)
+        .getByText(AUTH_MESSAGES.mailSendFailure)
         .first()
         .waitFor({ state: 'visible', timeout: Timeouts.OrderSuccess })
         .then(() => 'mail-failure' as const)

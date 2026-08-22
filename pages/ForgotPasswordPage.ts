@@ -47,7 +47,7 @@ export class ForgotPasswordPage extends BasePage {
         return this;
       }
       const serverError = await this.page
-        .getByText(/failed to send reset password email|internal server error/i)
+        .getByText(AUTH_MESSAGES.mailSendFailure)
         .first()
         .isVisible()
         .catch(() => false);
@@ -65,7 +65,7 @@ export class ForgotPasswordPage extends BasePage {
 
   async hasSendFailure(): Promise<boolean> {
     return this.page
-      .getByText(/failed to send reset password email|internal server error/i)
+      .getByText(AUTH_MESSAGES.mailSendFailure)
       .first()
       .isVisible()
       .catch(() => false);

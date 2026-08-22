@@ -2,6 +2,7 @@ export interface TempMailbox {
   readonly address: string;
   readonly password: string;
   readonly token: string;
+  readonly apiBase: string;
 }
 
 export interface MailMessageSummary {
@@ -24,6 +25,7 @@ export interface WaitForMessageOptions {
 
 export interface MailTmDomain {
   readonly domain: string;
+  readonly isActive?: boolean;
 }
 
 export interface MailTmHydraCollection<T> {

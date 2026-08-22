@@ -2,11 +2,11 @@ import { Timeouts } from '@constants/timeouts';
 import { isProductionEnv } from '@constants/environments';
 import { TEST_DATA } from '@data/index';
 import {
-  createTempMailbox,
   extractConfirmLink,
   waitForMessage,
 } from '@api/mail-tm/MailTmClient';
 import { test } from '@fixtures/test-fixtures';
+import { registerWithFreshMailbox, StagingMailerDownError } from '@helpers/email-account.helper';
 
 test.describe('Register email confirmation', () => {
   test.skip(isProductionEnv(), 'Do not create disposable accounts on production');
@@ -18,14 +18,15 @@ test.describe('Register email confirmation', () => {
   }) => {
     test.setTimeout(Timeouts.EmailFlow);
 
-    const mailbox = await test.step('Create temporary mailbox', async () => {
-      return createTempMailbox();
-    });
-
-    await test.step('Register with temp mailbox', async () => {
-      await registerPage.open();
-      await registerPage.register(mailbox.address, TEST_DATA.auth.password);
-      await registerPage.expectEmailConfirmation(mailbox.address);
+    const mailbox = await test.step('Register with temp mailbox', async () => {
+      try {
+        return await registerWithFreshMailbox(registerPage, TEST_DATA.auth.password);
+      } catch (error) {
+        if (error instanceof StagingMailerDownError) {
+          test.skip(true, error.message);
+        }
+        throw error;
+      }
     });
 
     const confirmUrl = await test.step('Wait for confirmation email', async () => {
@@ -49,14 +50,7 @@ test.describe('Register email confirmation', () => {
     await test.step('Login with confirmed account', async () => {
       await loginPage.open();
       await loginPage.login(mailbox.address, TEST_DATA.auth.password);
-
-      await Promise.race([
-        loginPage.expectLoginSuccess(),
-        loginPage.expectInvalidCredentials().then(() => {
-          throw new Error('Login rejected after confirmation — account may still be unverified');
-        }),
-      ]);
-
+      await loginPage.expectLoginSuccess();
       await header.expectLoggedIn();
     });
   });

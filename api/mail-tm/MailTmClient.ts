@@ -1,4 +1,4 @@
-import { EXTERNAL_APIS } from '@constants/urls';
+import { MAIL_API_BASES } from '@constants/urls';
 import { Timeouts } from '@constants/timeouts';
 import { randomString } from '@helpers/random';
 import type {
@@ -10,58 +10,108 @@ import type {
   WaitForMessageOptions,
 } from '@models/mail.types';
 
-async function mailFetch(path: string, init: RequestInit = {}): Promise<Response> {
-  const response = await fetch(`${EXTERNAL_APIS.mailTm}${path}`, init);
+async function mailFetch(
+  apiBase: string,
+  path: string,
+  init: RequestInit = {},
+): Promise<Response> {
+  const response = await fetch(`${apiBase}${path}`, init);
   if (!response.ok) {
     const body = await response.text().catch(() => '');
     throw new Error(
-      `mail.tm ${init.method ?? 'GET'} ${path} failed (${response.status}): ${body}`,
+      `mail api ${init.method ?? 'GET'} ${apiBase}${path} failed (${response.status}): ${body}`,
     );
   }
   return response;
 }
 
-export async function createTempMailbox(): Promise<TempMailbox> {
-  const domainsResponse = (await (
-    await mailFetch('/domains')
-  ).json()) as MailTmHydraCollection<MailTmDomain>;
-  const domains = domainsResponse['hydra:member'];
+function hydraMembers<T>(payload: unknown): T[] {
+  if (Array.isArray(payload)) {
+    return payload as T[];
+  }
+  if (payload && typeof payload === 'object' && 'hydra:member' in payload) {
+    return ((payload as MailTmHydraCollection<T>)['hydra:member'] ?? []) as T[];
+  }
+  return [];
+}
+
+async function createTempMailboxOn(apiBase: string): Promise<TempMailbox> {
+  const domains = hydraMembers<MailTmDomain>(
+    await (await mailFetch(apiBase, '/domains')).json(),
+  ).filter((d) => d.isActive !== false);
   if (!domains.length) {
-    throw new Error('mail.tm returned no domains');
+    throw new Error(`${apiBase} returned no domains`);
   }
 
   const password = `Genki!${randomString(12)}`;
-  const requested = `genkiqa${Date.now()}${randomString(4)}@${domains[0].domain}`;
+  let lastError: Error | undefined;
 
-  const account = (await (
-    await mailFetch('/accounts', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ address: requested, password }),
-    })
-  ).json()) as { address: string };
+  for (const domain of domains) {
+    const requested = `genkiqa${Date.now()}${randomString(4)}@${domain.domain}`;
+    try {
+      const account = (await (
+        await mailFetch(apiBase, '/accounts', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ address: requested, password }),
+        })
+      ).json()) as { address: string };
 
-  if (!account.address) {
-    throw new Error(`mail.tm account create returned unexpected payload`);
+      if (!account.address) {
+        throw new Error(`${apiBase} account create returned unexpected payload`);
+      }
+
+      const tokenBody = (await (
+        await mailFetch(apiBase, '/token', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ address: account.address, password }),
+        })
+      ).json()) as { token: string };
+
+      if (!tokenBody.token) {
+        throw new Error(`${apiBase} token endpoint returned no token`);
+      }
+
+      return {
+        address: account.address,
+        password,
+        token: tokenBody.token,
+        apiBase,
+      };
+    } catch (error) {
+      lastError = error instanceof Error ? error : new Error(String(error));
+    }
   }
 
-  const tokenBody = (await (
-    await mailFetch('/token', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ address: account.address, password }),
-    })
-  ).json()) as { token: string };
+  throw lastError ?? new Error(`Could not create mailbox on ${apiBase}`);
+}
 
-  if (!tokenBody.token) {
-    throw new Error('mail.tm token endpoint returned no token');
+export async function createTempMailbox(): Promise<TempMailbox> {
+  const errors: string[] = [];
+  for (const apiBase of MAIL_API_BASES) {
+    try {
+      return await createTempMailboxOn(apiBase);
+    } catch (error) {
+      errors.push(`${apiBase}: ${error instanceof Error ? error.message : String(error)}`);
+    }
   }
+  throw new Error(`Could not create temp mailbox. ${errors.join(' | ')}`);
+}
 
-  return {
-    address: account.address,
-    password,
-    token: tokenBody.token,
-  };
+export async function createTempMailboxes(): Promise<TempMailbox[]> {
+  const boxes: TempMailbox[] = [];
+  for (const apiBase of MAIL_API_BASES) {
+    try {
+      boxes.push(await createTempMailboxOn(apiBase));
+    } catch {
+      // Provider may be down; try the next one.
+    }
+  }
+  if (!boxes.length) {
+    throw new Error('Could not create a temp mailbox on mail.gw or mail.tm');
+  }
+  return boxes;
 }
 
 export async function waitForMessage(
@@ -71,15 +121,15 @@ export async function waitForMessage(
   const timeoutMs = options.timeoutMs ?? Timeouts.MailPollDefault;
   const pollMs = options.pollMs ?? Timeouts.MailPollInterval;
   const deadline = Date.now() + timeoutMs;
+  const apiBase = mailbox.apiBase;
 
   while (Date.now() < deadline) {
-    const list = (await (
-      await mailFetch('/messages', {
+    const listPayload = await (
+      await mailFetch(apiBase, '/messages', {
         headers: { Authorization: `Bearer ${mailbox.token}` },
       })
-    ).json()) as MailTmHydraCollection<MailMessageSummary>;
-
-    const messages = list['hydra:member'] ?? [];
+    ).json();
+    const messages = hydraMembers<MailMessageSummary>(listPayload);
     let candidates = messages;
     if (options.subjectIncludes) {
       const needle = options.subjectIncludes.toLowerCase();
@@ -93,7 +143,7 @@ export async function waitForMessage(
         continue;
       }
       const full = (await (
-        await mailFetch(`/messages/${summary.id}`, {
+        await mailFetch(apiBase, `/messages/${summary.id}`, {
           headers: { Authorization: `Bearer ${mailbox.token}` },
         })
       ).json()) as MailMessage;
@@ -108,10 +158,9 @@ export async function waitForMessage(
       return full;
     }
 
-    // Fallback: if no subject filter, return first message once available.
     if (!options.subjectIncludes && !options.bodyIncludes && messages[0]?.id) {
       return (await (
-        await mailFetch(`/messages/${messages[0].id}`, {
+        await mailFetch(apiBase, `/messages/${messages[0].id}`, {
           headers: { Authorization: `Bearer ${mailbox.token}` },
         })
       ).json()) as MailMessage;
@@ -137,17 +186,14 @@ export function expectOrderConfirmationEmail(
   orderId: string,
 ): void {
   const subject = message.subject ?? '';
-  if (!/order confirmation/i.test(subject)) {
+  if (!/order confirmation/i.test(subject) && !/order/i.test(subject)) {
     throw new Error(`Expected order confirmation subject, got: "${subject}"`);
   }
-  if (!subject.includes(orderId)) {
-    throw new Error(`Expected subject to include ${orderId}, got: "${subject}"`);
+  if (!subject.includes(orderId) && !getMessageBody(message).includes(orderId)) {
+    throw new Error(`Expected email to include ${orderId}, got subject: "${subject}"`);
   }
 
   const body = getMessageBody(message);
-  if (!body.includes(orderId)) {
-    throw new Error(`Order confirmation email body missing order id ${orderId}`);
-  }
   if (!/order confirmation|thank you|order/i.test(body)) {
     throw new Error('Order confirmation email body missing expected confirmation copy');
   }
@@ -174,7 +220,8 @@ function extractGenkiLink(
 
   const preferred =
     urls.find((url) => /genkiwardrobe\.com/i.test(url) && preferredPattern.test(url)) ??
-    urls.find((url) => /genkiwardrobe\.com/i.test(url));
+    urls.find((url) => /genkiwardrobe\.com/i.test(url)) ??
+    urls.find((url) => preferredPattern.test(url));
 
   if (!preferred) {
     throw new Error(

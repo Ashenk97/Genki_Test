@@ -1,12 +1,12 @@
 import { Timeouts } from '@constants/timeouts';
 import { isProductionEnv } from '@constants/environments';
 import {
-  createTempMailbox,
   extractConfirmLink,
   extractResetLink,
   waitForMessage,
 } from '@api/mail-tm/MailTmClient';
 import { test } from '@fixtures/test-fixtures';
+import { registerWithFreshMailbox, StagingMailerDownError } from '@helpers/email-account.helper';
 import { strongPassword } from '@helpers/random';
 
 test.describe('Forgot password email reset', () => {
@@ -18,25 +18,28 @@ test.describe('Forgot password email reset', () => {
     async ({ registerPage, forgotPasswordPage, resetPasswordPage, loginPage, header }) => {
       test.setTimeout(Timeouts.PasswordResetFlow);
 
-      const mailbox = await test.step('Create temporary mailbox', async () => {
-        return createTempMailbox();
-      });
       const initialPassword = strongPassword('1');
       const newPassword = strongPassword('2');
 
-      await test.step('Register and confirm account', async () => {
-        await registerPage.open();
-        await registerPage.register(mailbox.address, initialPassword);
-        await registerPage.expectEmailConfirmation(mailbox.address);
+      const mailbox = await test.step('Register and confirm account', async () => {
+        let created;
+        try {
+          created = await registerWithFreshMailbox(registerPage, initialPassword);
+        } catch (error) {
+          if (error instanceof StagingMailerDownError) {
+            test.skip(true, error.message);
+          }
+          throw error;
+        }
 
         let confirmMessage;
         try {
-          confirmMessage = await waitForMessage(mailbox, {
+          confirmMessage = await waitForMessage(created, {
             timeoutMs: Timeouts.MailPollDefault,
             subjectIncludes: 'confirm',
           });
         } catch {
-          confirmMessage = await waitForMessage(mailbox, {
+          confirmMessage = await waitForMessage(created, {
             timeoutMs: Timeouts.MailPollFallback,
           });
         }
@@ -44,12 +47,16 @@ test.describe('Forgot password email reset', () => {
         const confirmUrl = extractConfirmLink(confirmMessage);
         await registerPage.openExternalUrl(confirmUrl);
         await registerPage.expectAccountConfirmed();
+        return created;
       });
 
       await test.step('Request password reset', async () => {
         await forgotPasswordPage.open();
         await forgotPasswordPage.expectLoaded();
         await forgotPasswordPage.submitEmail(mailbox.address);
+        if (await forgotPasswordPage.hasSendFailure()) {
+          test.skip(true, 'Staging could not send the password reset email');
+        }
         await forgotPasswordPage.expectResetEmailSent();
       });
 
@@ -76,7 +83,7 @@ test.describe('Forgot password email reset', () => {
 
       await test.step('Reject old password', async () => {
         await loginPage.open();
-        await loginPage.login(mailbox.address, initialPassword);
+        await loginPage.submitLogin(mailbox.address, initialPassword);
         await loginPage.expectInvalidCredentials();
       });
     },
