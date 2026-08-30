@@ -43,8 +43,6 @@ async function expectCartHasEverySize(
 }
 
 test.describe('PDP variant matrix', () => {
-  test.describe.configure({ mode: 'parallel' });
-
   test.describe('White-only product', () => {
     test('should lock the single white color and show all sizes', async ({
       productDetailsPage,

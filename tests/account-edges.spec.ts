@@ -6,7 +6,6 @@ test.describe('Account edges', () => {
   test('should reject a reset-password link with an invalid token', async ({
     resetPasswordPage,
   }) => {
-    test.fail(true, 'GENKI: reset form does not reject a bogus token');
     await test.step('Open reset password with a bogus token', async () => {
       await resetPasswordPage.open(`${AppRoutes.ResetPassword}?token=invalid-qa-token`);
       await resetPasswordPage.expectInvalidOrExpiredToken();

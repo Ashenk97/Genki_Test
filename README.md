@@ -1,12 +1,10 @@
-<div align="center">
+# GENKI WARDROBE — E2E Test Automation
 
-<img src="https://readme-typing-svg.demolab.com?font=Fira+Code&weight=700&size=32&duration=2800&pause=1200&color=E11D48&center=true&vCenter=true&multiline=true&width=780&height=100&lines=GENKI+WARDROBE;%F0%9F%9A%80+E2E+Test+Automation" alt="Typing SVG" />
+![GENKI WARDROBE — E2E Test Automation](https://readme-typing-svg.demolab.com?font=Fira+Code&weight=700&size=32&duration=2800&pause=1200&color=E11D48&center=true&vCenter=true&multiline=true&width=780&height=100&lines=GENKI+WARDROBE;%F0%9F%9A%80+E2E+Test+Automation)
 
-### Production-ready UI tests for [Genki Wardrobe Staging](https://staging.genkiwardrobe.com/)
+## Production-ready UI tests for [Genki Wardrobe Staging](https://staging.genkiwardrobe.com/)
 
-**Playwright** · **TypeScript** · **Page Object Model** · **Chrome + mobile + cross-browser**
-
-<br/>
+**Playwright** · **TypeScript** · **Page Object Model** · **Chrome + mobile Chrome**
 
 ![Playwright](https://img.shields.io/badge/Playwright-2EAD33?style=for-the-badge&logo=playwright&logoColor=white)
 ![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white)
@@ -14,23 +12,19 @@
 ![POM](https://img.shields.io/badge/Pattern-Page%20Object%20Model-E11D48?style=for-the-badge)
 ![Allure](https://img.shields.io/badge/Reporting-Allure-FF6A00?style=for-the-badge)
 
-<br/>
-
 [![Staging](https://img.shields.io/badge/Target-staging.genkiwardrobe.com-black?style=flat-square)](https://staging.genkiwardrobe.com/)
 [![Status](https://img.shields.io/badge/Status-Active_Development-brightgreen?style=flat-square&logo=github)](https://github.com)
 [![License](https://img.shields.io/badge/License-Private-red?style=flat-square)](#license)
-
-</div>
 
 ---
 
 ## Why this suite
 
 | Feature | What you get |
-|:--------|:-------------|
+| :-------- | :------------- |
 | **POM + fixtures** | Locators/actions in `/pages`; specs stay thin via injected fixtures |
 | **Layered helpers** | Cart/checkout setup in `/helpers`; domain data in `/data` |
-| **Email flows** | mail.tm client for register confirm, password reset, order confirmation (`@email`) |
+| **Email flows** | AgentMail inboxes for register confirm, password reset, order confirmation (`@email`) |
 | **Payments** | COD, bank transfer, PayHere sandbox card success/decline paths |
 | **Failure forensics** | Trace · video · screenshot retained on fail |
 | **CI** | Daily GitHub Actions run with Allure report publish |
@@ -42,7 +36,7 @@
 ## Tech stack
 
 | Tool | Version | Purpose |
-|:-----|:-------:|:--------|
+| :----- | :-------: | :-------- |
 | [@playwright/test](https://playwright.dev/) | `^1.62.1` | Browser automation, assertions, reporting |
 | [TypeScript](https://www.typescriptlang.org/) | `^7.0.2` | Type-safe tests & page objects |
 | [allure-playwright](https://www.npmjs.com/package/allure-playwright) | `^3.10.2` | Allure results for CI reporting |
@@ -56,7 +50,7 @@ Path aliases (see `tsconfig.json`): `@pages/*`, `@fixtures/*`, `@helpers/*`, `@c
 
 ```text
 Genki_Test/
-├── api/mail-tm/              # Disposable inbox client (email specs)
+├── api/agentmail/            # AgentMail inbox client (email specs)
 ├── auth/                     # Reserved for Playwright storageState
 ├── constants/                # Routes, timeouts, payment enums, env config
 ├── data/                     # Auth, checkout, products, PayHere cards, nav copy
@@ -73,13 +67,13 @@ Genki_Test/
 ```
 
 | Folder | Purpose |
-|:-------|:--------|
+| :------- | :-------- |
 | **`/tests`** | `.spec.ts` scenarios by area (auth, cart, checkout, gift, nav, …) |
 | **`/pages`** | POM classes (inherit `BasePage`) |
 | **`/fixtures`** | Inject page objects; load `.env` / `.env.{TEST_ENV}` |
 | **`/helpers`** | Reusable flows (add sample product, start guest card checkout) |
 | **`/data`** | Test inputs and product paths |
-| **`/api`** | External APIs used by tests (mail.tm) |
+| **`/api`** | External APIs used by tests (AgentMail) |
 | **`/docs`** | Living test inventory |
 | **`/constants`** | Routes, messages, timeouts, payment methods |
 
@@ -99,12 +93,13 @@ Genki_Test/
 # 1. Install dependencies
 npm install
 
-# 2. Install Playwright browsers (first time only)
-npx playwright install
+# 2. Install Chrome for Playwright (first time only)
+npx playwright install chrome
 
-# 3. Configure env (staging credentials + optional checkout overrides)
+# 3. Configure env (staging credentials + AgentMail API key for @email)
 cp .env.example .env.staging
 # Edit GENKI_TEST_EMAIL / GENKI_TEST_PASSWORD / GENKI_TEST_DISPLAY_NAME
+# Edit AGENTMAIL_API_KEY (required for npm run test:email)
 
 # 4. Default suite — Chrome desktop + mobile-chrome, excludes @email
 npm test
@@ -122,23 +117,21 @@ npm run report
 ## NPM scripts
 
 | Command | Description |
-|:--------|:------------|
+| :-------- | :------------ |
 | `npm test` | Chrome + mobile-chrome, headless, **excludes** `@email` |
 | `npm run test:headed` | Same as `test`, headed |
 | `npm run test:chrome` | Desktop Chrome only (no `@email`) |
-| `npm run test:mobile` | `mobile-chrome` project (mobile nav specs) |
-| `npm run test:chromium` / `test:firefox` / `test:webkit` | Single engine, no `@email` |
-| `npm run test:all` | All configured projects, no `@email` |
-| `npm run test:staging` | Force `TEST_ENV=staging` |
-| `npm run test:production` | Force `TEST_ENV=production` |
-| `npm run test:email` | Staging only — specs tagged `@email` |
+| `npm run test:mobile` | `mobile-chrome` project (mobile nav / checkout specs) |
+| `npm run test:staging` | Force `TEST_ENV=staging` on Chrome + mobile-chrome |
+| `npm run test:production` | Force `TEST_ENV=production` on Chrome + mobile-chrome |
+| `npm run test:email` | Staging only — specs tagged `@email` (needs `AGENTMAIL_API_KEY`) |
 | `npm run typecheck` | `tsc --noEmit` |
 | `npm run report` | Open Playwright HTML report |
 | `npm run allure:generate` / `allure:open` / `allure:serve` | Allure report helpers |
 | `npm run codegen` | Record against staging |
 | `npm run docs:cases` | Regenerate `docs/test-cases.csv` |
 
-Email specs (`@email`) are **opt-in** via `npm run test:email` so disposable-inbox runs stay separate from the daily UI suite.
+Email specs (`@email`) are **opt-in** via `npm run test:email`. They create a throwaway AgentMail inbox, poll it for Genki mail, then delete the inbox.
 
 ---
 
@@ -147,15 +140,14 @@ Email specs (`@email`) are **opt-in** via `npm run test:email` so disposable-inb
 From `playwright.config.ts`:
 
 | Setting | Value |
-|:--------|:------|
+| :-------- | :------ |
 | Base URL | From `TEST_ENV` → staging or production (`constants/environments.ts`) |
-| Default projects | `chrome` (Desktop Chrome channel) + `mobile-chrome` (Pixel 7) |
-| Also available | `chromium`, `firefox`, `webkit` |
-| Parallelism | `fullyParallel: true` |
+| Projects | `setup` → `chrome` (Desktop Chrome) and `mobile-chrome` (Pixel 7). No other browsers. |
+| Parallelism | Parallel by default (`fullyParallel: true`). Specs that share the staging customer (`@shared-account`) stay serial and take a cross-worker lock. PayHere sandbox groups stay serial. |
 | Trace / video / screenshot | Retain / only on failure |
 | Reporters | HTML + Allure |
 
-**CI (`CI=1`):** `retries: 2`, `forbidOnly: true`, `workers: 2`. Daily workflow: `.github/workflows/daily-tests.yml`.
+**CI (`CI=1`):** `retries: 2`, `forbidOnly: true`, `workers: 4`. Daily workflow: `.github/workflows/daily-tests.yml`.
 
 ---
 
@@ -189,7 +181,7 @@ test('guest COD checkout', async ({ productDetailsPage, checkoutPage }) => {
 Inventory: [`docs/test-cases.csv`](./docs/test-cases.csv) (~95 cases; regenerate with `npm run docs:cases`). Details: [`docs/README.md`](./docs/README.md).
 
 | Area | Specs (examples) |
-|:-----|:-----------------|
+| :----- | :----------------- |
 | **Nav / chrome** | `home`, `main-nav`, `navigation`, `mobile-nav`, `top-bar`, `footer` |
 | **Auth** | `auth`, `register-email`, `forgot-password-email` |
 | **Catalog / PDP** | `collections`, `pdp`, `pdp-variants` (color × size matrix), `pdp-layout` (size wrap / overflow), `catalog-edges`, `search` (intentionally disabled) |
@@ -211,9 +203,11 @@ Product search is **disabled**. Desktop header and mobile menu must not expose a
 ## Docs
 
 | Doc | Purpose |
-|:----|:--------|
+| :---- | :-------- |
 | [`docs/test-cases.csv`](./docs/test-cases.csv) | Living case inventory |
 | [`docs/README.md`](./docs/README.md) | How to read / regenerate the CSV |
+| [`docs/staging-bugs-for-dev.md`](./docs/staging-bugs-for-dev.md) | Product bugs to share with development |
+| [`docs/staging-blocked-tests.md`](./docs/staging-blocked-tests.md) | Mailer skips and `@email` specs that do not run |
 
 ---
 
@@ -229,7 +223,7 @@ npx playwright show-trace test-results/<test-folder>/trace.zip
 ## Roadmap
 
 | Phase | Status | Focus |
-|:------|:------:|:------|
+| :------ | :------: | :------ |
 | **Core browse + PDP** | Done | Home, nav, collections, PDP, cart/wishlist |
 | **Auth + checkout + payments** | Done | Login/register/reset, COD/bank/PayHere, gift rules, email confirms |
 | **Hardening** | Planned | `storageState` reuse |
@@ -241,8 +235,4 @@ npx playwright show-trace test-results/<test-folder>/trace.zip
 
 **Private** — Genki Wardrobe QA Automation Project.
 
-<div align="center">
-
 ### Built with Playwright · Styled with Genki energy
-
-</div>

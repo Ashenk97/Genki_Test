@@ -1,9 +1,6 @@
 export const EXTERNAL_APIS = {
-  mailTm: 'https://api.mail.tm',
-  mailGw: 'https://api.mail.gw',
+  agentMail: 'https://api.agentmail.to',
 } as const;
-
-export const MAIL_API_BASES = [EXTERNAL_APIS.mailGw, EXTERNAL_APIS.mailTm] as const;
 
 export const SOCIAL_URLS = {
   facebook: 'https://facebook.com/genkiwardrobelk',

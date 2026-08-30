@@ -1,6 +1,7 @@
 import { Locator, Page, expect } from '@playwright/test';
 import { CART_PAGE } from '@data/navigation.data';
 import { AppRoutes } from '@constants/routes';
+import { Timeouts } from '@constants/timeouts';
 import { lkrAmountPattern } from '@helpers/string';
 import { BasePage } from '@pages/BasePage';
 
@@ -22,7 +23,7 @@ export class CartPage extends BasePage {
     this.emptyMessage = page.getByText(CART_PAGE.emptyMessage);
     this.shopNowLink = page.getByRole('link', { name: /shop now/i });
     this.proceedToCheckout = page.getByRole('link', { name: /proceed to checkout/i });
-    this.productRows = page.locator('table tbody tr').filter({
+    this.productRows = page.getByRole('table').first().locator('tbody tr').filter({
       has: page.locator('a[href^="/products/"]:not([href*="undefined"])'),
     });
     this.increaseQtyButton = this.productRows.first().getByRole('button', { name: /^\+$/ })
@@ -31,7 +32,7 @@ export class CartPage extends BasePage {
     this.decreaseQtyButton = this.productRows.first().getByRole('button', { name: /^−$|^-$/ })
       .or(this.productRows.first().locator('button.dec.qtybutton'))
       .or(this.productRows.first().locator('button.qtybutton').filter({ hasText: /^-$/ }));
-    this.removeButtons = page.locator('table tbody tr td:last-child button');
+    this.removeButtons = this.productRows.locator('td:last-child button');
     this.drawer = page.locator('.cart-overlay');
     this.drawerCheckout = this.drawer.getByRole('link', { name: /^checkout$/i });
   }
@@ -52,6 +53,10 @@ export class CartPage extends BasePage {
 
   async expectItemCount(count: number): Promise<void> {
     await expect(this.productRows).toHaveCount(count);
+  }
+
+  async getItemCount(): Promise<number> {
+    return this.productRows.count();
   }
 
   async expectLineContains(text: string | RegExp): Promise<void> {
@@ -135,17 +140,55 @@ export class CartPage extends BasePage {
     ).toHaveValue(String(quantity));
   }
 
+  async removeFirstLine(): Promise<void> {
+    await this.productRows.first().locator('td:last-child button').click();
+  }
+
+  async waitUntilReady(): Promise<void> {
+    await this.expectLoaded();
+    await this.page.waitForLoadState('networkidle').catch(() => undefined);
+    await expect
+      .poll(async () => {
+        const empty = await this.emptyMessage.isVisible().catch(() => false);
+        const rows = await this.productRows.count();
+        return empty || rows > 0;
+      }, { timeout: Timeouts.MediumUi })
+      .toBe(true);
+  }
+
+  private async isEmpty(): Promise<boolean> {
+    return (
+      (await this.emptyMessage.isVisible().catch(() => false)) &&
+      (await this.productRows.count()) === 0
+    );
+  }
+
   async clearCart(): Promise<void> {
-    for (let i = 0; i < 10; i += 1) {
-      const count = await this.removeButtons.count();
-      if (count === 0) {
-        break;
+    for (let attempt = 0; attempt < 4; attempt += 1) {
+      await this.waitUntilReady();
+      for (let i = 0; i < 15; i += 1) {
+        if (await this.isEmpty()) {
+          break;
+        }
+        const count = await this.productRows.count();
+        if (count === 0) {
+          break;
+        }
+        await this.productRows.first().locator('td:last-child button').click();
+        await expect
+          .poll(async () => this.productRows.count(), { timeout: 8_000 })
+          .toBeLessThan(count);
       }
-      await this.removeButtons.first().click();
-      await expect
-        .poll(async () => this.removeButtons.count(), { timeout: 5_000 })
-        .toBeLessThan(count);
+      await this.page.reload();
+      await this.waitForPageLoad();
+      await this.acceptCookiesIfVisible();
+      await this.waitUntilReady();
+      if (await this.isEmpty()) {
+        return;
+      }
     }
+    await this.expectEmpty();
+    await expect(this.productRows).toHaveCount(0);
   }
 
   async proceedToCheckoutPage(): Promise<void> {

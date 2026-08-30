@@ -118,7 +118,7 @@ test.describe('Theme collection empty states', () => {
   }
 });
 
-test.describe('Wishlist persistence', () => {
+test.describe('Wishlist persistence', { tag: '@shared-account' }, () => {
   test('should keep wishlist items after login', async ({
     productDetailsPage,
     wishlistPage,

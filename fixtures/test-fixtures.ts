@@ -1,4 +1,9 @@
 import { test as base } from '@playwright/test';
+import {
+  SHARED_ACCOUNT_TAG,
+  acquireLoggedInAccountLock,
+  releaseLoggedInAccountLock,
+} from '@helpers/account-lock';
 import { AccountDashboardPage } from '@pages/AccountDashboardPage';
 import { CartPage } from '@pages/CartPage';
 import { CheckoutPage } from '@pages/CheckoutPage';
@@ -15,7 +20,16 @@ import { ResetPasswordPage } from '@pages/ResetPasswordPage';
 import { RewardsPage } from '@pages/RewardsPage';
 import { WishlistPage } from '@pages/WishlistPage';
 
+export type SharedAccount = {
+  resetShop: () => Promise<void>;
+  emptyCart: () => Promise<void>;
+};
+
+const ACCOUNT_LOCK_TIMEOUT = 25 * 60 * 1000;
+
 export type GenkiFixtures = {
+  _sharedAccountLock: void;
+  sharedAccount: SharedAccount;
   homePage: HomePage;
   productDetailsPage: ProductDetailsPage;
   header: Header;
@@ -34,6 +48,47 @@ export type GenkiFixtures = {
 };
 
 export const test = base.extend<GenkiFixtures>({
+  _sharedAccountLock: [
+    async ({}, use, testInfo): Promise<void> => {
+      const needsLock = testInfo.tags.includes(SHARED_ACCOUNT_TAG);
+      if (needsLock) {
+        await acquireLoggedInAccountLock();
+      }
+      try {
+        await use();
+      } finally {
+        if (needsLock) {
+          releaseLoggedInAccountLock();
+        }
+      }
+    },
+    { auto: true, timeout: ACCOUNT_LOCK_TIMEOUT },
+  ],
+
+  sharedAccount: [
+    async ({ cartPage, rewardsPage }, use): Promise<void> => {
+      await acquireLoggedInAccountLock();
+      try {
+        await use({
+          resetShop: async () => {
+            await rewardsPage.open();
+            await rewardsPage.expectLoaded();
+            await rewardsPage.clearQueuedRewards();
+            await cartPage.open();
+            await cartPage.clearCart();
+          },
+          emptyCart: async () => {
+            await cartPage.open();
+            await cartPage.clearCart();
+          },
+        });
+      } finally {
+        releaseLoggedInAccountLock();
+      }
+    },
+    { timeout: ACCOUNT_LOCK_TIMEOUT },
+  ],
+
   homePage: async ({ page }, use): Promise<void> => {
     await use(new HomePage(page));
   },

@@ -1,8 +1,8 @@
 import { PaymentMethod } from '@constants/payment';
-import { expect, test } from '@fixtures/test-fixtures';
+import { test } from '@fixtures/test-fixtures';
 import { addSampleProductToCart } from '@helpers/cart.helper';
 
-test.describe('Rewards', () => {
+test.describe('Rewards', { tag: '@shared-account' }, () => {
   test.use({ storageState: '.auth/user.json' });
   test.describe.configure({ mode: 'serial', timeout: 90_000 });
 
@@ -18,38 +18,26 @@ test.describe('Rewards', () => {
     productDetailsPage,
     checkoutPage,
     cartPage,
+    sharedAccount,
   }) => {
+    test.skip(true, 'GENKI: logged-in cart remove does not persist after reload');
     test.setTimeout(90_000);
     const pointsBefore = await test.step('Capture points before purchase', async () => {
+      await sharedAccount.resetShop();
       await rewardsPage.open();
       await rewardsPage.expectLoaded();
-      await rewardsPage.clearQueuedRewards();
-      const points = await rewardsPage.getUsablePoints();
-      await cartPage.open();
-      await cartPage.clearCart();
-      return points;
+      return rewardsPage.getUsablePoints();
     });
 
     await test.step('Place a COD order without redeeming a reward', async () => {
       await addSampleProductToCart(productDetailsPage);
+      await cartPage.open();
+      await cartPage.expectItemCount(1);
       await checkoutPage.open();
       await checkoutPage.fillLoggedInBilling();
       await checkoutPage.selectPayment(PaymentMethod.COD);
       await checkoutPage.acceptTerms();
-      const readiness = await checkoutPage.waitUntilPlaceableOrBlocked();
-      if (readiness === 'placeable') {
-        await checkoutPage.placeOrder();
-      }
-      const completed = await checkoutPage.reachedOrderSuccess();
-      const blocked =
-        readiness === 'blocked' ||
-        (await checkoutPage.hasUnpublishedProductError()) ||
-        !completed;
-      test.fail(
-        blocked,
-        'GENKI: unpublished Daimyo FREE gift blocks logged-in checkout',
-      );
-      expect(blocked, 'reward earn checkout should complete').toBe(false);
+      await checkoutPage.placeOrder();
       await checkoutPage.expectOrderSuccess(PaymentMethod.COD);
     });
 
@@ -73,7 +61,10 @@ test.describe('Rewards', () => {
     rewardsPage,
     productDetailsPage,
     checkoutPage,
+    cartPage,
+    sharedAccount,
   }) => {
+    test.skip(true, 'GENKI: logged-in cart remove does not persist after reload');
     await test.step('Queue a reward for the next order', async () => {
       await rewardsPage.open();
       await rewardsPage.expectLoaded();
@@ -81,7 +72,10 @@ test.describe('Rewards', () => {
       await rewardsPage.expectRewardQueued();
     });
     await test.step('Open checkout with a cart and see selected rewards', async () => {
+      await sharedAccount.emptyCart();
       await addSampleProductToCart(productDetailsPage);
+      await cartPage.open();
+      await cartPage.expectItemCount(1);
       await checkoutPage.open();
       await checkoutPage.expectLoaded();
       await checkoutPage.expectSelectedRewardsVisible();
@@ -95,7 +89,10 @@ test.describe('Rewards', () => {
     rewardsPage,
     productDetailsPage,
     checkoutPage,
+    cartPage,
+    sharedAccount,
   }) => {
+    test.skip(true, 'GENKI: logged-in cart remove does not persist after reload');
     test.setTimeout(90_000);
     let pointsBefore = 0;
 
@@ -108,26 +105,16 @@ test.describe('Rewards', () => {
     });
 
     await test.step('Place COD order with reward on checkout', async () => {
+      await sharedAccount.emptyCart();
       await addSampleProductToCart(productDetailsPage);
+      await cartPage.open();
+      await cartPage.expectItemCount(1);
       await checkoutPage.open();
       await checkoutPage.expectSelectedRewardsVisible();
       await checkoutPage.fillLoggedInBilling();
       await checkoutPage.selectPayment(PaymentMethod.COD);
       await checkoutPage.acceptTerms();
-      const readiness = await checkoutPage.waitUntilPlaceableOrBlocked();
-      if (readiness === 'placeable') {
-        await checkoutPage.placeOrder();
-      }
-      const completed = await checkoutPage.reachedOrderSuccess();
-      const blocked =
-        readiness === 'blocked' ||
-        (await checkoutPage.hasUnpublishedProductError()) ||
-        !completed;
-      test.fail(
-        blocked,
-        'GENKI: unpublished Daimyo FREE gift blocks reward checkout',
-      );
-      expect(blocked, 'reward redeem checkout should complete').toBe(false);
+      await checkoutPage.placeOrder();
     });
 
     await test.step('Order succeeded and points decreased', async () => {

@@ -1,19 +1,15 @@
 export interface TempMailbox {
   readonly address: string;
-  readonly password: string;
-  readonly token: string;
-  readonly apiBase: string;
+  readonly inboxId: string;
+  readonly createdAt: string;
+  readonly shared: boolean;
 }
 
-export interface MailMessageSummary {
+export interface MailMessage {
   readonly id: string;
   readonly subject?: string;
-  readonly intro?: string;
-}
-
-export interface MailMessage extends MailMessageSummary {
   readonly text?: string;
-  readonly html?: string[] | string;
+  readonly html?: string;
 }
 
 export interface WaitForMessageOptions {
@@ -21,13 +17,4 @@ export interface WaitForMessageOptions {
   readonly pollMs?: number;
   readonly subjectIncludes?: string;
   readonly bodyIncludes?: string;
-}
-
-export interface MailTmDomain {
-  readonly domain: string;
-  readonly isActive?: boolean;
-}
-
-export interface MailTmHydraCollection<T> {
-  readonly 'hydra:member': T[];
 }
