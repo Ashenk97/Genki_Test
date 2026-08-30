@@ -19,9 +19,16 @@
       "problemMatcher": []
     },
     {
-      "label": "test:all",
+      "label": "test:chrome",
       "type": "shell",
-      "command": "npm run test:all",
+      "command": "npm run test:chrome",
+      "group": "test",
+      "problemMatcher": []
+    },
+    {
+      "label": "test:mobile",
+      "type": "shell",
+      "command": "npm run test:mobile",
       "group": "test",
       "problemMatcher": []
     },

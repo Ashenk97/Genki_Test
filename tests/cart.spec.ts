@@ -117,15 +117,18 @@ test.describe('Cart', () => {
     });
   });
 
-  test.describe('logged-in cart', () => {
+  test.describe('logged-in cart', { tag: '@shared-account' }, () => {
     test.use({ storageState: '.auth/user.json' });
+    test.describe.configure({ mode: 'serial' });
 
     test('should persist cart items for a logged-in customer after reload', async ({
       productDetailsPage,
       cartPage,
       header,
+      sharedAccount,
     }) => {
       await test.step('Add a product while signed in', async () => {
+        void sharedAccount;
         await addSampleProductToCart(productDetailsPage);
       });
       await test.step('Reload and confirm cart still has items', async () => {
@@ -135,6 +138,30 @@ test.describe('Cart', () => {
         await cartPage.open();
         await cartPage.expectHasItems();
         await header.expectCartBadgeHasItems();
+      });
+    });
+
+    test('should keep the cart empty after removing a line and reloading', async ({
+      productDetailsPage,
+      cartPage,
+      sharedAccount,
+    }) => {
+      test.skip(true, 'GENKI: logged-in cart remove does not persist after reload');
+      await test.step('Ensure the cart has a line to remove', async () => {
+        void sharedAccount;
+        await cartPage.open();
+        await cartPage.waitUntilReady();
+        if ((await cartPage.getItemCount()) === 0) {
+          await addSampleProductToCart(productDetailsPage);
+          await cartPage.open();
+          await cartPage.waitUntilReady();
+        }
+      });
+      await test.step('Remove the line, then reload', async () => {
+        await cartPage.removeFirstLine();
+        await cartPage.page.reload();
+        await cartPage.waitUntilReady();
+        await cartPage.expectEmpty();
       });
     });
   });

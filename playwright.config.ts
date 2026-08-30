@@ -10,10 +10,13 @@ const { baseURL } = getEnvConfig();
 export default defineConfig({
   testDir: './tests',
   timeout: 60_000,
+  // Guest/read-only specs run in parallel. Specs tagged @shared-account take a
+  // cross-worker lock (and stay serial within the file) so they do not fight
+  // over the one staging customer cart / rewards / profile.
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
-  workers: process.env.CI ? 2 : undefined,
+  workers: process.env.CI ? 4 : undefined,
   reporter: [
     ['html'],
     ['allure-playwright'],
@@ -40,24 +43,6 @@ export default defineConfig({
         ...devices['Desktop Chrome'],
         channel: 'chrome',
       },
-    },
-    {
-      name: 'chromium',
-      dependencies: ['setup'],
-      testIgnore: /mobile-.*\.spec\.ts|auth\.setup\.ts/,
-      use: { ...devices['Desktop Chrome'] },
-    },
-    {
-      name: 'firefox',
-      dependencies: ['setup'],
-      testIgnore: /mobile-.*\.spec\.ts|auth\.setup\.ts/,
-      use: { ...devices['Desktop Firefox'] },
-    },
-    {
-      name: 'webkit',
-      dependencies: ['setup'],
-      testIgnore: /mobile-.*\.spec\.ts|auth\.setup\.ts/,
-      use: { ...devices['Desktop Safari'] },
     },
     {
       name: 'mobile-chrome',

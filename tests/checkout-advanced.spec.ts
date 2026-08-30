@@ -8,8 +8,6 @@ import { test } from '@fixtures/test-fixtures';
 import { addSampleProductToCart, addSecondaryProductToCart } from '@helpers/cart.helper';
 
 test.describe('Checkout advanced flows', () => {
-  test.describe.configure({ mode: 'parallel' });
-
   test('should place a COD order with a separate shipping address', { tag: '@checkout' }, async ({
     productDetailsPage,
     checkoutPage,
@@ -76,8 +74,6 @@ test.describe('Checkout advanced flows', () => {
 });
 
 test.describe('Gift checkout', () => {
-  test.describe.configure({ mode: 'parallel' });
-
   test(
     'should disable COD for gift orders while keeping card and bank available',
     { tag: '@checkout' },
@@ -250,7 +246,7 @@ test.describe('Guest cart session', () => {
     });
   });
 
-  test('should merge guest cart into the account after login', async ({
+  test('should merge guest cart into the account after login', { tag: '@shared-account' }, async ({
     productDetailsPage,
     cartPage,
     loginPage,
@@ -298,8 +294,6 @@ test.describe('PayHere abandon', () => {
 });
 
 test.describe('Free delivery at checkout', () => {
-  test.describe.configure({ mode: 'parallel' });
-
   test('should show remaining amount at checkout when subtotal is below LKR 5,000', async ({
     productDetailsPage,
     checkoutPage,

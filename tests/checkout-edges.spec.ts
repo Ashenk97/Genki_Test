@@ -8,7 +8,6 @@ test.describe('Checkout edges', () => {
     productDetailsPage,
     checkoutPage,
   }) => {
-    test.fail(true, 'GENKI: checkout accepts a non-numeric phone number');
     await test.step('Fill billing with a non-phone value', async () => {
       await addSampleProductToCart(productDetailsPage);
       await checkoutPage.open();

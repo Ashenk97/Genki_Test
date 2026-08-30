@@ -58,7 +58,7 @@ add('Login', 'Session persists after reload', 'Session persistence', 'P1', 'regr
 add('Lost Password', 'Email required on forgot password', 'Required email', 'P1', 'regression,auth', 'On forgot password', '1. Submit empty', 'Email required', 'Covered');
 add('Lost Password', 'Send password reset email message', 'Reset request success copy', 'P0', 'smoke,auth', 'On forgot password', '1. Submit known email', 'Password reset email sent message', 'Covered');
 add('Lost Password', 'Back to login from forgot password', 'Return link', 'P2', 'regression,auth', 'On forgot password', '1. Click back to login', 'Login page', 'Covered');
-add('Lost Password', 'Complete reset via email link', 'End-to-end reset with temp mailbox', 'P0', 'smoke,auth,@email', 'Staging; mail.tm disposable inbox', '1. Register+confirm temp user 2. Request reset 3. Open email link 4. Set new password 5. Login with new password; old password fails', 'Password updated; login succeeds with new password only', 'Covered');
+add('Lost Password', 'Complete reset via email link', 'End-to-end reset with temp mailbox', 'P0', 'smoke,auth,@email', 'Staging; AgentMail inbox', '1. Register+confirm temp user 2. Request reset 3. Open email link 4. Set new password 5. Login with new password; old password fails', 'Password updated; login succeeds with new password only', 'Covered');
 
 add('Register', 'Open register from login', 'Register link', 'P0', 'smoke,auth', 'On login', '1. Click register here', '/register', 'Covered');
 add('Register', 'Link back to login', 'Login link on register', 'P2', 'regression,auth', 'On register', '1. Click login link', '/login', 'Covered');
@@ -68,7 +68,7 @@ add('Register', 'Password rules when missing', 'Password rules', 'P1', 'regressi
 add('Register', 'Weak password rules', 'Weak password', 'P1', 'regression,auth', 'On register', '1. Weak password', 'Rule messages', 'Covered');
 add('Register', 'Already registered email', 'Duplicate email', 'P1', 'regression,auth', 'Existing account email', '1. Register existing', 'Already taken', 'Covered');
 add('Register', 'New register shows email confirmation', 'Confirmation page', 'P0', 'smoke,auth', 'Fresh email', '1. Register valid user', 'Email confirmation page', 'Covered');
-add('Register', 'Confirm email and login', 'Full email confirm', 'P0', 'smoke,auth,@email', 'mail.tm on staging', '1. Register 2. Confirm link 3. Login', 'Account active', 'Covered');
+add('Register', 'Confirm email and login', 'Full email confirm', 'P0', 'smoke,auth,@email', 'AgentMail inbox on staging', '1. Register 2. Confirm link 3. Login', 'Account active', 'Covered');
 
 add('Home', 'Homepage loads with title and featured heading', 'Home smoke', 'P0', 'smoke,home', 'None', '1. Open /', 'Title Genki; featured heading visible', 'Covered');
 add('Search', 'Desktop search is disabled', 'Search hidden by requirement', 'P0', 'smoke,search', 'Desktop homepage', '1. Open / 2. Inspect header', 'No search control, overlay, or search input', 'Covered');
@@ -168,7 +168,7 @@ add('Checkout', 'Place order COD guest', 'Full COD order', 'P0', 'smoke,checkout
 add('Checkout', 'Create account at checkout COD', 'Guest create-account order', 'P0', 'smoke,checkout,auth', 'Guest cart; new email', '1. Check Create an account 2. Password 3. COD place order 4. Log in', 'order-success COD; account can log in', 'Covered');
 add('Checkout', 'Free delivery remaining under 5000', 'Checkout below threshold', 'P0', 'smoke,checkout', 'Qty 1 of LKR 3490 SKU', '1. Open checkout', 'You are LKR 1,510 away from free delivery', 'Covered');
 add('Checkout', 'Free delivery unlocked over 5000', 'Checkout above threshold', 'P0', 'smoke,checkout', 'Qty 2 of LKR 3490 SKU', '1. Open checkout', 'Free delivery unlocked on this order', 'Covered');
-add('Checkout', 'Order confirmation email after guest COD', 'Order confirmation email', 'P0', 'smoke,checkout,@email', 'Staging; mail.tm disposable inbox', '1. Place guest COD with temp email 2. Poll inbox for Order Confirmation', 'Email subject Order Confirmation #GK-*; body includes order id', 'Covered');
+add('Checkout', 'Order confirmation email after guest COD', 'Order confirmation email', 'P0', 'smoke,checkout,@email', 'Staging; AgentMail inbox', '1. Place guest COD with temp email 2. Poll inbox for Order Confirmation', 'Email subject Order Confirmation #GK-*; body includes order id', 'Covered');
 add('Checkout', 'Place order bank transfer guest', 'Full bank order', 'P0', 'smoke,checkout,payment', 'Guest cart', '1. Fill billing 2. Bank 3. Place order', 'order-success BankTransfer with bank details', 'Covered');
 add('Checkout', 'Gift order disables COD keeps card and bank', 'Gift payment rules', 'P0', 'smoke,checkout,gift', 'Guest cart', '1. Check This order is a gift', 'COD disabled with not-available copy; Card and Bank enabled; gift message shown', 'Covered');
 add('Checkout', 'Gift clears previously selected COD', 'Gift deselects COD', 'P1', 'regression,checkout,gift', 'Guest cart; COD selected', '1. Select COD 2. Enable gift', 'COD unchecked and disabled; no payment selected', 'Covered');

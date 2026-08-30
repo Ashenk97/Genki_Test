@@ -2,7 +2,7 @@ import { AppRoutes } from '@constants/routes';
 import { TEST_DATA } from '@data/index';
 import { expect, test } from '@fixtures/test-fixtures';
 
-test.describe('Profile', () => {
+test.describe('Profile', { tag: '@shared-account' }, () => {
   test.use({ storageState: '.auth/user.json' });
   test.describe.configure({ mode: 'serial', timeout: 90_000 });
 

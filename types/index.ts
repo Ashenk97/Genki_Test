@@ -14,11 +14,8 @@ export type {
 } from './checkout.types';
 export type {
   TempMailbox,
-  MailMessageSummary,
   MailMessage,
   WaitForMessageOptions,
-  MailTmDomain,
-  MailTmHydraCollection,
 } from './mail.types';
 export type {
   AuthCredentials,

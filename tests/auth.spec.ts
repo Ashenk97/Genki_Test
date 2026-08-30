@@ -27,7 +27,7 @@ test.describe('Remember me', () => {
     });
   });
 
-  test.describe('session persistence', () => {
+  test.describe('session persistence', { tag: '@shared-account' }, () => {
     test.use({ storageState: '.auth/user.json' });
 
     test('should stay signed in after reload', async ({ header, homePage }) => {
@@ -50,7 +50,6 @@ test.describe('Remember me', () => {
 });
 
 test.describe('Customer login', () => {
-  test.describe.configure({ mode: 'serial', timeout: 90_000 });
   test('should open the login page from the header', async ({ header, loginPage }) => {
     await test.step('Open home as guest', async () => {
       await header.openHome();
@@ -62,26 +61,27 @@ test.describe('Customer login', () => {
     });
   });
 
-  test('should sign in and land on the homepage with Logout in the header', async ({
-    loginPage,
-    header,
-    homePage,
-  }) => {
-    await test.step('Open login while logged out', async () => {
-      await loginPage.open();
-      await loginPage.expectLoaded();
-      await header.expectLoggedOut();
-    });
-    await test.step('Sign in with valid credentials', async () => {
-      await loginPage.login(TEST_DATA.auth.email, TEST_DATA.auth.password);
-      await loginPage.expectLoginSuccess();
-      await homePage.expectLoaded();
-      await header.expectLoggedIn(TEST_DATA.auth.displayName);
-    });
-  });
+  test(
+    'should sign in and land on the homepage with Logout in the header',
+    { tag: '@shared-account' },
+    async ({ loginPage, header, homePage }) => {
+      await test.step('Open login while logged out', async () => {
+        await loginPage.open();
+        await loginPage.expectLoaded();
+        await header.expectLoggedOut();
+      });
+      await test.step('Sign in with valid credentials', async () => {
+        await loginPage.login(TEST_DATA.auth.email, TEST_DATA.auth.password);
+        await loginPage.expectLoginSuccess();
+        await homePage.expectLoaded();
+        await header.expectLoggedIn(TEST_DATA.auth.displayName);
+      });
+    },
+  );
 
-  test.describe('signed-in header', () => {
+  test.describe('signed-in header', { tag: '@shared-account' }, () => {
     test.use({ storageState: '.auth/user.json' });
+    test.describe.configure({ mode: 'serial' });
 
     test('should restore the Login link after Logout', async ({ header, homePage }) => {
       await test.step('Open home while signed in', async () => {
@@ -183,7 +183,7 @@ test.describe('Customer login', () => {
     });
   });
 
-  test('should reject a wrong password with an error toast', async ({ loginPage, header }) => {
+  test('should reject a wrong password with an error toast', { tag: '@shared-account' }, async ({ loginPage, header }) => {
     await test.step('Attempt login with wrong password', async () => {
       await loginPage.open();
       await loginPage.expectLoaded();
@@ -215,7 +215,7 @@ test.describe('Forgot password', () => {
     });
   });
 
-  test('should send a password reset email message', async ({ forgotPasswordPage, header }) => {
+  test('should send a password reset email message', { tag: '@shared-account' }, async ({ forgotPasswordPage, header }) => {
     await test.step('Request password reset', async () => {
       await forgotPasswordPage.open();
       await forgotPasswordPage.expectLoaded();
