@@ -33,7 +33,6 @@ test.describe('PDP layout', () => {
     page,
     productDetailsPage,
   }) => {
-    test.skip(true, 'GENKI: wrapped size chips have no row gap');
     await page.setViewportSize({ width: 1024, height: 768 });
     await productDetailsPage.open(WHITE_ONLY_PRODUCT.path);
     await productDetailsPage.expectListedSizes(WHITE_ONLY_PRODUCT.sizes);
@@ -44,7 +43,6 @@ test.describe('PDP layout', () => {
     page,
     productDetailsPage,
   }) => {
-    test.skip(true, 'GENKI: wrapped size chips have no row gap');
     await page.setViewportSize({ width: 390, height: 844 });
     await productDetailsPage.open(WHITE_ONLY_PRODUCT.path);
     await productDetailsPage.expectListedSizes(WHITE_ONLY_PRODUCT.sizes);

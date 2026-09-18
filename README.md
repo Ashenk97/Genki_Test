@@ -206,8 +206,7 @@ Product search is **disabled**. Desktop header and mobile menu must not expose a
 | :---- | :-------- |
 | [`docs/test-cases.csv`](./docs/test-cases.csv) | Living case inventory |
 | [`docs/README.md`](./docs/README.md) | How to read / regenerate the CSV |
-| [`docs/staging-bugs-for-dev.md`](./docs/staging-bugs-for-dev.md) | Product bugs to share with development |
-| [`docs/staging-blocked-tests.md`](./docs/staging-blocked-tests.md) | Mailer skips and `@email` specs that do not run |
+| [`docs/staging-blocked-tests.md`](./docs/staging-blocked-tests.md) | Mailer and admin/ops skips; `@email` specs that do not run |
 
 ---
 

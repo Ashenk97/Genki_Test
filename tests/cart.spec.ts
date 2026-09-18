@@ -146,7 +146,6 @@ test.describe('Cart', () => {
       cartPage,
       sharedAccount,
     }) => {
-      test.skip(true, 'GENKI: logged-in cart remove does not persist after reload');
       await test.step('Ensure the cart has a line to remove', async () => {
         void sharedAccount;
         await cartPage.open();

@@ -20,7 +20,7 @@ test.describe('Rewards', { tag: '@shared-account' }, () => {
     cartPage,
     sharedAccount,
   }) => {
-    test.skip(true, 'GENKI: logged-in cart remove does not persist after reload');
+    test.skip(true, 'Staging admin: purchase does not credit usable points');
     test.setTimeout(90_000);
     const pointsBefore = await test.step('Capture points before purchase', async () => {
       await sharedAccount.resetShop();
@@ -64,7 +64,6 @@ test.describe('Rewards', { tag: '@shared-account' }, () => {
     cartPage,
     sharedAccount,
   }) => {
-    test.skip(true, 'GENKI: logged-in cart remove does not persist after reload');
     await test.step('Queue a reward for the next order', async () => {
       await rewardsPage.open();
       await rewardsPage.expectLoaded();
@@ -92,7 +91,6 @@ test.describe('Rewards', { tag: '@shared-account' }, () => {
     cartPage,
     sharedAccount,
   }) => {
-    test.skip(true, 'GENKI: logged-in cart remove does not persist after reload');
     test.setTimeout(90_000);
     let pointsBefore = 0;
 

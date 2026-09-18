@@ -141,7 +141,54 @@ export class CartPage extends BasePage {
   }
 
   async removeFirstLine(): Promise<void> {
+    const backendCleared = (await this.isSignedIn())
+      ? this.waitForEmptyCartSync()
+      : Promise.resolve();
     await this.productRows.first().locator('td:last-child button').click();
+    await this.expectEmpty();
+    await this.waitUntilPersistedCartEmpty();
+    await backendCleared;
+  }
+
+  async persistedCartItemCount(): Promise<number> {
+    return this.page.evaluate(() => {
+      const raw = localStorage.getItem('persist:genki');
+      if (!raw) {
+        return 0;
+      }
+      try {
+        const root = JSON.parse(raw) as { cart?: string | { cartItems?: unknown[] } };
+        const cart = typeof root.cart === 'string' ? JSON.parse(root.cart) : root.cart;
+        return Array.isArray(cart?.cartItems) ? cart.cartItems.length : 0;
+      } catch {
+        return -1;
+      }
+    });
+  }
+
+  async waitUntilPersistedCartEmpty(): Promise<void> {
+    await expect
+      .poll(async () => this.persistedCartItemCount(), { timeout: Timeouts.MediumUi })
+      .toBe(0);
+  }
+
+  private async isSignedIn(): Promise<boolean> {
+    return this.page.getByRole('button', { name: /^logout$/i }).isVisible().catch(() => false);
+  }
+
+  private waitForEmptyCartSync() {
+    return this.page.waitForResponse(
+      (res) => {
+        if (!res.url().includes('/api/cart/create-cart-with-items')) {
+          return false;
+        }
+        if (res.request().method() !== 'POST' || !res.ok()) {
+          return false;
+        }
+        return /"items"\s*:\s*\[\s*\]/.test(res.request().postData() ?? '');
+      },
+      { timeout: Timeouts.MediumUi },
+    );
   }
 
   async waitUntilReady(): Promise<void> {
@@ -166,6 +213,11 @@ export class CartPage extends BasePage {
   async clearCart(): Promise<void> {
     for (let attempt = 0; attempt < 4; attempt += 1) {
       await this.waitUntilReady();
+      const alreadyEmpty = await this.isEmpty();
+      const backendCleared =
+        alreadyEmpty || !(await this.isSignedIn())
+          ? Promise.resolve()
+          : this.waitForEmptyCartSync();
       for (let i = 0; i < 15; i += 1) {
         if (await this.isEmpty()) {
           break;
@@ -178,6 +230,10 @@ export class CartPage extends BasePage {
         await expect
           .poll(async () => this.productRows.count(), { timeout: 8_000 })
           .toBeLessThan(count);
+      }
+      if (await this.isEmpty()) {
+        await this.waitUntilPersistedCartEmpty();
+        await backendCleared;
       }
       await this.page.reload();
       await this.waitForPageLoad();

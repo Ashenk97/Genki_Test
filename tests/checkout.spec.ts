@@ -99,7 +99,6 @@ test.describe('Checkout', () => {
         cartPage,
         sharedAccount,
       }) => {
-        test.skip(true, 'GENKI: logged-in cart remove does not persist after reload');
         await test.step('Clear rewards queue and cart', async () => {
           await sharedAccount.resetShop();
         });
@@ -130,7 +129,6 @@ test.describe('Checkout', () => {
       'should place a Visa order via PayHere while logged in',
       { tag: ['@checkout', '@payment'] },
       async ({ productDetailsPage, checkoutPage, cartPage, sharedAccount, payHereCheckout }) => {
-        test.skip(true, 'GENKI: logged-in cart remove does not persist after reload');
         test.setTimeout(Timeouts.PayHereCheckout);
         await test.step('Clear rewards queue and cart', async () => {
           await sharedAccount.resetShop();
@@ -158,6 +156,7 @@ test.describe('Checkout', () => {
     productDetailsPage,
     checkoutPage,
   }) => {
+    test.skip(true, 'Staging admin: guest bank transfer success page is blocked');
     await test.step('Fill bank transfer guest checkout', async () => {
       await addSampleProductToCart(productDetailsPage);
       await checkoutPage.open();
