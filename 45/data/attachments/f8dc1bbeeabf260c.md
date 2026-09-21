@@ -1,0 +1,422 @@
+# Instructions
+
+- Following Playwright test failed.
+- Explain why, be concise, respect Playwright best practices.
+- Provide a snippet of code with the fix, if possible.
+
+# Test info
+
+- Name: mobile-checkout.spec.ts >> Mobile checkout >> should place a COD order on a phone viewport
+- Location: tests/mobile-checkout.spec.ts:19:7
+
+# Error details
+
+```
+TimeoutError: locator.click: Timeout 15000ms exceeded.
+Call log:
+  - waiting for getByRole('button', { name: /place order/i })
+    - locator resolved to <button disabled type="submit" aria-disabled="true" class="genki-button genki-button--medium">Place Order</button>
+  - attempting click action
+    2 × waiting for element to be visible, enabled and stable
+      - element is not stable
+    - retrying click action
+    - waiting 20ms
+    - waiting for element to be visible, enabled and stable
+    - element is not stable
+  2 × retrying click action
+      - waiting 100ms
+      - waiting for element to be visible, enabled and stable
+      - element is not enabled
+  28 × retrying click action
+       - waiting 500ms
+       - waiting for element to be visible, enabled and stable
+       - element is not enabled
+  - retrying click action
+    - waiting 500ms
+
+```
+
+# Page snapshot
+
+```yaml
+- generic [ref=f1e1]:
+  - alert [ref=f1e2]
+  - region "Notifications alt+T"
+  - banner [ref=f1e3]:
+    - generic [ref=f1e6]:
+      - link [ref=f1e8] [cursor=pointer]:
+        - /url: /
+        - img "Genki Wardrobe" [ref=f1e9]
+      - text: → →
+      - list [ref=f1e11]:
+        - listitem [ref=f1e12]:
+          - link [ref=f1e13] [cursor=pointer]:
+            - /url: /wishlist
+        - listitem [ref=f1e16]:
+          - link "1" [ref=f1e17] [cursor=pointer]:
+            - /url: /cart
+        - listitem [ref=f1e23]:
+          - button "Open menu" [ref=f1e24] [cursor=pointer]
+  - generic [ref=f1e30]:
+    - heading "Checkout" [level=1] [ref=f1e31]
+    - list [ref=f1e32]:
+      - listitem [ref=f1e33]:
+        - link "Home" [ref=f1e34] [cursor=pointer]:
+          - /url: /
+        - text: /
+      - listitem [ref=f1e35]: Checkout
+  - generic [ref=f1e42]:
+    - generic [ref=f1e43]:
+      - generic [ref=f1e44]:
+        - heading "Billing Address" [level=4] [ref=f1e45]
+        - generic [ref=f1e46]:
+          - generic [ref=f1e47]:
+            - generic [ref=f1e48]: First Name*
+            - textbox "First Name*" [ref=f1e49]: Auto
+          - generic [ref=f1e50]:
+            - generic [ref=f1e51]: Last Name*
+            - textbox "Last Name*" [ref=f1e52]: Tester
+          - generic [ref=f1e53]:
+            - generic [ref=f1e54]: Email Address*
+            - textbox "Email Address*" [ref=f1e55]: mobile-cod-1789977250510@mailinator.com
+          - generic [ref=f1e56]:
+            - generic [ref=f1e57]: Phone no*
+            - textbox "Phone no*" [ref=f1e58]: "0771234567"
+          - generic [ref=f1e59]:
+            - generic [ref=f1e60]: Address*
+            - textbox "Address*" [ref=f1e61]: 123 Test Street
+            - textbox [ref=f1e62]: Colombo 07
+          - generic [ref=f1e63]:
+            - generic [ref=f1e64]: Town/City*
+            - textbox "Town/City*" [ref=f1e65]: Colombo
+      - generic [ref=f1e66]:
+        - checkbox "Create an account?" [ref=f1e67]
+        - generic [ref=f1e68]: Create an account?
+      - generic [ref=f1e69]:
+        - checkbox "Shipping address is the same as billing address" [checked] [ref=f1e70]
+        - generic [ref=f1e71]: Shipping address is the same as billing address
+      - generic [ref=f1e72]:
+        - heading "Additional Information (Optional)" [level=4] [ref=f1e73]
+        - generic [ref=f1e74]:
+          - generic [ref=f1e75]: Order Notes
+          - textbox "Order Notes" [ref=f1e76]:
+            - /placeholder: Special delivery instructions or notes about your order...
+          - generic [ref=f1e77]: e.g., "Please call before delivery" or "Leave package at back door"
+        - generic [ref=f1e79]:
+          - checkbox "This order is a gift" [ref=f1e80]
+          - generic [ref=f1e81] [cursor=pointer]: This order is a gift
+    - generic [ref=f1e83]:
+      - generic [ref=f1e84]:
+        - heading "Cart Total" [level=4] [ref=f1e85]
+        - generic [ref=f1e86]:
+          - heading "Product Total" [level=4] [ref=f1e87]:
+            - text: Product
+            - generic [ref=f1e88]: Total
+          - list [ref=f1e89]:
+            - listitem [ref=f1e90]:
+              - text: Test Product W only X 1
+              - generic [ref=f1e91]: LKR 3490.00
+          - paragraph [ref=f1e92]:
+            - text: Sub Total
+            - generic [ref=f1e93]: LKR 3490.00
+          - paragraph [ref=f1e94]:
+            - text: Shipping Fee
+            - generic [ref=f1e95]: LKR 350.00
+          - heading "Grand Total LKR 3840.00" [level=4] [ref=f1e96]:
+            - text: Grand Total
+            - generic [ref=f1e97]: LKR 3840.00
+      - generic [ref=f1e98]:
+        - heading "Payment Method" [level=4] [ref=f1e99]
+        - generic [ref=f1e100]:
+          - generic [ref=f1e101]:
+            - radio "Card Payments (Debit/Credit via PayHere)" [ref=f1e102]
+            - generic [ref=f1e103]: Card Payments (Debit/Credit via PayHere)
+          - generic [ref=f1e104]:
+            - radio "Direct Bank Transfer" [ref=f1e105]
+            - generic [ref=f1e106]: Direct Bank Transfer
+          - generic [ref=f1e107]:
+            - radio "Cash on Delivery" [checked] [active] [ref=f1e108]
+            - generic [ref=f1e109]: Cash on Delivery
+        - generic [ref=f1e110]:
+          - checkbox "I've read and accept the terms & conditions" [checked] [ref=f1e111]
+          - generic [ref=f1e112]:
+            - text: I've read and accept the
+            - link "terms & conditions" [ref=f1e113] [cursor=pointer]:
+              - /url: /terms-and-conditions
+        - button "Place Order" [disabled] [ref=f1e114]
+        - generic [ref=f1e115]:
+          - strong [ref=f1e116]: Checkout temporarily disabled
+          - text: "- Site under review for payment gateway approval"
+  - contentinfo [ref=f1e117]:
+    - generic [ref=f1e119]:
+      - generic [ref=f1e120]:
+        - img "Genki Wardrobe" [ref=f1e122]
+        - generic [ref=f1e123]:
+          - text: © 2026
+          - link "| Genki" [ref=f1e124] [cursor=pointer]:
+            - /url: https://genkiwardrobe.com
+          - generic [ref=f1e125]: All Rights Reserved
+      - generic [ref=f1e126]:
+        - heading "INFO" [level=5] [ref=f1e127]
+        - navigation [ref=f1e128]:
+          - list [ref=f1e129]:
+            - listitem [ref=f1e130]:
+              - link "About us" [ref=f1e131] [cursor=pointer]:
+                - /url: /about-us
+            - listitem [ref=f1e132]:
+              - link "Contact" [ref=f1e133] [cursor=pointer]:
+                - /url: /about-us#contact
+            - listitem [ref=f1e134]:
+              - link "Privacy Policy" [ref=f1e135] [cursor=pointer]:
+                - /url: /privacy-policy
+            - listitem [ref=f1e136]:
+              - link "Terms and Conditions" [ref=f1e137] [cursor=pointer]:
+                - /url: /terms-and-conditions
+      - generic [ref=f1e138]:
+        - heading "USEFUL LINKS" [level=5] [ref=f1e139]
+        - navigation [ref=f1e140]:
+          - list [ref=f1e141]:
+            - listitem [ref=f1e142]:
+              - link "Returns" [ref=f1e143] [cursor=pointer]:
+                - /url: /return-policy
+            - listitem [ref=f1e144]:
+              - link "Shipping & Delivery" [ref=f1e145] [cursor=pointer]:
+                - /url: /shipping-policy
+            - listitem [ref=f1e146]:
+              - link "Size guide" [ref=f1e147] [cursor=pointer]:
+                - /url: /size-guide
+            - listitem [ref=f1e148]:
+              - link "FAQs" [ref=f1e149] [cursor=pointer]:
+                - /url: /faq
+      - generic [ref=f1e150]:
+        - heading "FOLLOW US ON" [level=5] [ref=f1e151]
+        - navigation [ref=f1e152]:
+          - list [ref=f1e153]:
+            - listitem [ref=f1e154]:
+              - link "Facebook" [ref=f1e155] [cursor=pointer]:
+                - /url: https://facebook.com/genkiwardrobelk
+            - listitem [ref=f1e158]:
+              - link "Instagram" [ref=f1e159] [cursor=pointer]:
+                - /url: https://instagram.com/genkiwardrobelk
+            - listitem [ref=f1e162]:
+              - link "TikTok" [ref=f1e163] [cursor=pointer]:
+                - /url: https://www.tiktok.com/@genkiwardrobelk
+            - listitem [ref=f1e166]:
+              - link "WhatsApp" [ref=f1e167] [cursor=pointer]:
+                - /url: https://wa.me/94701002922
+      - generic [ref=f1e171]:
+        - heading "Subscribe." [level=2] [ref=f1e172]
+        - paragraph [ref=f1e173]: Get the latest drops, exclusive offers, and style updates.
+        - generic [ref=f1e176]:
+          - textbox "Email address" [ref=f1e177]:
+            - /placeholder: Your email address
+          - button "Subscribe to newsletter" [disabled] [ref=f1e178]
+  - button "Scroll to top" [ref=f1e181] [cursor=pointer]
+```
+
+# Test source
+
+```ts
+  135 |     if (!(await this.phone.inputValue()).trim()) {
+  136 |       await this.phone.fill(checkout.phone);
+  137 |     }
+  138 |     if (!(await this.addressOne.inputValue()).trim()) {
+  139 |       await this.addressOne.fill(checkout.addressOne);
+  140 |     }
+  141 |     if (
+  142 |       (await this.addressTwo.isVisible().catch(() => false)) &&
+  143 |       !(await this.addressTwo.inputValue()).trim()
+  144 |     ) {
+  145 |       await this.addressTwo.fill(checkout.addressTwo);
+  146 |     }
+  147 |     if (!(await this.city.inputValue()).trim()) {
+  148 |       await this.city.fill(checkout.city);
+  149 |     }
+  150 |     return this;
+  151 |   }
+  152 | 
+  153 |   async enableCreateAccount(password: string): Promise<this> {
+  154 |     await expect(this.createAccountLabel).toBeVisible();
+  155 |     if (!(await this.createAccount.isChecked())) {
+  156 |       await this.createAccountLabel.click();
+  157 |     }
+  158 |     await expect(this.accountPassword).toBeVisible();
+  159 |     await this.accountPassword.fill(password);
+  160 |     return this;
+  161 |   }
+  162 | 
+  163 |   async expectCreateAccountPasswordVisible(): Promise<void> {
+  164 |     await expect(this.accountPassword).toBeVisible();
+  165 |     await expect(this.page.getByText(AUTH_MESSAGES.passwordLength)).toBeVisible();
+  166 |   }
+  167 | 
+  168 |   async selectPayment(method: PaymentMethod): Promise<this> {
+  169 |     if (method === PaymentMethod.Card) {
+  170 |       await expect(this.cardPaymentInput).toBeEnabled();
+  171 |       await this.cardPaymentLabel.click();
+  172 |       await expect(this.cardPaymentInput).toBeChecked();
+  173 |       return this;
+  174 |     }
+  175 |     if (method === PaymentMethod.BankTransfer) {
+  176 |       await expect(this.bankPaymentInput).toBeEnabled();
+  177 |       await this.bankPaymentLabel.click();
+  178 |       await expect(this.bankPaymentInput).toBeChecked();
+  179 |       return this;
+  180 |     }
+  181 |     await expect(this.codPaymentInput).toBeEnabled();
+  182 |     await this.codPaymentLabel.click();
+  183 |     await expect(this.codPaymentInput).toBeChecked();
+  184 |     return this;
+  185 |   }
+  186 | 
+  187 |   async expectPaymentSelected(method: PaymentMethod): Promise<void> {
+  188 |     if (method === PaymentMethod.Card) {
+  189 |       await expect(this.cardPaymentInput).toBeChecked();
+  190 |       return;
+  191 |     }
+  192 |     if (method === PaymentMethod.BankTransfer) {
+  193 |       await expect(this.bankPaymentInput).toBeChecked();
+  194 |       return;
+  195 |     }
+  196 |     await expect(this.codPaymentInput).toBeChecked();
+  197 |   }
+  198 | 
+  199 |   async expectNoPaymentSelected(): Promise<void> {
+  200 |     await expect(this.cardPaymentInput).not.toBeChecked();
+  201 |     await expect(this.bankPaymentInput).not.toBeChecked();
+  202 |     await expect(this.codPaymentInput).not.toBeChecked();
+  203 |   }
+  204 | 
+  205 |   async expectCodPaymentDisabledForGift(): Promise<void> {
+  206 |     await expect(this.codPaymentInput).toBeDisabled();
+  207 |     await expect(this.codPaymentLabel).toHaveClass(/disabled/);
+  208 |     await expect(this.codPaymentLabel).toContainText(/not available for gift orders/i);
+  209 |   }
+  210 | 
+  211 |   async expectCodPaymentEnabled(): Promise<void> {
+  212 |     await expect(this.codPaymentInput).toBeEnabled();
+  213 |     await expect(this.codPaymentLabel).not.toHaveClass(/disabled/);
+  214 |     await expect(this.codPaymentLabel).toHaveText(/^cash on delivery$/i);
+  215 |   }
+  216 | 
+  217 |   async expectCardAndBankPaymentsAvailable(): Promise<void> {
+  218 |     await expect(this.cardPaymentInput).toBeEnabled();
+  219 |     await expect(this.bankPaymentInput).toBeEnabled();
+  220 |     await expect(this.cardPaymentLabel).toBeVisible();
+  221 |     await expect(this.bankPaymentLabel).toBeVisible();
+  222 |   }
+  223 | 
+  224 |   async acceptTerms(): Promise<this> {
+  225 |     await this.page.locator('#accept_terms').evaluate((el: HTMLInputElement) => {
+  226 |       if (!el.checked) {
+  227 |         el.click();
+  228 |       }
+  229 |     });
+  230 |     await expect(this.termsCheckbox).toBeChecked();
+  231 |     return this;
+  232 |   }
+  233 | 
+  234 |   async placeOrder(): Promise<this> {
+> 235 |     await this.placeOrderButton.click();
+      |                                 ^ TimeoutError: locator.click: Timeout 15000ms exceeded.
+  236 |     return this;
+  237 |   }
+  238 | 
+  239 |   async expectPlaceOrderDisabled(): Promise<void> {
+  240 |     await expect(this.placeOrderButton).toBeDisabled();
+  241 |   }
+  242 | 
+  243 |   async expectStillOnCheckout(): Promise<void> {
+  244 |     await expect(this.page).toHaveURL(new RegExp(AppRoutes.Checkout));
+  245 |   }
+  246 | 
+  247 |   async expectNotOnOrderSuccess(): Promise<void> {
+  248 |     await expect(this.page).not.toHaveURL(new RegExp(AppRoutes.OrderSuccess));
+  249 |   }
+  250 | 
+  251 |   async expectOrderSuccess(paymentType: PaymentMethod): Promise<void> {
+  252 |     await expect(this.page).toHaveURL(new RegExp(CHECKOUT_PAGE.successPath), {
+  253 |       timeout: Timeouts.OrderSuccess,
+  254 |     });
+  255 |     await expect(this.page).toHaveURL(new RegExp(`paymentType=${paymentType}`));
+  256 |     await expect(this.orderSuccessHeading).toBeVisible();
+  257 |     await expect(this.page.getByText('Order ID', { exact: true })).toBeVisible();
+  258 |   }
+  259 | 
+  260 |   async getOrderId(): Promise<string> {
+  261 |     const orderIdText = this.page.getByText(/GK-\d+/).first();
+  262 |     await expect(orderIdText).toBeVisible({ timeout: Timeouts.OrderSuccess });
+  263 |     const text = (await orderIdText.innerText()).trim();
+  264 |     const match = text.match(/GK-\d+/);
+  265 |     if (!match) {
+  266 |       throw new Error(`Could not parse order id from: ${text}`);
+  267 |     }
+  268 |     return match[0];
+  269 |   }
+  270 | 
+  271 |   async expectCardPaymentReceived(): Promise<void> {
+  272 |     await this.expectOrderSuccess(PaymentMethod.Card);
+  273 |     await expect(
+  274 |       this.page.getByText(/payment received|payment was successful/i).first(),
+  275 |     ).toBeVisible();
+  276 |   }
+  277 | 
+  278 |   async expectBankTransferInstructions(): Promise<void> {
+  279 |     await expect(this.page.getByText(/awaiting bank transfer/i)).toBeVisible();
+  280 |     await expect(this.page.getByText(/commercial bank/i)).toBeVisible();
+  281 |   }
+  282 | 
+  283 |   async expectCodInstructions(): Promise<void> {
+  284 |     await expect(this.page.getByText(/cash on delivery/i)).toBeVisible();
+  285 |   }
+  286 | 
+  287 |   async expectSelectedRewardsVisible(): Promise<void> {
+  288 |     await expect(this.selectedRewards).toBeVisible();
+  289 |     await expect(
+  290 |       this.page.getByText(/anime sticker|sticker pack|keytag|total points to redeem/i).first(),
+  291 |     ).toBeVisible();
+  292 |   }
+  293 | 
+  294 |   unpublishedProductError(): Locator {
+  295 |     return this.page.getByText(/not available or not published/i);
+  296 |   }
+  297 | 
+  298 |   async hasUnpublishedProductError(): Promise<boolean> {
+  299 |     return this.unpublishedProductError().isVisible().catch(() => false);
+  300 |   }
+  301 | 
+  302 |   async expectUnpublishedProductError(): Promise<void> {
+  303 |     await expect(this.unpublishedProductError()).toBeVisible();
+  304 |   }
+  305 | 
+  306 |   async canPlaceOrder(): Promise<boolean> {
+  307 |     return this.placeOrderButton.isEnabled();
+  308 |   }
+  309 | 
+  310 |   async waitUntilPlaceableOrBlocked(): Promise<'placeable' | 'blocked'> {
+  311 |     const unpublished = this.unpublishedProductError();
+  312 |     const blocked = await unpublished
+  313 |       .waitFor({ state: 'visible', timeout: 5_000 })
+  314 |       .then(() => true)
+  315 |       .catch(() => false);
+  316 |     if (blocked) {
+  317 |       return 'blocked';
+  318 |     }
+  319 |     return (await this.canPlaceOrder()) ? 'placeable' : 'blocked';
+  320 |   }
+  321 | 
+  322 |   async waitForPayHereOrUnpublished(): Promise<'payhere' | 'blocked'> {
+  323 |     const unpublished = this.unpublishedProductError();
+  324 |     const iframe = this.page.locator('#ph-iframe');
+  325 |     try {
+  326 |       return await Promise.race([
+  327 |         unpublished
+  328 |           .waitFor({ state: 'visible', timeout: Timeouts.PayHereFrame })
+  329 |           .then(() => 'blocked' as const),
+  330 |         iframe
+  331 |           .waitFor({ state: 'visible', timeout: Timeouts.PayHereFrame })
+  332 |           .then(() => 'payhere' as const),
+  333 |       ]);
+  334 |     } catch {
+  335 |       return 'blocked';
+```
