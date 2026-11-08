@@ -1,4 +1,5 @@
 import { MAIN_NAV_DROPDOWNS, MAIN_NAV_TOP_LEVEL } from '@data/navigation.data';
+import { ProductTypeTag } from '@data/pdp-variants.data';
 import { test } from '@fixtures/test-fixtures';
 
 test.describe('Categories and products PLP', () => {
@@ -21,7 +22,9 @@ test.describe('Categories and products PLP', () => {
   });
 
   for (const item of MAIN_NAV_DROPDOWNS.find((c) => c.category === 'Collections')!.items) {
-    test(`should open ${item.name} theme collection`, async ({ collectionPage }) => {
+    test(`should open ${item.name} theme collection`, item.tag ? { tag: item.tag } : {}, async ({
+      collectionPage,
+    }) => {
       await test.step(`Open ${item.name} theme collection`, async () => {
         await collectionPage.open(item.path);
         await collectionPage.expectLoaded(item.path, item.heading);
@@ -29,7 +32,9 @@ test.describe('Categories and products PLP', () => {
     });
   }
 
-  test('should show products on the Anime theme collection', async ({ collectionPage }) => {
+  test('should show products on the Anime theme collection', { tag: ProductTypeTag.Anime }, async ({
+    collectionPage,
+  }) => {
     await test.step('Open Anime collection with products', async () => {
       await collectionPage.open('/collection/anime');
       await collectionPage.expectLoaded('/collection/anime', /^Anime Collection$/i);

@@ -1,9 +1,10 @@
 import { PaymentMethod } from '@constants/payment';
 import { guestCheckoutEmail } from '@data/checkout.data';
 import { test } from '@fixtures/test-fixtures';
+import { ProductTypeTag } from '@data/pdp-variants.data';
 import { addSampleProductToCart } from '@helpers/cart.helper';
 
-test.describe('Checkout edges', () => {
+test.describe('Checkout edges', { tag: ProductTypeTag.AcidWash }, () => {
   test('should keep place order disabled for an invalid phone number', async ({
     productDetailsPage,
     checkoutPage,

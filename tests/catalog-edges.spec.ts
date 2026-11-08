@@ -1,27 +1,29 @@
 import { EMPTY_THEME_COLLECTIONS, PRODUCT_DATA } from '@data/products.data';
 import {
+  ACID_WASH_FULL_PRODUCT,
   DUAL_COLOR_PRODUCT,
   OUT_OF_STOCK_PRODUCT,
+  ProductTypeTag,
 } from '@data/pdp-variants.data';
 import { TEST_DATA } from '@data/index';
 import { test } from '@fixtures/test-fixtures';
 
-test.describe('Color and stock PDP', () => {
+test.describe('Color and stock PDP', { tag: ProductTypeTag.AcidWash }, () => {
   test('should require a color before sizes are available', async ({ productDetailsPage }) => {
-    await test.step('Open dual-color PDP', async () => {
-      await productDetailsPage.open(DUAL_COLOR_PRODUCT.path);
+    await test.step('Open acid-wash PDP', async () => {
+      await productDetailsPage.open(ACID_WASH_FULL_PRODUCT.path);
       await productDetailsPage.expectColorRequired();
       await productDetailsPage.expectSizesHidden();
       await productDetailsPage.expectQuantityStepperDisabled();
-      await productDetailsPage.expectColorOptions(DUAL_COLOR_PRODUCT.colors);
+      await productDetailsPage.expectColorOptions(ACID_WASH_FULL_PRODUCT.colors);
     });
   });
 
   test('should reveal sizes after a color is selected', async ({ productDetailsPage }) => {
-    await test.step('Select black then expect the size matrix', async () => {
-      await productDetailsPage.open(DUAL_COLOR_PRODUCT.path);
-      await productDetailsPage.selectColor('black');
-      await productDetailsPage.expectSelectedColor('black');
+    await test.step('Select Black then expect the size matrix', async () => {
+      await productDetailsPage.open(ACID_WASH_FULL_PRODUCT.path);
+      await productDetailsPage.selectColor('Black');
+      await productDetailsPage.expectSelectedColor('Black');
       await productDetailsPage.expectSizesVisible();
       await productDetailsPage.expectSizeRequired();
     });
@@ -47,6 +49,30 @@ test.describe('Color and stock PDP', () => {
     });
   });
 
+  test('should expose every purchasable size on the acid-wash tee', async ({
+    productDetailsPage,
+  }) => {
+    await test.step('Acid-wash PDP has selectable sizes after a color', async () => {
+      await productDetailsPage.open(PRODUCT_DATA.samplePath);
+      await productDetailsPage.selectColor(PRODUCT_DATA.sampleColor);
+      await productDetailsPage.expectAvailableSizeCount(PRODUCT_DATA.sizes.length);
+      await productDetailsPage.selectSize(PRODUCT_DATA.defaultSize);
+      await productDetailsPage.expectAddToCartVisible();
+    });
+  });
+
+  test('should 404 for a non-canonical uppercase product slug', async ({
+    productDetailsPage,
+  }) => {
+    await test.step('Open uppercase /products/JJK', async () => {
+      await productDetailsPage.open(PRODUCT_DATA.nonCanonicalSlugPath);
+      await productDetailsPage.expectPageNotFound();
+    });
+  });
+});
+
+test.describe.skip('Black and white catalog', { tag: ProductTypeTag.BlackWhite }, () => {
+
   test('should add the white variant of the dual-color product to cart', async ({
     productDetailsPage,
     cartPage,
@@ -61,17 +87,6 @@ test.describe('Color and stock PDP', () => {
     await test.step('Cart shows white and XXXL', async () => {
       await cartPage.open();
       await cartPage.expectLineWithAttributes({ color: 'white', size: 'XXXL' });
-    });
-  });
-
-  test('should expose every purchasable size on the white-only tee', async ({
-    productDetailsPage,
-  }) => {
-    await test.step('White-only PDP has selectable sizes', async () => {
-      await productDetailsPage.open(PRODUCT_DATA.samplePath);
-      await productDetailsPage.expectAvailableSizeCount(PRODUCT_DATA.sizes.length);
-      await productDetailsPage.selectFirstAvailableSize();
-      await productDetailsPage.expectAddToCartVisible();
     });
   });
 
@@ -93,15 +108,6 @@ test.describe('Color and stock PDP', () => {
       await productDetailsPage.expectProductTitle(/gojo/i);
     });
   });
-
-  test('should 404 for a non-canonical uppercase product slug', async ({
-    productDetailsPage,
-  }) => {
-    await test.step('Open uppercase /products/JJK', async () => {
-      await productDetailsPage.open(PRODUCT_DATA.nonCanonicalSlugPath);
-      await productDetailsPage.expectPageNotFound();
-    });
-  });
 });
 
 test.describe('Theme collection empty states', () => {
@@ -118,7 +124,7 @@ test.describe('Theme collection empty states', () => {
   }
 });
 
-test.describe('Wishlist persistence', { tag: '@shared-account' }, () => {
+test.describe('Wishlist persistence', { tag: ['@shared-account', ProductTypeTag.AcidWash] }, () => {
   test('should keep wishlist items after login', async ({
     productDetailsPage,
     wishlistPage,

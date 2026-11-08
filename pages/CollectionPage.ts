@@ -63,7 +63,8 @@ export class CollectionPage extends BasePage {
   }
 
   async expectEmptyCollection(): Promise<void> {
-    await expect(this.page.getByText(/no products found/i)).toBeVisible();
+    await expect(this.heading).toBeVisible();
+    await expect(this.productLinks).toHaveCount(0);
   }
 
   async openFirstProduct(): Promise<ProductDetailsPage> {

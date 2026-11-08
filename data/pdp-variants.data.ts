@@ -10,14 +10,56 @@ export const PRODUCT_PRICE = {
   xxxl: 3590,
 } as const;
 
+/** Active catalog: acid-washed oversized tees. Some designs omit colors. */
+export const ACID_WASH_SIZES = ['S', 'M', 'L', 'XL', 'XXL'] as const;
+export type AcidWashSize = (typeof ACID_WASH_SIZES)[number];
+
+export const ACID_WASH_COLORS = ['Black', 'Ash', 'Brown', 'Pink', 'Purple'] as const;
+export type AcidWashColor = (typeof ACID_WASH_COLORS)[number];
+
+export const ACID_WASH_PRICE = {
+  unit: 4490,
+} as const;
+
+export const ProductTypeTag = {
+  AcidWash: '@acid-wash',
+  BlackWhite: '@black-white',
+  Anime: '@anime',
+} as const;
+
+export const BLACK_WHITE_OFFLINE =
+  'Black and white tees are offline until they are relaunched';
+
+export const ACID_WASH_FULL_PRODUCT = {
+  path: '/products/akaza-acid-wash-oversized-tee',
+  name: /akaza acid wash oversized tee/i,
+  colors: ACID_WASH_COLORS,
+  sizes: ACID_WASH_SIZES,
+  defaultColor: 'Black' as const,
+  defaultSize: 'M' as const,
+  unitPrice: ACID_WASH_PRICE.unit,
+};
+
+/** Shinobu does not offer Brown or Purple. */
+export const ACID_WASH_PARTIAL_PRODUCT = {
+  path: '/products/shinobu-acid-wash-oversized-tee',
+  name: /shinobu acid wash oversized tee/i,
+  colors: ['Black', 'Ash', 'Pink'] as const,
+  absentColors: ['Brown', 'Purple'] as const,
+  sizes: ACID_WASH_SIZES,
+  defaultColor: 'Black' as const,
+  defaultSize: 'M' as const,
+  unitPrice: ACID_WASH_PRICE.unit,
+};
+
 export const SIZE_CHART_EXCESS_SIZE = 'XXXXL';
 
 export const FREE_DELIVERY = {
   threshold: 5000,
   qtyBelow: 1,
   qtyAbove: 2,
-  remainingBelow: PRODUCT_PRICE.unit * 1 < 5000 ? 5000 - PRODUCT_PRICE.unit : 0,
-  remainingMessage: /you're\s+lkr\s*1,?510\s+away from free delivery/i,
+  remainingBelow: 5000 - ACID_WASH_PRICE.unit,
+  remainingMessage: /you're\s+lkr\s*510\s+away from free delivery/i,
   unlockedMessage: /free delivery unlocked on this order/i,
   pdpNote: /free delivery on orders over lkr\s*5,?000/i,
 } as const;

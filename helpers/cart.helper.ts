@@ -32,7 +32,10 @@ export async function addSampleProductToCart(
   productDetailsPage: ProductDetailsPage,
   options: AddToCartOptions = {},
 ): Promise<void> {
-  await addProductToCart(productDetailsPage, PRODUCT_DATA.samplePath, options);
+  await addProductToCart(productDetailsPage, PRODUCT_DATA.samplePath, {
+    color: PRODUCT_DATA.sampleColor,
+    ...options,
+  });
 }
 
 export async function addSecondaryProductToCart(
@@ -40,6 +43,7 @@ export async function addSecondaryProductToCart(
   options: AddToCartOptions = {},
 ): Promise<void> {
   await addProductToCart(productDetailsPage, PRODUCT_DATA.secondaryPath, {
+    color: PRODUCT_DATA.secondaryColor,
     size: PRODUCT_DATA.secondarySize,
     ...options,
   });

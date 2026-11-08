@@ -102,7 +102,8 @@ async function addSizeMIfCartEmpty(page) {
     return;
   }
 
-  await page.goto(`${BASE_URL}/products/test-white-only`, { waitUntil: 'domcontentloaded' });
+  await page.goto(`${BASE_URL}/products/akaza-acid-wash-oversized-tee`, { waitUntil: 'domcontentloaded' });
+  await page.locator('label[for="Black"]').click();
   await page.locator('.product-content__size__content label').filter({ hasText: /^M$/ }).click();
   await page.getByRole('button', { name: /add to cart/i }).click();
   const closeDrawer = page.locator('.cart-overlay__close-icon');
@@ -110,7 +111,7 @@ async function addSizeMIfCartEmpty(page) {
     await closeDrawer.click();
   }
   await page.goto(`${BASE_URL}/cart`, { waitUntil: 'domcontentloaded' });
-  await page.getByRole('link', { name: /test product w only/i }).first().waitFor();
+  await page.getByRole('link', { name: /akaza acid wash/i }).first().waitFor();
 }
 
 async function saveVideo(page, context, browser) {

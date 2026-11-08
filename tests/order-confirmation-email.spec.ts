@@ -9,6 +9,7 @@ import {
   waitForMessage,
 } from '@api/agentmail/AgentMailClient';
 import { test } from '@fixtures/test-fixtures';
+import { ProductTypeTag } from '@data/pdp-variants.data';
 import { addSampleProductToCart } from '@helpers/cart.helper';
 import type { TempMailbox } from '@models/mail.types';
 
@@ -18,7 +19,7 @@ test.describe('Order confirmation email', () => {
 
   test(
     'should send an order confirmation email after guest COD checkout',
-    { tag: ['@email', '@checkout'] },
+    { tag: ['@email', '@checkout', ProductTypeTag.AcidWash] },
     async ({ productDetailsPage, checkoutPage }) => {
       test.setTimeout(Timeouts.EmailFlow);
       let mailbox: TempMailbox | undefined;

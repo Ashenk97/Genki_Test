@@ -1,9 +1,10 @@
 import { PaymentMethod } from '@constants/payment';
 import { guestCheckoutEmail } from '@data/checkout.data';
 import { test } from '@fixtures/test-fixtures';
+import { ProductTypeTag } from '@data/pdp-variants.data';
 import { addSampleProductToCart } from '@helpers/cart.helper';
 
-test.describe('Mobile checkout', () => {
+test.describe('Mobile checkout', { tag: ProductTypeTag.AcidWash }, () => {
   test('should open checkout on a phone viewport without horizontal overflow', async ({
     productDetailsPage,
     checkoutPage,

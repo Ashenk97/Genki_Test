@@ -54,7 +54,11 @@ export class WishlistPage extends BasePage {
   }
 
   async openFirstProduct(): Promise<void> {
-    await this.page.getByRole('link', { name: /view product/i }).first().click();
+    await this.page
+      .getByRole('link', { name: /view product|acid wash/i })
+      .or(this.page.locator('a[href^="/products/"]'))
+      .first()
+      .click();
     await this.waitForPageLoad();
     await this.acceptCookiesIfVisible();
   }

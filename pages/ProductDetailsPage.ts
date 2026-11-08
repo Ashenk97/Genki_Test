@@ -28,14 +28,17 @@ export class ProductDetailsPage extends BasePage {
     super(page);
 
     this.productTitle = page.getByRole('heading', { level: 1 }).first();
-    this.price = page.locator('span.discounted-price').or(page.getByText(/LKR\s*[\d,.]+/)).first();
+    this.price = page
+      .locator('span.main-price, span.discounted-price')
+      .or(page.getByText(/LKR\s*[\d,.]+/))
+      .first();
     this.addToCartButton = page.getByRole('button', { name: /add to cart/i });
     this.outOfStockButton = page.getByRole('button', { name: /out of stock/i });
     this.selectSizePrompt = page.getByRole('button', { name: /select a size/i });
     this.selectColorPrompt = page.getByRole('button', { name: /select a color/i });
     this.addToWishlistButton = page
-      .getByRole('button', { name: /add to wishlist/i })
-      .or(page.locator('button.wishlist-icon'))
+      .locator('.product-content__wishlist')
+      .or(page.getByRole('button', { name: /add to wishlist/i }))
       .first();
     this.qtyInput = page.locator('.product-content .cart-plus-minus-box').first();
     this.increaseQtyButton = page
@@ -51,35 +54,46 @@ export class ProductDetailsPage extends BasePage {
     this.colorRadios = page.locator('input[name="product-color"]');
     this.cartDrawerClose = page.locator('.cart-overlay__close-icon');
     this.freeDeliveryNote = page.locator('.product-content__delivery-note');
-    this.galleryImage = page.locator('.product-large-image-wrapper .single-image img').first();
+    this.galleryImage = page
+      .locator('.product-gallery__image img, .product-large-image-wrapper .single-image img')
+      .first();
     this.galleryThumbs = page.locator(
-      '.product-small-image-wrapper img, .product-large-image-wrapper .swiper-slide img',
+      '.product-gallery__image img, .product-small-image-wrapper img, .product-large-image-wrapper .swiper-slide img',
     );
   }
 
-  async selectFirstAvailableSize(): Promise<this> {
-    const sizeRadio = this.page.getByRole('radio', { name: SIZE_RADIO_PATTERN }).first();
-
-    if (await sizeRadio.isVisible().catch(() => false)) {
-      await sizeRadio.click();
-      return this;
+  /** Acid-wash PDPs hide sizes until a color is chosen. */
+  private async ensureColorSelected(): Promise<void> {
+    if (await this.selectColorPrompt.isVisible().catch(() => false)) {
+      await this.selectFirstColor();
     }
+  }
 
-    const sizeInput = this.sizeRadios.first();
-    const sizeId = await sizeInput.getAttribute('id');
-    if (sizeId) {
-      const label = this.page.locator(`label[for="${sizeId}"]`);
-      if (await label.isVisible().catch(() => false)) {
-        await label.click();
+  private async variantAction(): Promise<'atc' | 'oos' | ''> {
+    if (await this.addToCartButton.isVisible().catch(() => false)) {
+      return 'atc';
+    }
+    if (await this.outOfStockButton.isVisible().catch(() => false)) {
+      return 'oos';
+    }
+    return '';
+  }
+
+  /** Picks the first size that can be added. Some sizes, such as Black / S, are out of stock. */
+  async selectFirstAvailableSize(): Promise<this> {
+    await this.ensureColorSelected();
+    const count = await this.sizeLabels.count();
+    for (let i = 0; i < count; i += 1) {
+      await this.sizeLabels.nth(i).click();
+      if ((await this.variantAction()) === 'atc') {
         return this;
       }
     }
-
-    await sizeInput.click({ force: true });
     return this;
   }
 
   async selectSize(size: string): Promise<this> {
+    await this.ensureColorSelected();
     const byRole = this.page.getByRole('radio', {
       name: new RegExp(`^${size}$`, 'i'),
     });
@@ -114,6 +128,15 @@ export class ProductDetailsPage extends BasePage {
     await expect(this.addToCartButton).toBeEnabled();
   }
 
+  async expectAddToCartOrOutOfStock(): Promise<void> {
+    await expect(this.addToCartButton.or(this.outOfStockButton)).toBeVisible();
+    if (await this.addToCartButton.isVisible().catch(() => false)) {
+      await expect(this.addToCartButton).toBeEnabled();
+      return;
+    }
+    await expect(this.outOfStockButton).toBeDisabled();
+  }
+
   async expectSizeRequired(): Promise<void> {
     await expect(this.selectSizePrompt).toBeVisible();
     await expect(this.addToCartButton).toHaveCount(0);
@@ -133,13 +156,7 @@ export class ProductDetailsPage extends BasePage {
   }
 
   async selectFirstColor(): Promise<this> {
-    const input = this.colorRadios.first();
-    const colorId = await input.getAttribute('id');
-    if (colorId) {
-      await this.page.locator(`label[for="${colorId}"]`).click({ force: true });
-    } else {
-      await input.check({ force: true });
-    }
+    await this.colorRadios.first().evaluate((el: HTMLInputElement) => el.click());
     await expect(
       this.sizeLabels.first().or(this.addToCartButton).or(this.outOfStockButton),
     ).toBeVisible();
@@ -188,15 +205,9 @@ export class ProductDetailsPage extends BasePage {
   }
 
   async selectColor(color: string): Promise<this> {
-    const input = this.page.locator(
-      `input[name="product-color"][value="${color}" i], input[name="product-color"]#${color}`,
-    );
-    const colorId = await input.first().getAttribute('id');
-    if (colorId) {
-      await this.page.locator(`label[for="${colorId}"]`).click({ force: true });
-    } else {
-      await input.first().check({ force: true });
-    }
+    const input = this.page.locator(`input[name="product-color"][value="${color}" i]`).first();
+    await input.evaluate((el: HTMLInputElement) => el.click());
+    await expect(input).toBeChecked();
     await expect(this.sizeLabels.first()).toBeVisible();
     return this;
   }
@@ -220,6 +231,10 @@ export class ProductDetailsPage extends BasePage {
     for (const color of colors) {
       await expect(this.page.locator(`label[for="${color}"]`)).toBeVisible();
     }
+  }
+
+  async expectColorAbsent(color: string): Promise<void> {
+    await expect(this.page.locator(`input[name="product-color"][value="${color}" i]`)).toHaveCount(0);
   }
 
   async expectListedSizes(sizes: readonly string[]): Promise<void> {
@@ -393,7 +408,11 @@ export class ProductDetailsPage extends BasePage {
 
   async expectSizeChartVisible(): Promise<void> {
     await expect(this.page.getByRole('heading', { name: /size chart/i })).toBeVisible();
-    await expect(this.page.getByRole('img', { name: /size chart/i })).toBeVisible();
+    await expect(
+      this.page
+        .getByRole('img', { name: /size chart/i })
+        .or(this.page.getByText(/all measurements are in inches/i)),
+    ).toBeVisible();
   }
 
   async expectAdditionalInformation(): Promise<void> {
