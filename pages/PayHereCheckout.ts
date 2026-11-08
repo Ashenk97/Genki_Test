@@ -193,6 +193,6 @@ export class PayHereCheckout extends BasePage {
   }
 
   async expectCheckoutFrameVisible(): Promise<void> {
-    await expect(this.page.locator('#ph-iframe')).toBeVisible({ timeout: Timeouts.PayHereFrame });
+    await this.waitForCheckoutFrame();
   }
 }
