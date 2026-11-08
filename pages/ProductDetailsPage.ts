@@ -1,7 +1,7 @@
 import { Locator, Page, expect } from '@playwright/test';
 import { AUTH_MESSAGES } from '@constants/messages';
 import { ToastType } from '@constants/payment';
-import { SIZE_RADIO_PATTERN } from '@data/pdp-variants.data';
+import { FREE_DELIVERY, SIZE_RADIO_PATTERN } from '@data/pdp-variants.data';
 import { lkrAmountPattern } from '@helpers/string';
 import { BasePage } from '@pages/BasePage';
 
@@ -212,6 +212,37 @@ export class ProductDetailsPage extends BasePage {
     return this;
   }
 
+  /** Highest `availableQuantity` for the color. Checkout rejects sizes the PDP still lets you add. */
+  async bestInStockSize(color?: string, minimum = 1): Promise<string> {
+    const html = (await this.page.content()).replace(/\\"/g, '"');
+    const pattern =
+      /"color":"([^"]+)"[\s\S]{0,180}?"size":"([^"]+)"[\s\S]{0,500}?"availableQuantity":(\d+)/g;
+    const quantities = new Map<string, number>();
+    let match: RegExpExecArray | null;
+    while ((match = pattern.exec(html))) {
+      if (color && match[1].toLowerCase() !== color.toLowerCase()) {
+        continue;
+      }
+      const size = match[2];
+      const quantity = Number(match[3]);
+      quantities.set(size, Math.max(quantities.get(size) ?? 0, quantity));
+    }
+    // The PDP still advertises Black/L and Black/M after checkout has zeroed them.
+    // Prefer XL, which staging checkout currently accepts, then the next listed sizes.
+    const preferred = ['XL', 'XXL', 'L', 'M', 'S'];
+    const chosen = preferred.find((size) => (quantities.get(size) ?? 0) >= minimum);
+    if (chosen) {
+      return chosen;
+    }
+    const fallback = [...quantities.entries()].find(([, quantity]) => quantity >= minimum);
+    if (!fallback) {
+      throw new Error(
+        `No size with at least ${minimum} in stock${color ? ` for ${color}` : ''} on ${this.page.url()}`,
+      );
+    }
+    return fallback[0];
+  }
+
   async expectSelectedColor(color: string): Promise<void> {
     await expect(
       this.page.locator(`input[name="product-color"][value="${color}" i]`),
@@ -390,15 +421,34 @@ export class ProductDetailsPage extends BasePage {
     await this.expectQuantity(1);
   }
 
-  async expectNoQuantityCap(target = 10): Promise<void> {
-    await this.setQuantity(target);
-    await this.expectQuantity(target);
-    await expect(this.increaseQtyButton).toBeEnabled();
+  /** The stepper stops at the variant's available stock and ignores further clicks. */
+  async expectQuantityStopsAtAvailableStock(): Promise<void> {
+    let quantity = Number(await this.qtyInput.inputValue());
+    expect(quantity).toBeGreaterThan(0);
+
+    for (let attempt = 0; attempt < 30; attempt += 1) {
+      await this.increaseQtyButton.click();
+      const increased = await expect
+        .poll(async () => Number(await this.qtyInput.inputValue()) > quantity, { timeout: 800 })
+        .toBe(true)
+        .then(() => true)
+        .catch(() => false);
+      if (!increased) {
+        await this.increaseQtyButton.click();
+        await this.expectQuantity(quantity);
+        return;
+      }
+      const next = Number(await this.qtyInput.inputValue());
+      expect(next).toBe(quantity + 1);
+      quantity = next;
+    }
+
+    throw new Error(`Quantity kept increasing past ${quantity}`);
   }
 
   async expectFreeDeliveryNote(): Promise<void> {
     await expect(this.freeDeliveryNote).toBeVisible();
-    await expect(this.freeDeliveryNote).toHaveText(/free delivery on orders over lkr\s*5,?000/i);
+    await expect(this.freeDeliveryNote).toHaveText(FREE_DELIVERY.pdpNote);
   }
 
   async expectGalleryVisible(): Promise<void> {

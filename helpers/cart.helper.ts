@@ -15,24 +15,28 @@ export async function addProductToCart(
   productDetailsPage: ProductDetailsPage,
   path: string,
   options: AddToCartOptions = {},
-): Promise<void> {
+): Promise<string> {
   await productDetailsPage.open(path);
   if (options.color) {
     await productDetailsPage.selectColor(options.color);
   }
-  await productDetailsPage.selectSize(options.size ?? PRODUCT_DATA.defaultSize);
+  const size =
+    options.size ??
+    (await productDetailsPage.bestInStockSize(options.color, options.quantity ?? 1));
+  await productDetailsPage.selectSize(size);
   if (options.quantity && options.quantity > 1) {
     await productDetailsPage.setQuantity(options.quantity);
   }
   await productDetailsPage.addToCart();
   await productDetailsPage.expectAddedToCart();
+  return size;
 }
 
 export async function addSampleProductToCart(
   productDetailsPage: ProductDetailsPage,
   options: AddToCartOptions = {},
-): Promise<void> {
-  await addProductToCart(productDetailsPage, PRODUCT_DATA.samplePath, {
+): Promise<string> {
+  return addProductToCart(productDetailsPage, PRODUCT_DATA.samplePath, {
     color: PRODUCT_DATA.sampleColor,
     ...options,
   });
@@ -41,10 +45,9 @@ export async function addSampleProductToCart(
 export async function addSecondaryProductToCart(
   productDetailsPage: ProductDetailsPage,
   options: AddToCartOptions = {},
-): Promise<void> {
-  await addProductToCart(productDetailsPage, PRODUCT_DATA.secondaryPath, {
+): Promise<string> {
+  return addProductToCart(productDetailsPage, PRODUCT_DATA.secondaryPath, {
     color: PRODUCT_DATA.secondaryColor,
-    size: PRODUCT_DATA.secondarySize,
     ...options,
   });
 }

@@ -69,6 +69,14 @@ export class AccountDashboardPage extends BasePage {
     await expect(this.page.getByText(orderId).first()).toBeVisible();
   }
 
+  async hasOrderToOpen(): Promise<boolean> {
+    return this.page
+      .getByRole('button', { name: /^view$/i })
+      .first()
+      .isVisible()
+      .catch(() => false);
+  }
+
   async openFirstOrderDetail(): Promise<this> {
     await this.page.getByRole('button', { name: /^view$/i }).first().click();
     await expect(this.page.getByText(/order details/i).first()).toBeVisible();

@@ -90,6 +90,7 @@ add('Individual product', 'Select size enables ATC', 'Size selection', 'P0', 'sm
 add('Individual product', 'Add to cart success toast and badge', 'ATC happy path', 'P0', 'smoke,pdp,cart', 'PDP', '1. Select size 2. ATC', 'Toast; cart badge count', 'Covered');
 add('Individual product', 'Add to wishlist from PDP', 'Wishlist from PDP', 'P0', 'smoke,pdp,wishlist', 'PDP', '1. Click add to wishlist', 'Item in wishlist drawer or toast', 'Covered');
 add('Individual product', 'Quantity stepper on PDP', 'Qty controls', 'P2', 'regression,pdp', 'PDP', '1. Increase qty', 'Qty value updates', 'Covered');
+add('Individual product', 'Quantity stepper stops at available stock', 'Stock cap', 'P1', 'regression,pdp,@acid-wash', 'Acid-wash PDP', '1. Select Black and M 2. Click plus until it stops', 'Quantity stays at the available stock', 'Covered');
 add('Individual product', 'Qty 3 from PDP lands in cart', 'Higher qty ATC', 'P1', 'regression,pdp,cart,@acid-wash', 'Acid-wash PDP', '1. Select color and size 2. Set qty 3 3. ATC 4. Open cart', 'Cart qty is 3; subtotal is 3 x LKR 4490', 'Covered');
 add('Individual product', 'Qty stepper disabled until color and size selected', 'Qty gated on variant', 'P1', 'regression,pdp,@acid-wash', 'Acid-wash PDP', '1. Open PDP 2. Select a color', 'Plus/minus disabled until color then size', 'Covered');
 add('Individual product', 'All sizes S to XXL listed', 'Acid-wash size matrix', 'P1', 'regression,pdp,@acid-wash', 'Acid-wash PDP', '1. Select a color', 'S M L XL XXL visible', 'Covered');
@@ -158,8 +159,8 @@ add('Profile', 'Guest deep link account details redirects to login', 'Auth guard
 add('Profile', 'Guest rewards page prompts sign in', 'Public rewards catalog', 'P1', 'regression,profile,auth', 'Logged out', '1. Open /rewards', 'Catalog visible; sign-in prompt; still logged out', 'Covered');
 
 add('Rewards', 'Rewards page shows usable points and catalog', 'Rewards load', 'P0', 'smoke,rewards', 'Logged in with points', '1. Open /rewards', 'Points and catalog visible', 'Covered');
-add('Rewards', 'Add reward to next order', 'Redeem add', 'P1', 'regression,rewards', 'Usable points >= reward cost', '1. Click ADD on a reward', 'Reward queued for next order', 'Covered');
-add('Rewards', 'Redeeming a reward decreases points', 'Points debit', 'P1', 'regression,rewards,checkout', 'Logged in; affordable reward', '1. Queue reward 2. Place COD order', 'Usable points decrease after order (or known checkout bug)', 'Covered');
+add('Rewards', 'Add reward to next order', 'Redeem add', 'P1', 'regression,rewards', 'Usable points >= reward cost', '1. Click ADD on a reward', 'Reward queued for next order', 'Blocked');
+add('Rewards', 'Redeeming a reward decreases points', 'Points debit', 'P1', 'regression,rewards,checkout', 'Logged in; affordable reward', '1. Queue reward 2. Place COD order', 'Skipped while the staging account has no usable points', 'Blocked');
 add('Rewards', 'Purchasing an item increases points', 'Points earn', 'P1', 'regression,rewards,checkout', 'Logged in; no reward queued', '1. Capture points 2. Place COD order 3. Reopen rewards', 'Usable points greater than before purchase', 'Blocked');
 
 add('Checkout', 'Checkout loads with billing and payment methods', 'Checkout smoke', 'P0', 'smoke,checkout', 'Guest cart with item', '1. Open /checkout', 'Billing fields; Card Bank COD', 'Covered');

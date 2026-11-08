@@ -1,6 +1,8 @@
 import { AppRoutes } from '@constants/routes';
+import { PaymentMethod } from '@constants/payment';
 import { TEST_DATA } from '@data/index';
 import { expect, test } from '@fixtures/test-fixtures';
+import { addSampleProductToCart } from '@helpers/cart.helper';
 
 test.describe('Profile', { tag: '@shared-account' }, () => {
   test.use({ storageState: '.auth/user.json' });
@@ -26,11 +28,26 @@ test.describe('Profile', { tag: '@shared-account' }, () => {
     });
   });
 
-  test('should open order detail from the Orders list', async ({ accountDashboardPage }) => {
+  test('should open order detail from the Orders list', async ({
+    accountDashboardPage,
+    productDetailsPage,
+    checkoutPage,
+  }) => {
     await test.step('Open first order detail panel', async () => {
       await accountDashboardPage.open();
       await accountDashboardPage.openSection('orders');
       await accountDashboardPage.expectOrdersLoaded();
+      if (!(await accountDashboardPage.hasOrderToOpen())) {
+        await addSampleProductToCart(productDetailsPage);
+        await checkoutPage.open();
+        await checkoutPage.fillLoggedInBilling();
+        await checkoutPage.selectPayment(PaymentMethod.COD);
+        await checkoutPage.acceptTerms();
+        await checkoutPage.placeOrder();
+        await checkoutPage.expectOrderSuccess(PaymentMethod.COD);
+        await accountDashboardPage.goto(AppRoutes.AccountOrders);
+        await accountDashboardPage.expectOrdersLoaded();
+      }
       await accountDashboardPage.openFirstOrderDetail();
       await expect(
         accountDashboardPage.page.getByText(/ordered products|payment type|total cost/i).first(),

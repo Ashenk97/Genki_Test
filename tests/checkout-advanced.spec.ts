@@ -308,21 +308,23 @@ test.describe('Multi-product checkout prices', { tag: ProductTypeTag.AcidWash },
     test.setTimeout(120_000);
     const unit = ACID_WASH_PRICE.unit;
     const subtotal = unit * 3;
+    let akazaSize = '';
+    let shinobuSize = '';
 
     await test.step('Add Akaza qty 1 and Shinobu qty 2', async () => {
-      await addSampleProductToCart(productDetailsPage, { quantity: 1 });
-      await addSecondaryProductToCart(productDetailsPage, { quantity: 2 });
+      akazaSize = await addSampleProductToCart(productDetailsPage, { quantity: 1 });
+      shinobuSize = await addSecondaryProductToCart(productDetailsPage, { quantity: 2 });
     });
 
     await test.step('Cart lines, subtotal, and total match the quantities', async () => {
       await cartPage.open();
       await cartPage.expectItemCount(2);
       await cartPage.expectLinePrices(
-        { name: ACID_WASH_FULL_PRODUCT.name, color: 'Black', size: 'M' },
+        { name: ACID_WASH_FULL_PRODUCT.name, color: 'Black', size: akazaSize },
         { unit, line: unit },
       );
       await cartPage.expectLinePrices(
-        { name: ACID_WASH_PARTIAL_PRODUCT.name, color: 'Black', size: 'M' },
+        { name: ACID_WASH_PARTIAL_PRODUCT.name, color: 'Black', size: shinobuSize },
         { unit, line: unit * 2 },
       );
       await cartPage.expectCartTotals(subtotal, subtotal);

@@ -61,7 +61,7 @@ export const FREE_DELIVERY = {
   remainingBelow: 5000 - ACID_WASH_PRICE.unit,
   remainingMessage: /you're\s+lkr\s*510\s+away from free delivery/i,
   unlockedMessage: /free delivery unlocked on this order/i,
-  pdpNote: /free delivery on orders over lkr\s*5,?000/i,
+  pdpNote: /free delivery on orders of lkr\s*5,?000 or more/i,
 } as const;
 
 /** Below LKR 5,000 the fee appears only after a payment method is chosen. */

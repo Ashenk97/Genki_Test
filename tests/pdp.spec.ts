@@ -113,13 +113,13 @@ test.describe('Individual product', { tag: ProductTypeTag.AcidWash }, () => {
     });
   });
 
-  test('should keep increasing quantity when the UI has no max cap', async ({
+  test('should stop increasing quantity at the available stock', async ({
     productDetailsPage,
   }) => {
-    await test.step('Increase PDP qty to 10', async () => {
+    await test.step('Increase PDP quantity until stock stops it', async () => {
       await productDetailsPage.open(PRODUCT_DATA.samplePath);
       await productDetailsPage.selectSize(PRODUCT_DATA.defaultSize);
-      await productDetailsPage.expectNoQuantityCap(10);
+      await productDetailsPage.expectQuantityStopsAtAvailableStock();
     });
   });
 
