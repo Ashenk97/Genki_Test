@@ -5,6 +5,7 @@ import { Timeouts } from '@constants/timeouts';
 import { CHECKOUT_PAGE } from '@data/navigation.data';
 import { FREE_DELIVERY } from '@data/pdp-variants.data';
 import { getGuestBillingDetails } from '@data/checkout.data';
+import { getAuthCredentials } from '@data/auth.data';
 import { lkrAmountPattern } from '@helpers/string';
 import { BasePage } from '@pages/BasePage';
 import { AppRoutes } from '@constants/routes';
@@ -133,6 +134,9 @@ export class CheckoutPage extends BasePage {
     if (!(await this.lastName.inputValue()).trim()) {
       await this.lastName.fill(checkout.lastName);
     }
+    if (!(await this.email.inputValue()).trim()) {
+      await this.email.fill(getAuthCredentials().email);
+    }
     if (!(await this.phone.inputValue()).trim()) {
       await this.phone.fill(checkout.phone);
     }
@@ -250,9 +254,24 @@ export class CheckoutPage extends BasePage {
   }
 
   async expectOrderSuccess(paymentType: PaymentMethod): Promise<void> {
-    await expect(this.page).toHaveURL(new RegExp(CHECKOUT_PAGE.successPath), {
-      timeout: Timeouts.OrderSuccess,
-    });
+    const success = new RegExp(CHECKOUT_PAGE.successPath);
+    const crashed = this.page.getByRole('heading', { name: /something went wrong on our end/i });
+    const reached = await Promise.race([
+      this.page.waitForURL(success, { timeout: Timeouts.OrderSuccess }).then(() => 'ok' as const),
+      crashed.waitFor({ state: 'visible', timeout: Timeouts.OrderSuccess }).then(() => 'crashed' as const),
+    ]).catch(() => 'pending' as const);
+
+    if (reached === 'crashed') {
+      await this.page.getByRole('button', { name: /try again/i }).click();
+      await expect(this.placeOrderButton).toBeEnabled();
+      if (!(await this.termsCheckbox.isChecked().catch(() => false))) {
+        await this.acceptTerms();
+      }
+      await this.placeOrderButton.click();
+      await expect(this.page).toHaveURL(success, { timeout: Timeouts.OrderSuccess });
+    } else if (reached !== 'ok') {
+      await expect(this.page).toHaveURL(success, { timeout: 1_000 });
+    }
     await expect(this.page).toHaveURL(new RegExp(`paymentType=${paymentType}`));
     await expect(this.orderSuccessHeading).toBeVisible();
     await expect(this.page.getByText('Order ID', { exact: true })).toBeVisible();

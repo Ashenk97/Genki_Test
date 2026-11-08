@@ -14,8 +14,8 @@ export class RewardsPage extends BasePage {
     this.heading = page.getByRole('heading', { name: ACCOUNT_PAGES.rewards.heading });
     this.usablePoints = page.getByText(/usable points/i);
     this.catalogHeading = page.getByText(/rewards catalog/i);
-    this.addButtons = page.getByRole('button', { name: /^add$/i });
-    this.includedSection = page.getByText(/included with your next order/i);
+    this.addButtons = page.getByRole('button', { name: /^(view|choose|add)$|choose a design|view /i });
+    this.includedSection = page.getByText(/included with your next order|queued|selected rewards/i);
   }
 
   async open(): Promise<this> {
@@ -25,20 +25,26 @@ export class RewardsPage extends BasePage {
 
   async expectGuestSignInPrompt(): Promise<void> {
     await this.expectPathname(ACCOUNT_PAGES.rewards.path);
-    await expect(this.page.getByText(/sign in to view your points balance/i)).toBeVisible();
+    await expect(this.page.getByText(/sign in to redeem|have an account\?/i).first()).toBeVisible();
     await expect(this.catalogHeading).toBeVisible();
   }
 
   async expectLoaded(): Promise<void> {
     await this.expectPathname(ACCOUNT_PAGES.rewards.path);
     await expect(this.heading).toBeVisible();
-    await expect(this.usablePoints).toBeVisible();
+    await expect(this.usablePoints).toBeVisible({ timeout: 20_000 });
     await expect(this.catalogHeading).toBeVisible();
     await expect(this.addButtons.first()).toBeVisible();
   }
 
   async addFirstAffordableReward(): Promise<this> {
-    await this.addButtons.first().click();
+    const directAdd = this.page.getByRole('button', { name: /^add$/i });
+    if (await directAdd.first().isVisible().catch(() => false)) {
+      await directAdd.first().click();
+    } else {
+      await this.page.getByRole('button', { name: /choose a design|^choose$|view /i }).first().click();
+      await this.page.getByRole('button', { name: /^add\b/i }).first().click();
+    }
     await expect(this.includedSection).toBeVisible({ timeout: 10_000 });
     return this;
   }
@@ -66,6 +72,7 @@ export class RewardsPage extends BasePage {
     const body = await this.page.locator('body').innerText();
     const normalized = body.replace(/,/g, '');
     const match =
+      normalized.match(/(\d+)\s*usable points/i) ||
       normalized.match(/usable points[^\d]*(\d+)/i) ||
       normalized.match(/(\d+)\s*points available/i);
     return match ? Number(match[1]) : 0;

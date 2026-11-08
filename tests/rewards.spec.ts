@@ -52,6 +52,10 @@ test.describe('Rewards', { tag: '@shared-account' }, () => {
     await test.step('Queue an affordable reward', async () => {
       await rewardsPage.open();
       await rewardsPage.expectLoaded();
+      test.skip(
+        (await rewardsPage.getUsablePoints()) < 1,
+        'Staging account has no usable points to redeem',
+      );
       await rewardsPage.addFirstAffordableReward();
       await rewardsPage.expectRewardQueued();
     });
@@ -67,6 +71,10 @@ test.describe('Rewards', { tag: '@shared-account' }, () => {
     await test.step('Queue a reward for the next order', async () => {
       await rewardsPage.open();
       await rewardsPage.expectLoaded();
+      test.skip(
+        (await rewardsPage.getUsablePoints()) < 1,
+        'Staging account has no usable points to redeem',
+      );
       await rewardsPage.addFirstAffordableReward();
       await rewardsPage.expectRewardQueued();
     });
@@ -98,6 +106,7 @@ test.describe('Rewards', { tag: '@shared-account' }, () => {
       await rewardsPage.open();
       await rewardsPage.expectLoaded();
       pointsBefore = await rewardsPage.getUsablePoints();
+      test.skip(pointsBefore < 1, 'Staging account has no usable points to redeem');
       await rewardsPage.addFirstAffordableReward();
       await rewardsPage.expectRewardQueued();
     });
