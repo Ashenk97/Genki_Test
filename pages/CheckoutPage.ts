@@ -442,6 +442,36 @@ export class CheckoutPage extends BasePage {
     ).toBeVisible();
   }
 
+  private orderSummary(): Locator {
+    return this.page.locator('.checkout-cart-total');
+  }
+
+  async expectCheckoutLine(name: RegExp, qty: number, amount: number): Promise<void> {
+    const item = this.orderSummary()
+      .locator('li')
+      .filter({ hasText: name })
+      .filter({ hasText: new RegExp(`X\\s*${qty}\\b`, 'i') });
+    await expect(item).toHaveCount(1);
+    await expect(item).toContainText(lkrAmountPattern(amount));
+  }
+
+  async expectCheckoutAmounts(amounts: {
+    subtotal: number;
+    shipping: number;
+    grand: number;
+  }): Promise<void> {
+    const summary = this.orderSummary();
+    await expect(summary.locator('p').filter({ hasText: /^sub total/i })).toContainText(
+      lkrAmountPattern(amounts.subtotal),
+    );
+    await expect(summary.locator('p').filter({ hasText: /^shipping fee/i })).toContainText(
+      lkrAmountPattern(amounts.shipping),
+    );
+    await expect(summary.locator('h4').filter({ hasText: /^grand total/i })).toContainText(
+      lkrAmountPattern(amounts.grand),
+    );
+  }
+
   couponField(): Locator {
     return this.page
       .locator('#coupon, input[name="coupon"], input[name="promoCode"]')

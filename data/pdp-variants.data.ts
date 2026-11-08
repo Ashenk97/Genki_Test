@@ -64,6 +64,14 @@ export const FREE_DELIVERY = {
   pdpNote: /free delivery on orders over lkr\s*5,?000/i,
 } as const;
 
+/** Below LKR 5,000 the fee appears only after a payment method is chosen. */
+export const SHIPPING_FEE = {
+  beforePaymentSelected: 0,
+  prepaidBelowThreshold: 350,
+  codBelowThreshold: 450,
+  free: 0,
+} as const;
+
 export const WHITE_ONLY_PRODUCT = {
   path: '/products/test-white-only',
   name: /test product w only/i,
