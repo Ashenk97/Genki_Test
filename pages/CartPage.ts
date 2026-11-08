@@ -64,11 +64,11 @@ export class CartPage extends BasePage {
     await expect(this.productRows.first().getByText(text)).toBeVisible();
   }
 
-  async expectLineWithAttributes(attrs: {
+  lineWithAttributes(attrs: {
     name?: string | RegExp;
     color?: string;
     size?: string;
-  }): Promise<void> {
+  }): Locator {
     let row = this.productRows;
     if (attrs.name) {
       row = row.filter({ hasText: attrs.name });
@@ -79,7 +79,34 @@ export class CartPage extends BasePage {
     if (attrs.size) {
       row = row.filter({ hasText: new RegExp(`Size:\\s*${attrs.size}`, 'i') });
     }
-    await expect(row.first()).toBeVisible();
+    return row.first();
+  }
+
+  async expectLineWithAttributes(attrs: {
+    name?: string | RegExp;
+    color?: string;
+    size?: string;
+  }): Promise<void> {
+    await expect(this.lineWithAttributes(attrs)).toBeVisible();
+  }
+
+  async expectLinePrices(
+    attrs: { name?: string | RegExp; color?: string; size?: string },
+    prices: { unit: number; line: number },
+  ): Promise<void> {
+    const row = this.lineWithAttributes(attrs);
+    await expect(row).toBeVisible();
+    await expect(row).toContainText(lkrAmountPattern(prices.unit));
+    await expect(row).toContainText(lkrAmountPattern(prices.line));
+  }
+
+  async expectCartTotals(subtotal: number, total: number): Promise<void> {
+    await expect(this.page.getByRole('row', { name: /^subtotal/i })).toContainText(
+      lkrAmountPattern(subtotal),
+    );
+    await expect(this.page.getByRole('row', { name: /^total/i })).toContainText(
+      lkrAmountPattern(total),
+    );
   }
 
   async expectFreeDeliveryRemaining(): Promise<void> {

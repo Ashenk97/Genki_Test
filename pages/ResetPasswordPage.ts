@@ -2,6 +2,7 @@ import { Locator, Page, expect } from '@playwright/test';
 import { AppRoutes } from '@constants/routes';
 import { Timeouts } from '@constants/timeouts';
 import { RESET_PASSWORD_PAGE } from '@data/navigation.data';
+import { strongPassword } from '@helpers/random';
 import { BasePage } from '@pages/BasePage';
 
 export class ResetPasswordPage extends BasePage {
@@ -37,7 +38,8 @@ export class ResetPasswordPage extends BasePage {
     await expect(this.page).toHaveURL(new RegExp(AppRoutes.ResetPassword));
     const formReady = await this.passwordInput.isVisible().catch(() => false);
     if (formReady) {
-      await this.resetPassword('Genki!Valid1', 'Genki!Valid1');
+      const password = strongPassword();
+      await this.resetPassword(password, password);
     }
     await expect(
       this.page.getByText(/invalid|expired|already used|token is (invalid|missing)|missing token/i).first(),

@@ -2,7 +2,13 @@ import { PaymentMethod } from '@constants/payment';
 import { Timeouts } from '@constants/timeouts';
 import { guestCheckoutEmail } from '@data/checkout.data';
 import { TEST_DATA } from '@data/index';
-import { ACID_WASH_PRICE, ProductTypeTag } from '@data/pdp-variants.data';
+import {
+  ACID_WASH_FULL_PRODUCT,
+  ACID_WASH_PARTIAL_PRODUCT,
+  ACID_WASH_PRICE,
+  SHIPPING_FEE,
+  ProductTypeTag,
+} from '@data/pdp-variants.data';
 import { strongPassword } from '@helpers/random';
 import { test } from '@fixtures/test-fixtures';
 import { addSampleProductToCart, addSecondaryProductToCart } from '@helpers/cart.helper';
@@ -291,6 +297,63 @@ test.describe('PayHere abandon', { tag: ProductTypeTag.AcidWash }, () => {
       });
     },
   );
+});
+
+test.describe('Multi-product checkout prices', { tag: ProductTypeTag.AcidWash }, () => {
+  test('should show each product price on the cart and at checkout', async ({
+    productDetailsPage,
+    cartPage,
+    checkoutPage,
+  }) => {
+    test.setTimeout(120_000);
+    const unit = ACID_WASH_PRICE.unit;
+    const subtotal = unit * 3;
+
+    await test.step('Add Akaza qty 1 and Shinobu qty 2', async () => {
+      await addSampleProductToCart(productDetailsPage, { quantity: 1 });
+      await addSecondaryProductToCart(productDetailsPage, { quantity: 2 });
+    });
+
+    await test.step('Cart lines, subtotal, and total match the quantities', async () => {
+      await cartPage.open();
+      await cartPage.expectItemCount(2);
+      await cartPage.expectLinePrices(
+        { name: ACID_WASH_FULL_PRODUCT.name, color: 'Black', size: 'M' },
+        { unit, line: unit },
+      );
+      await cartPage.expectLinePrices(
+        { name: ACID_WASH_PARTIAL_PRODUCT.name, color: 'Black', size: 'M' },
+        { unit, line: unit * 2 },
+      );
+      await cartPage.expectCartTotals(subtotal, subtotal);
+      await cartPage.expectFreeDeliveryUnlocked();
+    });
+
+    await test.step('Checkout summary keeps the same prices and free shipping', async () => {
+      await cartPage.proceedToCheckoutPage();
+      await checkoutPage.expectLoaded();
+      await checkoutPage.expectCheckoutLine(ACID_WASH_FULL_PRODUCT.name, 1, unit);
+      await checkoutPage.expectCheckoutLine(ACID_WASH_PARTIAL_PRODUCT.name, 2, unit * 2);
+      await checkoutPage.expectCheckoutAmounts({
+        subtotal,
+        shipping: SHIPPING_FEE.free,
+        grand: subtotal,
+      });
+      await checkoutPage.expectFreeDeliveryUnlocked();
+    });
+
+    await test.step('Card, bank, and COD keep shipping at zero above LKR 5,000', async () => {
+      for (const method of [PaymentMethod.Card, PaymentMethod.BankTransfer, PaymentMethod.COD]) {
+        await checkoutPage.selectPayment(method);
+        await checkoutPage.expectCheckoutAmounts({
+          subtotal,
+          shipping: SHIPPING_FEE.free,
+          grand: subtotal,
+        });
+      }
+      await checkoutPage.expectStillOnCheckout();
+    });
+  });
 });
 
 test.describe('Free delivery at checkout', { tag: ProductTypeTag.AcidWash }, () => {
