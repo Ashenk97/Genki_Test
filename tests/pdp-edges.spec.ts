@@ -1,16 +1,21 @@
 import { AppRoutes } from '@constants/routes';
-import { SIZE_CHART_EXCESS_SIZE, WHITE_ONLY_PRODUCT } from '@data/pdp-variants.data';
+import {
+  ACID_WASH_FULL_PRODUCT,
+  ProductTypeTag,
+  SIZE_CHART_EXCESS_SIZE,
+} from '@data/pdp-variants.data';
 import { expect, test } from '@fixtures/test-fixtures';
 
-test.describe('PDP merchandising edges', () => {
-  test('should list sizes XXS to XXXL and not offer XXXXL', async ({
+test.describe('PDP merchandising edges', { tag: ProductTypeTag.AcidWash }, () => {
+  test('should list sizes S to XXL and not offer XXXXL', async ({
     productDetailsPage,
     footer,
     homePage,
   }) => {
-    await test.step('White-only PDP sizes stop at XXXL', async () => {
-      await productDetailsPage.open(WHITE_ONLY_PRODUCT.path);
-      await productDetailsPage.expectListedSizes(WHITE_ONLY_PRODUCT.sizes);
+    await test.step('Acid-wash PDP sizes stop at XXL', async () => {
+      await productDetailsPage.open(ACID_WASH_FULL_PRODUCT.path);
+      await productDetailsPage.selectColor(ACID_WASH_FULL_PRODUCT.defaultColor);
+      await productDetailsPage.expectListedSizes(ACID_WASH_FULL_PRODUCT.sizes);
       await productDetailsPage.expectSizeNotListed(SIZE_CHART_EXCESS_SIZE);
       await productDetailsPage.expectSizeChartDoesNotList(SIZE_CHART_EXCESS_SIZE);
     });

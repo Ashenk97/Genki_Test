@@ -1,6 +1,7 @@
+import { ProductTypeTag } from '@data/pdp-variants.data';
 import { test } from '@fixtures/test-fixtures';
 
-test.describe('Homepage navigation', () => {
+test.describe('Homepage navigation', { tag: ProductTypeTag.AcidWash }, () => {
   test('should navigate from homepage to a product and display Add to Cart', async ({
     homePage,
   }) => {

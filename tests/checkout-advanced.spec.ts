@@ -2,12 +2,12 @@ import { PaymentMethod } from '@constants/payment';
 import { Timeouts } from '@constants/timeouts';
 import { guestCheckoutEmail } from '@data/checkout.data';
 import { TEST_DATA } from '@data/index';
-import { PRODUCT_PRICE } from '@data/pdp-variants.data';
+import { ACID_WASH_PRICE, ProductTypeTag } from '@data/pdp-variants.data';
 import { strongPassword } from '@helpers/random';
 import { test } from '@fixtures/test-fixtures';
 import { addSampleProductToCart, addSecondaryProductToCart } from '@helpers/cart.helper';
 
-test.describe('Checkout advanced flows', () => {
+test.describe('Checkout advanced flows', { tag: ProductTypeTag.AcidWash }, () => {
   test('should place a COD order with a separate shipping address', { tag: '@checkout' }, async ({
     productDetailsPage,
     checkoutPage,
@@ -73,7 +73,7 @@ test.describe('Checkout advanced flows', () => {
   );
 });
 
-test.describe('Gift checkout', () => {
+test.describe('Gift checkout', { tag: ProductTypeTag.AcidWash }, () => {
   test(
     'should disable COD for gift orders while keeping card and bank available',
     { tag: '@checkout' },
@@ -228,7 +228,7 @@ test.describe('Gift checkout', () => {
   });
 });
 
-test.describe('Guest cart session', () => {
+test.describe('Guest cart session', { tag: ProductTypeTag.AcidWash }, () => {
   test('should persist guest cart items after reload', async ({
     productDetailsPage,
     cartPage,
@@ -269,7 +269,7 @@ test.describe('Guest cart session', () => {
   });
 });
 
-test.describe('PayHere abandon', () => {
+test.describe('PayHere abandon', { tag: ProductTypeTag.AcidWash }, () => {
   test(
     'should keep the cart after abandoning PayHere checkout',
     { tag: ['@checkout', '@payment'] },
@@ -293,16 +293,16 @@ test.describe('PayHere abandon', () => {
   );
 });
 
-test.describe('Free delivery at checkout', () => {
+test.describe('Free delivery at checkout', { tag: ProductTypeTag.AcidWash }, () => {
   test('should show remaining amount at checkout when subtotal is below LKR 5,000', async ({
     productDetailsPage,
     checkoutPage,
   }) => {
-    await test.step('Checkout with qty 1 (LKR 3,490)', async () => {
+    await test.step('Checkout with qty 1 (LKR 4,490)', async () => {
       await addSampleProductToCart(productDetailsPage, { quantity: 1 });
       await checkoutPage.open();
       await checkoutPage.expectLoaded();
-      await checkoutPage.expectOrderSubtotal(PRODUCT_PRICE.unit);
+      await checkoutPage.expectOrderSubtotal(ACID_WASH_PRICE.unit);
       await checkoutPage.expectFreeDeliveryRemaining();
     });
   });
@@ -311,16 +311,16 @@ test.describe('Free delivery at checkout', () => {
     productDetailsPage,
     checkoutPage,
   }) => {
-    await test.step('Checkout with qty 2 (LKR 6,980)', async () => {
+    await test.step('Checkout with qty 2 (LKR 8,980)', async () => {
       await addSampleProductToCart(productDetailsPage, { quantity: 2 });
       await checkoutPage.open();
       await checkoutPage.expectLoaded();
-      await checkoutPage.expectOrderSubtotal(PRODUCT_PRICE.unit * 2);
+      await checkoutPage.expectOrderSubtotal(ACID_WASH_PRICE.unit * 2);
       await checkoutPage.expectFreeDeliveryUnlocked();
     });
   });
 
-  test('should keep the below-threshold message at the LKR 3,490 boundary', async ({
+  test('should keep the below-threshold message at the LKR 4,490 boundary', async ({
     productDetailsPage,
     checkoutPage,
   }) => {

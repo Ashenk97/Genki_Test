@@ -5,6 +5,7 @@ import {
   OUT_OF_STOCK_PRODUCT,
   PRODUCT_PRICE,
   PRODUCT_SIZES,
+  ProductTypeTag,
   WHITE_ONLY_PRODUCT,
 } from '@data/pdp-variants.data';
 import { test } from '@fixtures/test-fixtures';
@@ -42,7 +43,8 @@ async function expectCartHasEverySize(
   }
 }
 
-test.describe('PDP variant matrix', () => {
+test.describe.skip('PDP variant matrix', { tag: ProductTypeTag.BlackWhite }, () => {
+
   test.describe('White-only product', () => {
     test('should lock the single white color and show all sizes', async ({
       productDetailsPage,

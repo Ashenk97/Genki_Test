@@ -39,7 +39,10 @@ test.describe('Desktop main navigation', () => {
 
   for (const { category, items } of MAIN_NAV_DROPDOWNS) {
     for (const item of items) {
-      test(`should open ${category} → ${item.name}`, async ({ header, collectionPage }) => {
+      test(`should open ${category} → ${item.name}`, item.tag ? { tag: item.tag } : {}, async ({
+        header,
+        collectionPage,
+      }) => {
         await test.step(`Open ${category} → ${item.name}`, async () => {
           await header.clickDropdownItem(category, item.name);
           await collectionPage.expectLoaded(item.path, item.heading);

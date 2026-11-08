@@ -81,7 +81,7 @@ add('Newsletter', 'Reject invalid newsletter email', 'Newsletter validation', 'P
 
 add('Categories', 'Open Men collection PLP', 'Men PLP', 'P0', 'smoke,plp', 'Desktop', '1. Navigate Men', 'Men H1 and products', 'Covered');
 add('Categories', 'Open Women collection PLP', 'Women PLP', 'P0', 'smoke,plp', 'Desktop', '1. Navigate Women', 'Women H1 and products', 'Covered');
-add('Categories', 'Open theme collections', 'Anime Originals Culture JDM Kawaii', 'P0', 'smoke,plp', 'Desktop', '1. Open each theme collection', 'Correct H1', 'Covered');
+add('Categories', 'Open theme collections', 'Anime is active; Originals Culture JDM Kawaii are empty', 'P0', 'smoke,plp,@anime', 'Desktop', '1. Open each theme collection', 'Correct H1; only Anime lists products', 'Covered');
 add('Products', 'PLP shows product grid and opens PDP', 'Grid to PDP', 'P0', 'smoke,plp', 'On Men collection', '1. Assert products 2. Open first valid product', 'PDP URL /products/', 'Covered');
 add('Products', 'PLP filters or sort if present', 'Optional filters', 'P2', 'regression,plp', 'Collection with filters', '1. Apply filter/sort if UI exists', 'Results update or products remain when no control exists', 'Covered');
 
@@ -90,33 +90,33 @@ add('Individual product', 'Select size enables ATC', 'Size selection', 'P0', 'sm
 add('Individual product', 'Add to cart success toast and badge', 'ATC happy path', 'P0', 'smoke,pdp,cart', 'PDP', '1. Select size 2. ATC', 'Toast; cart badge count', 'Covered');
 add('Individual product', 'Add to wishlist from PDP', 'Wishlist from PDP', 'P0', 'smoke,pdp,wishlist', 'PDP', '1. Click add to wishlist', 'Item in wishlist drawer or toast', 'Covered');
 add('Individual product', 'Quantity stepper on PDP', 'Qty controls', 'P2', 'regression,pdp', 'PDP', '1. Increase qty', 'Qty value updates', 'Covered');
-add('Individual product', 'Qty 3 from PDP lands in cart', 'Higher qty ATC', 'P1', 'regression,pdp,cart', 'White-only PDP', '1. Select size 2. Set qty 3 3. ATC 4. Open cart', 'Cart qty is 3', 'Covered');
-add('Individual product', 'Qty stepper disabled until size selected', 'Qty gated on size', 'P1', 'regression,pdp', 'White-only PDP', '1. Open PDP without size', 'Plus/minus disabled; Select a size shown', 'Covered');
-add('Individual product', 'All sizes XXS to XXXL listed', 'Full size matrix', 'P1', 'regression,pdp', 'White-only PDP', '1. Open PDP', 'XXS XS S M L XL XXL XXXL visible', 'Covered');
-add('Individual product', 'Gallery size chart additional info', 'PDP chrome', 'P2', 'regression,pdp', 'White-only PDP', '1. Open PDP', 'Gallery thumbs, size chart, additional information', 'Covered');
+add('Individual product', 'Qty 3 from PDP lands in cart', 'Higher qty ATC', 'P1', 'regression,pdp,cart,@acid-wash', 'Acid-wash PDP', '1. Select color and size 2. Set qty 3 3. ATC 4. Open cart', 'Cart qty is 3; subtotal is 3 x LKR 4490', 'Covered');
+add('Individual product', 'Qty stepper disabled until color and size selected', 'Qty gated on variant', 'P1', 'regression,pdp,@acid-wash', 'Acid-wash PDP', '1. Open PDP 2. Select a color', 'Plus/minus disabled until color then size', 'Covered');
+add('Individual product', 'All sizes S to XXL listed', 'Acid-wash size matrix', 'P1', 'regression,pdp,@acid-wash', 'Acid-wash PDP', '1. Select a color', 'S M L XL XXL visible', 'Covered');
+add('Individual product', 'Gallery size chart additional info', 'PDP chrome', 'P2', 'regression,pdp,@acid-wash', 'Acid-wash PDP', '1. Open PDP', 'Gallery thumbs, size chart, additional information', 'Covered');
 
-add('PDP variants', 'White-only locks white and lists all sizes', 'Single-color white SKU', 'P0', 'smoke,pdp', '/products/test-white-only', '1. Open PDP', 'White color locked; sizes XXS-XXXL; size required', 'Covered');
-add('PDP variants', 'White-only every size enables ATC', 'Per-size ATC enable', 'P1', 'regression,pdp', 'White-only PDP', '1. Select each size XXS-XXXL', 'Add to cart enabled for every size', 'Covered');
-add('PDP variants', 'White-only every size added to cart', 'Per-size ATC cart lines', 'P1', 'regression,pdp,cart', 'White-only PDP', '1. Add each size 2. Open cart', '8 lines each Color white with matching size', 'Covered');
-add('PDP variants', 'Black-only locks black and lists all sizes', 'Single-color black SKU', 'P0', 'smoke,pdp', '/products/test-black-only', '1. Open PDP', 'Black color locked; sizes XXS-XXXL; size required', 'Covered');
-add('PDP variants', 'Black-only every size enables ATC', 'Per-size ATC enable', 'P1', 'regression,pdp', 'Black-only PDP', '1. Select each size XXS-XXXL', 'Add to cart enabled for every size', 'Covered');
-add('PDP variants', 'Black-only every size added to cart', 'Per-size ATC cart lines', 'P1', 'regression,pdp,cart', 'Black-only PDP', '1. Add each size 2. Open cart', '8 lines each Color black with matching size', 'Covered');
-add('PDP variants', 'Dual-color requires color before sizes', 'Color-first UX', 'P0', 'smoke,pdp', '/products/test-black-white-both', '1. Open PDP', 'Select a color; sizes hidden', 'Covered');
-add('PDP variants', 'Dual-color switching color clears size', 'Color change resets size', 'P1', 'regression,pdp', 'Dual-color PDP', '1. Select black+M 2. Switch to white', 'Size required again; then XXS enables ATC', 'Covered');
-add('PDP variants', 'Dual-color every color x size enables ATC', 'Full color-size matrix', 'P1', 'regression,pdp', 'Dual-color PDP', '1. For black and white select each size', 'ATC enabled for all 16 pairs', 'Covered');
-add('PDP variants', 'Dual-color every black size in cart', 'Black matrix ATC', 'P1', 'regression,pdp,cart', 'Dual-color PDP', '1. Select black 2. Add every size', '8 cart lines Color black', 'Covered');
-add('PDP variants', 'Dual-color every white size in cart', 'White matrix ATC', 'P1', 'regression,pdp,cart', 'Dual-color PDP', '1. Select white 2. Add every size', '8 cart lines Color white', 'Covered');
-add('PDP variants', 'Dual-color qty 3 with attributes in cart', 'Color size qty cart', 'P1', 'regression,pdp,cart', 'Dual-color PDP', '1. White + XL + qty 3 2. ATC', 'Cart line white XL qty 3', 'Covered');
-add('PDP variants', 'Berserk size is out of stock', 'OOS ATC blocked', 'P0', 'smoke,pdp', '/products/berserk-oversized-tee', '1. Select XS', 'Out of Stock disabled; no Add to cart', 'Covered');
-add('PDP variants', 'Lowercase jjk slug loads Gojo PDP', 'Canonical lowercase slug', 'P1', 'regression,pdp', '/products/jjk', '1. Open lowercase slug', 'Gojo PDP with size controls', 'Covered');
+add('PDP variants', 'White-only locks white and lists all sizes', 'Single-color white SKU', 'P0', 'smoke,pdp,@black-white', '/products/test-white-only', '1. Open PDP', 'White color locked; sizes XXS-XXXL; size required', 'Skipped');
+add('PDP variants', 'White-only every size enables ATC', 'Per-size ATC enable', 'P1', 'regression,pdp,@black-white', 'White-only PDP', '1. Select each size XXS-XXXL', 'Add to cart enabled for every size', 'Skipped');
+add('PDP variants', 'White-only every size added to cart', 'Per-size ATC cart lines', 'P1', 'regression,pdp,cart,@black-white', 'White-only PDP', '1. Add each size 2. Open cart', '8 lines each Color white with matching size', 'Skipped');
+add('PDP variants', 'Black-only locks black and lists all sizes', 'Single-color black SKU', 'P0', 'smoke,pdp,@black-white', '/products/test-black-only', '1. Open PDP', 'Black color locked; sizes XXS-XXXL; size required', 'Skipped');
+add('PDP variants', 'Black-only every size enables ATC', 'Per-size ATC enable', 'P1', 'regression,pdp,@black-white', 'Black-only PDP', '1. Select each size XXS-XXXL', 'Add to cart enabled for every size', 'Skipped');
+add('PDP variants', 'Black-only every size added to cart', 'Per-size ATC cart lines', 'P1', 'regression,pdp,cart,@black-white', 'Black-only PDP', '1. Add each size 2. Open cart', '8 lines each Color black with matching size', 'Skipped');
+add('PDP variants', 'Dual-color requires color before sizes', 'Color-first UX', 'P0', 'smoke,pdp,@black-white', '/products/test-black-white-both', '1. Open PDP', 'Select a color; sizes hidden', 'Skipped');
+add('PDP variants', 'Dual-color switching color clears size', 'Color change resets size', 'P1', 'regression,pdp,@black-white', 'Dual-color PDP', '1. Select black+M 2. Switch to white', 'Size required again; then XXS enables ATC', 'Skipped');
+add('PDP variants', 'Dual-color every color x size enables ATC', 'Full color-size matrix', 'P1', 'regression,pdp,@black-white', 'Dual-color PDP', '1. For black and white select each size', 'ATC enabled for all 16 pairs', 'Skipped');
+add('PDP variants', 'Dual-color every black size in cart', 'Black matrix ATC', 'P1', 'regression,pdp,cart,@black-white', 'Dual-color PDP', '1. Select black 2. Add every size', '8 cart lines Color black', 'Skipped');
+add('PDP variants', 'Dual-color every white size in cart', 'White matrix ATC', 'P1', 'regression,pdp,cart,@black-white', 'Dual-color PDP', '1. Select white 2. Add every size', '8 cart lines Color white', 'Skipped');
+add('PDP variants', 'Dual-color qty 3 with attributes in cart', 'Color size qty cart', 'P1', 'regression,pdp,cart,@black-white', 'Dual-color PDP', '1. White + XL + qty 3 2. ATC', 'Cart line white XL qty 3', 'Skipped');
+add('PDP variants', 'Berserk size is out of stock', 'OOS ATC blocked', 'P0', 'smoke,pdp,@black-white', '/products/berserk-oversized-tee', '1. Select XS', 'Out of Stock disabled; no Add to cart', 'Skipped');
+add('PDP variants', 'Lowercase jjk slug loads Gojo PDP', 'Canonical lowercase slug', 'P1', 'regression,pdp,@black-white', '/products/jjk', '1. Open lowercase slug', 'Gojo PDP with size controls', 'Skipped');
+add('Acid wash', 'Full palette hides sizes until color', 'Five colors', 'P0', 'smoke,pdp,@acid-wash', '/products/akaza-acid-wash-oversized-tee', '1. Open PDP', 'Black Ash Brown Pink Purple; sizes hidden', 'Covered');
+add('Acid wash', 'Sizes S to XXL after color', 'Five sizes', 'P0', 'smoke,pdp,@acid-wash', 'Acid-wash PDP', '1. Select Black', 'S M L XL XXL; size required', 'Covered');
+add('Acid wash', 'Partial palette omits colors', 'Design-specific colors', 'P1', 'regression,pdp,@acid-wash', '/products/shinobu-acid-wash-oversized-tee', '1. Open PDP', 'Black Ash Pink only; Brown and Purple absent', 'Covered');
 add('PDP variants', 'Uppercase JJK slug 404s', 'Non-canonical slug casing', 'P2', 'regression,pdp', '/products/JJK', '1. Open uppercase slug', 'Page Not Found', 'Covered');
-add('PDP layout', 'White-only PDP has no horizontal overflow', 'Page does not scroll sideways', 'P1', 'regression,pdp,layout', 'White-only PDP desktop', '1. Open PDP 2. Measure document width', 'All sizes listed; scrollWidth fits the viewport', 'Covered');
-add('PDP layout', 'Size options listed at laptop width', '1024px size list', 'P1', 'regression,pdp,layout', '1024×768', '1. Open white-only PDP', 'XXS–XXXL listed; no horizontal overflow', 'Covered');
-add('PDP layout', 'Size options listed on mobile viewport', '390px size list', 'P1', 'regression,pdp,layout', '390×844', '1. Open white-only PDP', 'XXS–XXXL listed; no horizontal overflow', 'Covered');
-add('PDP layout', 'Dual-color sizes listed after color select', 'Color-first size list', 'P1', 'regression,pdp,layout', 'Dual-color PDP', '1. Select black 2. Measure sizes', 'XXS–XXXL listed; no horizontal overflow', 'Covered');
-add('PDP layout', 'Wrapped size chips have row gap at 1024', 'Laptop wrap spacing', 'P1', 'regression,pdp,layout', '1024×768 white-only PDP', '1. Open PDP 2. Measure size-chip row gap', 'Wrapped chips have at least 8px row gap', 'Covered');
-add('PDP layout', 'Wrapped size chips have row gap at 390', 'Mobile wrap spacing', 'P1', 'regression,pdp,layout', '390×844 white-only PDP', '1. Open PDP 2. Measure size-chip row gap', 'Wrapped chips have at least 8px row gap', 'Covered');
-add('PDP merchandising', 'PDP and size guide list XXS to XXXL only', 'Size range', 'P2', 'regression,pdp', 'White-only PDP and size guide', '1. List PDP sizes 2. Open size guide', 'Sizes are XXS–XXXL; XXXXL is not offered', 'Covered');
+add('PDP layout', 'Acid-wash PDP has no horizontal overflow', 'Page does not scroll sideways', 'P1', 'regression,pdp,layout,@acid-wash', 'Acid-wash PDP desktop', '1. Select a color 2. Measure document width', 'S–XXL listed; scrollWidth fits the viewport', 'Covered');
+add('PDP layout', 'Size options listed at laptop width', '1024px size list', 'P1', 'regression,pdp,layout,@acid-wash', '1024×768', '1. Open acid-wash PDP and select a color', 'S–XXL listed; no horizontal overflow', 'Covered');
+add('PDP layout', 'Size options listed on mobile viewport', '390px size list', 'P1', 'regression,pdp,layout,@acid-wash', '390×844', '1. Open acid-wash PDP and select a color', 'S–XXL listed; no horizontal overflow', 'Covered');
+add('PDP merchandising', 'PDP lists S to XXL and size guide has no XXXXL', 'Size range', 'P2', 'regression,pdp,@acid-wash', 'Acid-wash PDP and size guide', '1. List PDP sizes 2. Open size guide', 'Sizes are S–XXL; XXXXL is not offered', 'Covered');
 
 add('Wishlist', 'Add product to wishlist and open drawer', 'Wishlist add', 'P0', 'smoke,wishlist', 'Empty wishlist', '1. Add from PDP 2. Open wishlist', 'Item listed', 'Covered');
 add('Wishlist', 'Remove item from wishlist', 'Wishlist remove', 'P1', 'regression,wishlist', 'Item in wishlist', '1. Remove item', 'Empty or item gone', 'Covered');
@@ -126,13 +126,13 @@ add('Cart', 'View cart page after ATC', 'Cart view', 'P0', 'smoke,cart', 'Item a
 add('Cart', 'Increase quantity on cart page', 'Qty increase', 'P1', 'regression,cart', 'Item in cart', '1. Click +', 'Qty and totals update', 'Covered');
 add('Cart', 'Remove item empties cart', 'Remove line', 'P1', 'regression,cart', 'Item in cart', '1. Remove', 'No items found; shop now', 'Covered');
 add('Cart', 'Proceed to checkout from cart', 'Checkout entry', 'P0', 'smoke,cart,checkout', 'Item in cart', '1. Click proceed to checkout', '/checkout loads', 'Covered');
-add('Cart', 'Free delivery remaining under 5000', 'Below threshold', 'P0', 'smoke,cart,checkout', 'Qty 1 of LKR 3490 SKU', '1. ATC qty 1 2. Open cart', 'You are LKR 1,510 away from free delivery', 'Covered');
-add('Cart', 'Free delivery unlocked over 5000', 'Above threshold', 'P0', 'smoke,cart,checkout', 'Qty 2 of LKR 3490 SKU', '1. ATC qty 2 2. Open cart', 'Free delivery unlocked on this order', 'Covered');
+add('Cart', 'Free delivery remaining under 5000', 'Below threshold', 'P0', 'smoke,cart,checkout,@acid-wash', 'Qty 1 of LKR 4490 SKU', '1. ATC qty 1 2. Open cart', 'You are LKR 510 away from free delivery', 'Covered');
+add('Cart', 'Free delivery unlocked over 5000', 'Above threshold', 'P0', 'smoke,cart,checkout,@acid-wash', 'Qty 2 of LKR 4490 SKU', '1. ATC qty 2 2. Open cart', 'Free delivery unlocked on this order', 'Covered');
 add('Cart', 'Free delivery boundary qty 1 to 2', 'Cross threshold on cart', 'P1', 'regression,cart', 'Qty 1 in cart', '1. Increase to 2 2. Decrease to 1', 'Unlocked at 2; remaining at 1', 'Covered');
 add('Cart', 'Same variant added twice merges quantity', 'Qty merge', 'P1', 'regression,cart', 'Empty guest cart', '1. ATC size M 2. ATC size M again', 'One cart line with qty 2', 'Covered');
-add('Cart', 'Price differs for XXS and XXXL', 'Size-based pricing', 'P1', 'regression,cart,pdp', 'White-only PDP', '1. ATC XXS 2. ATC XXXL 3. Open cart', 'XXS 3390; XXXL 3590; subtotal 6980', 'Covered');
+add('Cart', 'Price differs for XXS and XXXL', 'Size-based pricing', 'P1', 'regression,cart,pdp,@black-white', 'White-only PDP', '1. ATC XXS 2. ATC XXXL 3. Open cart', 'XXS 3390; XXXL 3590; subtotal 6980', 'Skipped');
 add('Cart', 'Cart line size and color are read-only', 'No in-cart variant edit', 'P2', 'regression,cart', 'Item in cart', '1. Open cart', 'No size/color editor on the line', 'Covered');
-add('Cart', 'OOS product cannot join an in-stock checkout', 'OOS blocked at ATC', 'P1', 'regression,cart,checkout', 'In-stock line in cart', '1. Open Berserk 2. Confirm OOS 3. Checkout', 'Cart still has one in-stock line; checkout loads', 'Covered');
+add('Cart', 'OOS product cannot join an in-stock checkout', 'OOS blocked at ATC', 'P1', 'regression,cart,checkout,@black-white', 'In-stock line in cart', '1. Open Berserk 2. Confirm OOS 3. Checkout', 'Cart still has one in-stock line; checkout loads', 'Skipped');
 
 add('Info', 'About us page', 'About CMS', 'P1', 'regression,footer', 'Home', '1. Footer About us', '/about-us content loads', 'Covered');
 add('Info', 'Contact section', 'Contact anchor', 'P1', 'regression,footer', 'Home', '1. Footer Contact', '/about-us#contact', 'Covered');
@@ -166,8 +166,8 @@ add('Checkout', 'Checkout loads with billing and payment methods', 'Checkout smo
 add('Checkout', 'Place order disabled when billing incomplete', 'Billing required', 'P1', 'regression,checkout', 'Guest cart', '1. Open checkout without billing 2. Select COD', 'Place Order stays disabled', 'Covered');
 add('Checkout', 'Place order COD guest', 'Full COD order', 'P0', 'smoke,checkout,payment', 'Guest cart', '1. Fill billing 2. COD 3. Accept terms 4. Place order', 'order-success COD', 'Covered');
 add('Checkout', 'Create account at checkout COD', 'Guest create-account order', 'P0', 'smoke,checkout,auth', 'Guest cart; new email', '1. Check Create an account 2. Password 3. COD place order 4. Log in', 'order-success COD; account can log in', 'Covered');
-add('Checkout', 'Free delivery remaining under 5000', 'Checkout below threshold', 'P0', 'smoke,checkout', 'Qty 1 of LKR 3490 SKU', '1. Open checkout', 'You are LKR 1,510 away from free delivery', 'Covered');
-add('Checkout', 'Free delivery unlocked over 5000', 'Checkout above threshold', 'P0', 'smoke,checkout', 'Qty 2 of LKR 3490 SKU', '1. Open checkout', 'Free delivery unlocked on this order', 'Covered');
+add('Checkout', 'Free delivery remaining under 5000', 'Checkout below threshold', 'P0', 'smoke,checkout,@acid-wash', 'Qty 1 of LKR 4490 SKU', '1. Open checkout', 'You are LKR 510 away from free delivery', 'Covered');
+add('Checkout', 'Free delivery unlocked over 5000', 'Checkout above threshold', 'P0', 'smoke,checkout,@acid-wash', 'Qty 2 of LKR 4490 SKU', '1. Open checkout', 'Free delivery unlocked on this order', 'Covered');
 add('Checkout', 'Order confirmation email after guest COD', 'Order confirmation email', 'P0', 'smoke,checkout,@email', 'Staging; AgentMail inbox', '1. Place guest COD with temp email 2. Poll inbox for Order Confirmation', 'Email subject Order Confirmation #GK-*; body includes order id', 'Covered');
 add('Checkout', 'Place order bank transfer guest', 'Full bank order', 'P0', 'smoke,checkout,payment', 'Guest cart', '1. Fill billing 2. Bank 3. Place order', 'order-success BankTransfer with bank details', 'Blocked');
 add('Checkout', 'Gift order disables COD keeps card and bank', 'Gift payment rules', 'P0', 'smoke,checkout,gift', 'Guest cart', '1. Check This order is a gift', 'COD disabled with not-available copy; Card and Bank enabled; gift message shown', 'Covered');

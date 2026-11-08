@@ -4,6 +4,9 @@ import { getGuestBillingDetails } from './checkout.data';
 import { getPayHereCardDefaults, PAYHERE_SANDBOX_CARDS } from './payhere.data';
 import { NEWSLETTER_DATA, PRODUCT_DATA, SEARCH_QUERIES } from './products.data';
 import {
+  ACID_WASH_FULL_PRODUCT,
+  ACID_WASH_PARTIAL_PRODUCT,
+  ACID_WASH_SIZES,
   BLACK_ONLY_PRODUCT,
   DUAL_COLOR_PRODUCT,
   FREE_DELIVERY,
@@ -22,8 +25,10 @@ export const TEST_DATA = {
   },
   searchQueries: SEARCH_QUERIES,
   product: PRODUCT_DATA,
-  sizes: PRODUCT_SIZES,
+  sizes: ACID_WASH_SIZES,
   freeDelivery: FREE_DELIVERY,
+  acidWash: ACID_WASH_FULL_PRODUCT,
+  acidWashPartial: ACID_WASH_PARTIAL_PRODUCT,
   whiteOnly: WHITE_ONLY_PRODUCT,
   blackOnly: BLACK_ONLY_PRODUCT,
   dualColor: DUAL_COLOR_PRODUCT,
@@ -69,13 +74,20 @@ export { getGuestBillingDetails, guestCheckoutEmail } from './checkout.data';
 export { getPayHereCardDefaults, PAYHERE_SANDBOX_CARDS } from './payhere.data';
 export { NEWSLETTER_DATA, PRODUCT_DATA, SEARCH_QUERIES, EMPTY_THEME_COLLECTIONS } from './products.data';
 export {
+  ACID_WASH_COLORS,
+  ACID_WASH_FULL_PRODUCT,
+  ACID_WASH_PARTIAL_PRODUCT,
+  ACID_WASH_PRICE,
+  ACID_WASH_SIZES,
   BLACK_ONLY_PRODUCT,
+  BLACK_WHITE_OFFLINE,
   DUAL_COLOR_PRODUCT,
   DUAL_COLOR_SIZE_MATRIX,
   FREE_DELIVERY,
   OUT_OF_STOCK_PRODUCT,
   PRODUCT_PRICE,
   PRODUCT_SIZES,
+  ProductTypeTag,
   SIZE_RADIO_PATTERN,
   WHITE_ONLY_PRODUCT,
 } from './pdp-variants.data';

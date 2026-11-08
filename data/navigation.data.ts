@@ -1,4 +1,5 @@
 import { AppRoutes } from '@constants/routes';
+import { ProductTypeTag } from '@data/pdp-variants.data';
 import { SOCIAL_URLS } from '@constants/urls';
 import type {
   FooterLink,
@@ -66,16 +67,11 @@ export const MAIN_NAV_DROPDOWNS: readonly NavCategory[] = [
     category: 'Men',
     items: [
       { name: "View All Men's", path: '/collection/men', heading: /^Men's Wear$/i },
-      { name: 'Hoodies', path: '/collection/men/hoodies', heading: /^Men's Hoodies$/i },
       {
-        name: 'Oversized T-Shirts',
-        path: '/collection/men/oversized-tees',
-        heading: /^Men's Oversized T-Shirts$/i,
-      },
-      {
-        name: 'Regular T-Shirts',
-        path: '/collection/men/regular-tees',
-        heading: /^Men's Regular T-Shirts$/i,
+        name: 'Acid Washed Oversized',
+        path: '/collection/men/acid-washed-oversized',
+        heading: /^Men's Acid Washed Oversized$/i,
+        tag: ProductTypeTag.AcidWash,
       },
     ],
   },
@@ -83,23 +79,23 @@ export const MAIN_NAV_DROPDOWNS: readonly NavCategory[] = [
     category: 'Women',
     items: [
       { name: "View All Women's", path: '/collection/women', heading: /^Women's Wear$/i },
-      { name: 'Hoodies', path: '/collection/women/hoodies', heading: /^Women's Hoodies$/i },
       {
-        name: 'Oversized T-Shirts',
-        path: '/collection/women/oversized-tees',
-        heading: /^Women's Oversized T-Shirts$/i,
-      },
-      {
-        name: 'Regular T-Shirts',
-        path: '/collection/women/regular-tees',
-        heading: /^Women's Regular T-Shirts$/i,
+        name: 'Acid Washed Oversized',
+        path: '/collection/women/acid-washed-oversized',
+        heading: /^Women's Acid Washed Oversized$/i,
+        tag: ProductTypeTag.AcidWash,
       },
     ],
   },
   {
     category: 'Collections',
     items: [
-      { name: 'Anime', path: '/collection/anime', heading: /^Anime Collection$/i },
+      {
+        name: 'Anime',
+        path: '/collection/anime',
+        heading: /^Anime Collection$/i,
+        tag: ProductTypeTag.Anime,
+      },
       { name: 'Originals', path: '/collection/originals', heading: /^Originals Collection$/i },
       { name: 'Culture', path: '/collection/culture', heading: /^Culture Collection$/i },
       { name: 'JDM', path: '/collection/jdm', heading: /^JDM Collection$/i },

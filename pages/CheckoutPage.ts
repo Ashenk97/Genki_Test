@@ -3,6 +3,7 @@ import { AUTH_MESSAGES } from '@constants/messages';
 import { PaymentMethod } from '@constants/payment';
 import { Timeouts } from '@constants/timeouts';
 import { CHECKOUT_PAGE } from '@data/navigation.data';
+import { FREE_DELIVERY } from '@data/pdp-variants.data';
 import { getGuestBillingDetails } from '@data/checkout.data';
 import { lkrAmountPattern } from '@helpers/string';
 import { BasePage } from '@pages/BasePage';
@@ -425,7 +426,7 @@ export class CheckoutPage extends BasePage {
 
   async expectFreeDeliveryRemaining(): Promise<void> {
     await expect(this.page.locator('.free-shipping-progress__message').first()).toHaveText(
-      /you're\s+lkr\s*1,?510\s+away from free delivery/i,
+      FREE_DELIVERY.remainingMessage,
     );
   }
 

@@ -1,18 +1,23 @@
 import {
+  ACID_WASH_PRICE,
+  BLACK_WHITE_OFFLINE,
   OUT_OF_STOCK_PRODUCT,
   PRODUCT_PRICE,
+  ProductTypeTag,
   WHITE_ONLY_PRODUCT,
 } from '@data/pdp-variants.data';
+import { PRODUCT_DATA } from '@data/products.data';
 import { test } from '@fixtures/test-fixtures';
 import { addProductToCart, addSampleProductToCart } from '@helpers/cart.helper';
 
-test.describe('Cart edges', () => {
+test.describe('Cart edges', { tag: ProductTypeTag.AcidWash }, () => {
   test('should merge quantity when the same variant is added twice', async ({
     productDetailsPage,
     cartPage,
   }) => {
-    await test.step('Add the same white-only M line twice', async () => {
-      await productDetailsPage.open(WHITE_ONLY_PRODUCT.path);
+    await test.step('Add the same Black / M line twice', async () => {
+      await productDetailsPage.open(PRODUCT_DATA.samplePath);
+      await productDetailsPage.selectColor(PRODUCT_DATA.sampleColor);
       await productDetailsPage.selectSize('M');
       await productDetailsPage.addToCart();
       await productDetailsPage.expectAddedToCart();
@@ -25,14 +30,18 @@ test.describe('Cart edges', () => {
       await cartPage.expectLoaded();
       await cartPage.expectItemCount(1);
       await cartPage.expectQuantity(2);
-      await cartPage.expectSubtotal(PRODUCT_PRICE.unit * 2);
+      await cartPage.expectSubtotal(ACID_WASH_PRICE.unit * 2);
     });
   });
 
-  test('should price XXS lower and XXXL higher than the default size', async ({
+  test(
+    'should price XXS lower and XXXL higher than the default size',
+    { tag: ProductTypeTag.BlackWhite },
+    async ({
     productDetailsPage,
     cartPage,
   }) => {
+    test.skip(true, BLACK_WHITE_OFFLINE);
     await test.step('XXS shows LKR 3390 on the PDP and in cart', async () => {
       await productDetailsPage.open(WHITE_ONLY_PRODUCT.path);
       await productDetailsPage.selectSize('XXS');
@@ -64,18 +73,22 @@ test.describe('Cart edges', () => {
       await addSampleProductToCart(productDetailsPage, { size: 'L' });
       await cartPage.open();
       await cartPage.expectHasItems();
-      await cartPage.expectLineWithAttributes({ color: 'white', size: 'L' });
+      await cartPage.expectLineWithAttributes({ color: PRODUCT_DATA.sampleColor, size: 'L' });
     });
     await test.step('No size or color editor on the cart line', async () => {
       await cartPage.expectLineAttributesReadOnly();
     });
   });
 
-  test('should not add an out-of-stock product and still checkout the in-stock line', async ({
+  test(
+    'should not add an out-of-stock product and still checkout the in-stock line',
+    { tag: ProductTypeTag.BlackWhite },
+    async ({
     productDetailsPage,
     cartPage,
     checkoutPage,
   }) => {
+    test.skip(true, BLACK_WHITE_OFFLINE);
     await test.step('Add an in-stock product', async () => {
       await addProductToCart(productDetailsPage, WHITE_ONLY_PRODUCT.path, { size: 'M' });
     });

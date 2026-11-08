@@ -1,5 +1,6 @@
 import { Locator, Page, expect } from '@playwright/test';
 import { CART_PAGE } from '@data/navigation.data';
+import { FREE_DELIVERY } from '@data/pdp-variants.data';
 import { AppRoutes } from '@constants/routes';
 import { Timeouts } from '@constants/timeouts';
 import { lkrAmountPattern } from '@helpers/string';
@@ -73,17 +74,17 @@ export class CartPage extends BasePage {
       row = row.filter({ hasText: attrs.name });
     }
     if (attrs.color) {
-      row = row.filter({ hasText: `Color: ${attrs.color}` });
+      row = row.filter({ hasText: new RegExp(`Color:\\s*${attrs.color}`, 'i') });
     }
     if (attrs.size) {
-      row = row.filter({ hasText: `Size: ${attrs.size}` });
+      row = row.filter({ hasText: new RegExp(`Size:\\s*${attrs.size}`, 'i') });
     }
     await expect(row.first()).toBeVisible();
   }
 
   async expectFreeDeliveryRemaining(): Promise<void> {
     await expect(this.page.locator('.free-shipping-progress__message').first()).toHaveText(
-      /you're\s+lkr\s*1,?510\s+away from free delivery/i,
+      FREE_DELIVERY.remainingMessage,
     );
   }
 

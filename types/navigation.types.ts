@@ -2,6 +2,8 @@ export interface NavDestination {
   readonly name: string;
   readonly path: string;
   readonly heading: RegExp;
+  /** Playwright tag such as `@acid-wash` or `@anime`. */
+  readonly tag?: string;
 }
 
 export interface NavCategory {

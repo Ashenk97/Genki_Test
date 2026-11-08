@@ -1,24 +1,32 @@
 import { PRODUCT_DATA } from '@data/products.data';
 import {
-  PRODUCT_PRICE,
-  PRODUCT_SIZES,
-  WHITE_ONLY_PRODUCT,
+  ACID_WASH_PRICE,
+  ACID_WASH_SIZES,
+  ProductTypeTag,
 } from '@data/pdp-variants.data';
 import { test } from '@fixtures/test-fixtures';
 
-test.describe('Individual product', () => {
+test.describe('Individual product', { tag: ProductTypeTag.AcidWash }, () => {
   test('should show title, price, and add to cart controls', async ({ productDetailsPage }) => {
-    await test.step('Open in-stock white-only PDP', async () => {
+    await test.step('Open in-stock acid-wash PDP', async () => {
       await productDetailsPage.open(PRODUCT_DATA.samplePath);
       await productDetailsPage.expectProductDetailsVisible();
-      await productDetailsPage.expectProductTitle(WHITE_ONLY_PRODUCT.name);
+      await productDetailsPage.expectProductTitle(PRODUCT_DATA.sampleNamePattern);
       await productDetailsPage.expectFreeDeliveryNote();
     });
   });
 
-  test('should require a size before add to cart is available', async ({ productDetailsPage }) => {
-    await test.step('Open PDP without selecting a size', async () => {
+  test('should require a color and then a size before add to cart is available', async ({
+    productDetailsPage,
+  }) => {
+    await test.step('Open PDP without selecting a color', async () => {
       await productDetailsPage.open(PRODUCT_DATA.samplePath);
+      await productDetailsPage.expectColorRequired();
+      await productDetailsPage.expectSizesHidden();
+      await productDetailsPage.expectQuantityStepperDisabled();
+    });
+    await test.step('Select a color and expect a size', async () => {
+      await productDetailsPage.selectColor(PRODUCT_DATA.sampleColor);
       await productDetailsPage.expectSizeRequired();
       await productDetailsPage.expectQuantityStepperDisabled();
     });
@@ -34,7 +42,7 @@ test.describe('Individual product', () => {
   });
 
   test('should select a specific size from the size matrix', async ({ productDetailsPage }) => {
-    await test.step('Select size M on black-only PDP', async () => {
+    await test.step('Select size M on the acid-wash PDP', async () => {
       await productDetailsPage.open(PRODUCT_DATA.secondaryPath);
       await productDetailsPage.selectSize(PRODUCT_DATA.defaultSize);
       await productDetailsPage.expectAddToCartVisible();
@@ -101,7 +109,7 @@ test.describe('Individual product', () => {
       await cartPage.open();
       await cartPage.expectHasItems();
       await cartPage.expectQuantity(3);
-      await cartPage.expectSubtotal(PRODUCT_PRICE.unit * 3);
+      await cartPage.expectSubtotal(ACID_WASH_PRICE.unit * 3);
     });
   });
 
@@ -115,11 +123,12 @@ test.describe('Individual product', () => {
     });
   });
 
-  test('should list every size from XXS to XXXL', async ({ productDetailsPage }) => {
-    await test.step('White-only PDP exposes the full size matrix', async () => {
+  test('should list every acid-wash size from S to XXL', async ({ productDetailsPage }) => {
+    await test.step('Acid-wash PDP exposes S through XXL after a color is chosen', async () => {
       await productDetailsPage.open(PRODUCT_DATA.samplePath);
-      await productDetailsPage.expectListedSizes(PRODUCT_SIZES);
-      await productDetailsPage.expectAvailableSizeCount(PRODUCT_SIZES.length);
+      await productDetailsPage.selectColor(PRODUCT_DATA.sampleColor);
+      await productDetailsPage.expectListedSizes(ACID_WASH_SIZES);
+      await productDetailsPage.expectAvailableSizeCount(ACID_WASH_SIZES.length);
     });
   });
 

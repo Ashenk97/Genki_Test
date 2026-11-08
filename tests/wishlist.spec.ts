@@ -1,7 +1,8 @@
 import { PRODUCT_DATA } from '@data/products.data';
+import { ProductTypeTag } from '@data/pdp-variants.data';
 import { test } from '@fixtures/test-fixtures';
 
-test.describe('Wishlist', () => {
+test.describe('Wishlist', { tag: ProductTypeTag.AcidWash }, () => {
   test('should add a product and show it in the wishlist drawer', async ({
     productDetailsPage,
     header,

@@ -1,27 +1,26 @@
 import {
-  BLACK_ONLY_PRODUCT,
-  DUAL_COLOR_PRODUCT,
-  PRODUCT_SIZES,
-  WHITE_ONLY_PRODUCT,
+  ACID_WASH_FULL_PRODUCT,
+  ACID_WASH_PARTIAL_PRODUCT,
+  ACID_WASH_SIZES,
 } from './pdp-variants.data';
 
 export const PRODUCT_DATA = {
-  defaultSize: 'M',
-  samplePath: WHITE_ONLY_PRODUCT.path,
-  sampleNamePattern: WHITE_ONLY_PRODUCT.name,
-  sampleColor: WHITE_ONLY_PRODUCT.lockedColor,
-  /** Second in-stock sized product for multi-line cart scenarios */
-  secondaryPath: BLACK_ONLY_PRODUCT.path,
-  secondaryNamePattern: BLACK_ONLY_PRODUCT.name,
-  secondaryColor: BLACK_ONLY_PRODUCT.lockedColor,
-  secondarySize: 'L',
+  defaultSize: ACID_WASH_FULL_PRODUCT.defaultSize,
+  samplePath: ACID_WASH_FULL_PRODUCT.path,
+  sampleNamePattern: ACID_WASH_FULL_PRODUCT.name,
+  sampleColor: ACID_WASH_FULL_PRODUCT.defaultColor,
+  /** Second in-stock product for multi-line cart scenarios (fewer colors) */
+  secondaryPath: ACID_WASH_PARTIAL_PRODUCT.path,
+  secondaryNamePattern: ACID_WASH_PARTIAL_PRODUCT.name,
+  secondaryColor: ACID_WASH_PARTIAL_PRODUCT.defaultColor,
+  secondarySize: ACID_WASH_PARTIAL_PRODUCT.defaultSize,
   /** Color-variant PDP (requires color before sizes) */
-  colorVariantPath: DUAL_COLOR_PRODUCT.path,
-  colorVariantNamePattern: DUAL_COLOR_PRODUCT.name,
-  colorVariantColor: 'black',
-  colorVariantSize: 'M',
-  colorVariantColors: DUAL_COLOR_PRODUCT.colors,
-  sizes: PRODUCT_SIZES,
+  colorVariantPath: ACID_WASH_FULL_PRODUCT.path,
+  colorVariantNamePattern: ACID_WASH_FULL_PRODUCT.name,
+  colorVariantColor: ACID_WASH_FULL_PRODUCT.defaultColor,
+  colorVariantSize: ACID_WASH_FULL_PRODUCT.defaultSize,
+  colorVariantColors: ACID_WASH_FULL_PRODUCT.colors,
+  sizes: ACID_WASH_SIZES,
   /** Canonical lowercase product slug */
   canonicalSlugPath: '/products/jjk',
   /** Non-canonical casing 404s; slugs are lowercase-only */

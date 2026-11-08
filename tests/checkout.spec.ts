@@ -4,10 +4,11 @@ import { TEST_DATA } from '@data/index';
 import { guestCheckoutEmail } from '@data/checkout.data';
 import { strongPassword } from '@helpers/random';
 import { test } from '@fixtures/test-fixtures';
+import { ProductTypeTag } from '@data/pdp-variants.data';
 import { addSampleProductToCart } from '@helpers/cart.helper';
 import { startGuestCardCheckout } from '@helpers/checkout.helper';
 
-test.describe('Checkout', () => {
+test.describe('Checkout', { tag: ProductTypeTag.AcidWash }, () => {
   test('should load checkout with billing and payment methods', async ({
     productDetailsPage,
     checkoutPage,

@@ -1,11 +1,11 @@
-import { PRODUCT_PRICE } from '@data/pdp-variants.data';
+import { ACID_WASH_PRICE, ProductTypeTag } from '@data/pdp-variants.data';
 import { test } from '@fixtures/test-fixtures';
 import {
   addSampleProductToCart,
   addSecondaryProductToCart,
 } from '@helpers/cart.helper';
 
-test.describe('Cart', () => {
+test.describe('Cart', { tag: ProductTypeTag.AcidWash }, () => {
   test('should show the cart page with the added line item', async ({
     productDetailsPage,
     cartPage,
@@ -166,16 +166,16 @@ test.describe('Cart', () => {
   });
 });
 
-test.describe('Free delivery threshold', () => {
+test.describe('Free delivery threshold', { tag: ProductTypeTag.AcidWash }, () => {
   test('should show remaining amount when the cart is below LKR 5,000', async ({
     productDetailsPage,
     cartPage,
   }) => {
-    await test.step('Add qty 1 (LKR 3,490)', async () => {
+    await test.step('Add qty 1 (LKR 4,490)', async () => {
       await addSampleProductToCart(productDetailsPage, { quantity: 1 });
       await cartPage.open();
       await cartPage.expectHasItems();
-      await cartPage.expectSubtotal(PRODUCT_PRICE.unit);
+      await cartPage.expectSubtotal(ACID_WASH_PRICE.unit);
       await cartPage.expectFreeDeliveryRemaining();
     });
   });
@@ -184,12 +184,12 @@ test.describe('Free delivery threshold', () => {
     productDetailsPage,
     cartPage,
   }) => {
-    await test.step('Add qty 2 (LKR 6,980)', async () => {
+    await test.step('Add qty 2 (LKR 8,980)', async () => {
       await addSampleProductToCart(productDetailsPage, { quantity: 2 });
       await cartPage.open();
       await cartPage.expectHasItems();
       await cartPage.expectQuantity(2);
-      await cartPage.expectSubtotal(PRODUCT_PRICE.unit * 2);
+      await cartPage.expectSubtotal(ACID_WASH_PRICE.unit * 2);
       await cartPage.expectFreeDeliveryUnlocked();
     });
   });
