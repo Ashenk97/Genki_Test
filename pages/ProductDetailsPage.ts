@@ -3,6 +3,7 @@ import { AUTH_MESSAGES } from '@constants/messages';
 import { ToastType } from '@constants/payment';
 import { FREE_DELIVERY, SIZE_RADIO_PATTERN } from '@data/pdp-variants.data';
 import { lkrAmountPattern } from '@helpers/string';
+import { rejectedSizes } from '@helpers/rejected-sizes';
 import { BasePage } from '@pages/BasePage';
 
 export class ProductDetailsPage extends BasePage {
@@ -227,14 +228,17 @@ export class ProductDetailsPage extends BasePage {
       const quantity = Number(match[3]);
       quantities.set(size, Math.max(quantities.get(size) ?? 0, quantity));
     }
-    // The PDP still advertises Black/L and Black/M after checkout has zeroed them.
-    // Prefer XL, which staging checkout currently accepts, then the next listed sizes.
+    const blocked = rejectedSizes();
     const preferred = ['XL', 'XXL', 'L', 'M', 'S'];
-    const chosen = preferred.find((size) => (quantities.get(size) ?? 0) >= minimum);
+    const start = Number(process.env.TEST_WORKER_INDEX || 0) % preferred.length;
+    const ordered = [...preferred.slice(start), ...preferred.slice(0, start)];
+    const chosen = ordered.find((size) => !blocked.has(size) && (quantities.get(size) ?? 0) >= minimum);
     if (chosen) {
       return chosen;
     }
-    const fallback = [...quantities.entries()].find(([, quantity]) => quantity >= minimum);
+    const fallback = [...quantities.entries()].find(
+      ([size, quantity]) => !blocked.has(size) && quantity >= minimum,
+    );
     if (!fallback) {
       throw new Error(
         `No size with at least ${minimum} in stock${color ? ` for ${color}` : ''} on ${this.page.url()}`,
